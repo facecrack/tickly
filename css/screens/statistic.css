@@ -1,0 +1,381 @@
+/*
+ * Statistic — экран статистики (Weekly + Overall).
+ */
+
+
+/* ============================================
+   TABS — переключатель Weekly / Overall
+   ============================================ */
+
+.stat-tabs {
+    background: var(--bg-card);
+    border-radius: var(--radius-full);
+    padding: 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 24px;
+}
+
+.stat-tab {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 10px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.stat-tab-active {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+
+/* ============================================
+   SECTION
+   ============================================ */
+
+.stat-section {
+    margin-bottom: 24px;
+}
+
+
+/* ============================================
+   SUMMARY CARDS (Overall)
+   ============================================ */
+
+.stat-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.stat-summary-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.stat-summary-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0 0 8px;
+}
+
+.stat-summary-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.stat-summary-value span {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+
+/* ============================================
+   WEEKLY CARDS
+   ============================================ */
+
+.stat-weekly-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-week-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+}
+
+.stat-week-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-week-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-week-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.stat-week-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-week-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+}
+
+.stat-week-streak {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.stat-week-schedule {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.stat-week-divider {
+    height: 1px;
+    background: var(--bg-elevated);
+    margin-bottom: 16px;
+}
+
+.stat-week-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.stat-week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-week-day-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.stat-week-day-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-week-day-circle-done {
+    background: var(--brand-lime);
+}
+
+.stat-week-day-circle-missed {
+    background: var(--status-red);
+}
+
+.stat-week-day-circle-skipped {
+    background: var(--text-secondary);
+}
+
+/* Сегодня + не done — белая обводка ВНУТРИ */
+.stat-week-day-circle-today {
+    background: var(--bg-elevated);
+    box-shadow: inset 0 0 0 2px var(--text-primary);
+}
+
+.stat-week-day-today-label {
+    color: var(--brand-lime);
+}
+
+.stat-week-day-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--bg-primary);
+}
+
+
+/* ============================================
+   OVERALL HEATMAP
+   ============================================ */
+
+.stat-overall-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-overall-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+}
+
+.stat-overall-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-overall-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-overall-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.stat-overall-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-overall-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 2px;
+}
+
+.stat-overall-meta {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.stat-overall-percent {
+    font-size: 14px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.stat-heatmap-wrap {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.stat-heatmap-labels {
+    display: grid;
+    grid-template-rows: repeat(7, 1fr);
+    gap: 3px;
+    align-items: center;
+}
+
+.stat-heatmap-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    line-height: 1;
+}
+
+.stat-heatmap-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 3px;
+}
+
+.stat-heatmap-cell {
+    aspect-ratio: 1;
+    background: var(--bg-elevated);
+    border-radius: 3px;
+}
+
+.stat-heatmap-cell-skipped {
+    background: var(--text-secondary);
+}
+
+.stat-heatmap-cell-missed {
+    background: var(--status-red);
+}
+
+/* Сегодня + не done — белая внутренняя обводка */
+.stat-heatmap-cell-today {
+    background: var(--bg-elevated);
+    box-shadow: inset 0 0 0 2px var(--text-primary);
+}
+
+/* Done — лайм, согласован с легендой */
+.stat-heatmap-cell-done {
+    background: var(--brand-lime);
+}
+
+/* Сегодняшний день недели в столбце слева */
+.stat-heatmap-label-today {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stat-overall-divider {
+    height: 1px;
+    background: var(--bg-elevated);
+    margin-bottom: 12px;
+}
+
+.stat-overall-legend {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.stat-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.stat-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.stat-legend-dot-done {
+    background: var(--brand-lime);
+}
+
+.stat-legend-dot-skipped {
+    background: var(--text-secondary);
+}
+
+.stat-legend-dot-missed {
+    background: var(--status-red);
+}

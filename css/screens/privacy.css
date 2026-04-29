@@ -1,0 +1,121 @@
+/*
+ * Privacy — экран политики конфиденциальности.
+ */
+
+
+/* ============================================
+   HERO — большая иконка + заголовок + описание
+   ============================================ */
+
+.privacy-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.privacy-hero-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-md);
+    background: var(--brand-lime-25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.privacy-hero-icon-mask {
+    width: 20px;
+    height: 22px;
+    background-color: var(--brand-lime);
+    -webkit-mask: url('../../icons/shield.svg') no-repeat center / contain;
+    mask: url('../../icons/shield.svg') no-repeat center / contain;
+}
+
+.privacy-hero-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.privacy-hero-subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 320px;
+}
+
+
+/* ============================================
+   PRIVACY ROW — общие стили
+   ============================================ */
+
+.privacy-row {
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.privacy-row-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+
+/* ============================================
+   PRIVACY ROW DO — с галочкой, по 16px сверху-снизу
+   ============================================ */
+
+.privacy-row-do {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+
+/* ============================================
+   PRIVACY ROW DON'T — фиксированная высота 56px
+   ============================================ */
+
+.privacy-row-dont {
+    height: 56px;
+}
+
+
+/* ============================================
+   ICONS — отдельные классы для галочки и крестика
+   ============================================ */
+
+.privacy-icon-check {
+    width: 12px;
+    height: 9px;
+    flex-shrink: 0;
+    /* Лаймовый */
+    filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
+}
+
+.privacy-icon-close {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    background-color: var(--status-red);
+    -webkit-mask: url('../../icons/close.svg') no-repeat center / contain;
+    mask: url('../../icons/close.svg') no-repeat center / contain;
+}
+/* ============================================
+   LAST UPDATED
+   ============================================ */
+
+.privacy-updated {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: 16px;
+}

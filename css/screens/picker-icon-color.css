@@ -1,0 +1,88 @@
+/*
+ * Icon & color picker — содержимое модалки.
+ */
+
+
+/* ============================================
+   PREVIEW — большой квадрат сверху
+   ============================================ */
+
+.picker-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.picker-preview-box {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-md);
+    background: var(--brand-purple-25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+
+/* ============================================
+   GROUP — обёртка для COLOR / ICON секций
+   ============================================ */
+
+.picker-group {
+    margin-bottom: 32px;
+}
+
+.picker-group .form-label {
+    margin-bottom: 12px;
+}
+
+
+/* ============================================
+   COLOR — 5 кружочков
+   ============================================ */
+
+.color-options {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    border: 2px solid transparent;
+    flex-shrink: 0;
+}
+
+.color-option-active {
+    border-color: var(--text-primary);
+}
+
+
+/* ============================================
+   ICON — сетка 7×4 эмоджи
+   ============================================ */
+
+.icon-options {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.icon-option {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    border: 2px solid transparent;
+    background: var(--bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    padding: 0;
+}
+
+.icon-option-active {
+    border-color: var(--brand-lime);
+}

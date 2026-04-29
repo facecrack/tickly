@@ -1,0 +1,107 @@
+/*
+ * Feedback — экран отправки обратной связи.
+ */
+
+
+/* ============================================
+   CATEGORIES — chips с категориями
+   ============================================ */
+
+.feedback-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.feedback-chip {
+    height: 40px;
+    background: var(--bg-card);
+    border-radius: var(--radius-full);
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.feedback-chip-active {
+    background: var(--brand-lime-25);
+}
+
+.feedback-chip-emoji {
+    font-size: 14px;
+}
+
+.feedback-chip-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.feedback-chip-active .feedback-chip-label {
+    color: var(--brand-lime);
+}
+
+
+/* ============================================
+   TEXTAREA — поле ввода сообщения
+   ============================================ */
+
+.feedback-textarea {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+    resize: none;
+    border: none;
+    outline: none;
+    min-height: 200px;
+}
+
+.feedback-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.feedback-counter {
+    text-align: right;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+
+/* ============================================
+   INFO — информационный блок снизу
+   ============================================ */
+
+.feedback-info {
+    background: var(--brand-purple-25);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.feedback-info-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    background-color: var(--brand-purple);
+    -webkit-mask: url('../../icons/info.svg') no-repeat center / contain;
+    mask: url('../../icons/info.svg') no-repeat center / contain;
+    margin-top: 2px;
+}
+
+.feedback-info-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+    flex: 1;
+}

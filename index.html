@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1D1D1D">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+		<link rel="manifest" href="manifest.json">
+		<link rel="apple-touch-icon" sizes="180x180" href="icons/app-icon-180.png">
+    <title>Habit Tracker</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ============================================
+         SCREENS
+         ============================================ -->
+
+    <!-- 01 — MAIN -->
+    <main class="screen" data-screen="main">
+        <header class="main-header">
+            <div class="main-greeting-block">
+                <p class="main-date">Saturday, April 25</p>
+                <h1 class="main-greeting">How's it going?</h1>
+            </div>
+        </header>
+
+        <section class="week">
+    <header class="week-header">
+        <h2 class="week-title">Last 5 days</h2>
+    </header>
+
+    <ul class="week-days"></ul>
+    <ul class="week-moods"></ul>
+</section>
+
+        <section class="counters">
+            <header class="section-header">
+                <h2 class="section-title">Daily check-in</h2>
+                <span class="section-meta">0 counters</span>
+            </header>
+            <ul class="counters-list"></ul>
+        </section>
+
+        <section class="today">
+            <header class="section-header">
+                <h2 class="section-title">Today</h2>
+                <span class="section-meta">0 of 0 done</span>
+            </header>
+            <ul class="today-list"></ul>
+        </section>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn" data-action="open-statistic">
+    <img src="icons/stats.svg" alt="" class="nav-icon-img">
+    <span class="nav-label">Statistic</span>
+</button>
+
+            <button class="nav-btn nav-btn-primary" data-action="new-habit">
+                <img src="icons/plus.svg" alt="" class="nav-plus">
+                <span class="nav-label">New habit</span>
+            </button>
+
+            <button class="nav-btn" data-action="open-settings">
+                <img src="icons/settings.svg" alt="" class="nav-icon-img">
+                <span class="nav-label">Settings</span>
+            </button>
+        </nav>
+    </main>
+
+
+    <!-- 02 — MAIN EMPTY -->
+    <main class="screen empty-screen" data-screen="main-empty" hidden>
+        <header class="empty-header">
+            <p class="empty-date">Saturday, April 25</p>
+            <h1 class="empty-greeting">Welcome 👋</h1>
+        </header>
+
+        <div class="empty-illustration">
+            <div class="empty-card empty-card-1">💪</div>
+            <div class="empty-card empty-card-2">📖</div>
+            <div class="empty-card empty-card-center">✨</div>
+            <div class="empty-card empty-card-3">💧</div>
+            <div class="empty-card empty-card-4">🧘</div>
+        </div>
+
+        <div class="empty-bottom">
+            <h2 class="empty-title">Create your first habit</h2>
+            <p class="empty-subtitle">Pick something small. One glass of water, one page read, one minute of stretching.</p>
+
+            <button class="empty-cta" data-action="new-habit">
+                <img src="icons/plus.svg" alt="" class="empty-cta-icon">
+                <span>Create habit</span>
+            </button>
+        </div>
+    </main>
+
+
+    <!-- 03 — NEW HABIT BINARY -->
+    <main class="screen new-habit-screen" data-screen="new-habit-binary" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="back-to-main">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">New habit</h1>
+            <button class="save-btn save-btn-disabled" data-action="save-habit">Save</button>
+        </header>
+
+        <section class="icon-picker">
+            <button class="icon-preview icon-preview-active" data-action="open-icon-picker">
+                <span class="icon-preview-emoji">💪</span>
+            </button>
+            <div class="icon-picker-text">
+                <p class="icon-picker-label">Icon & color</p>
+                <p class="icon-picker-hint">Tap to change</p>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">NAME</label>
+            <input type="text" class="form-input form-input-field" placeholder="Enter habit name…" maxlength="40">
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">TYPE</label>
+            <div class="type-switch">
+                <button class="type-option type-option-active">
+                    <span class="type-option-title">Yes / No</span>
+                    <span class="type-option-hint">Did you do it today?</span>
+                </button>
+                <button class="type-option">
+                    <span class="type-option-title">Counter</span>
+                    <span class="type-option-hint">How much today?</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">SCHEDULE</label>
+            <div class="schedule">
+                <div class="schedule-days">
+                    <button class="schedule-day schedule-day-active">M</button>
+                    <button class="schedule-day">T</button>
+                    <button class="schedule-day schedule-day-active">W</button>
+                    <button class="schedule-day">T</button>
+                    <button class="schedule-day schedule-day-active">F</button>
+                    <button class="schedule-day">S</button>
+                    <button class="schedule-day">S</button>
+                </div>
+                <div class="schedule-presets">
+                    <button class="preset">Every day</button>
+                    <button class="preset">Weekdays</button>
+                    <button class="preset">Weekends</button>
+                    <button class="preset preset-active">Custom</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">REMINDER</label>
+            <div class="reminder">
+                <button class="reminder-info" data-action="open-time-picker">
+                    <img src="icons/bell.svg" alt="" class="reminder-icon">
+                    <span class="reminder-time">9:00 AM</span>
+                </button>
+                <button class="toggle toggle-on">
+                    <span class="toggle-thumb"></span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- 04 — NEW HABIT COUNTER -->
+    <main class="screen new-habit-screen" data-screen="new-habit-counter" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="back-to-main">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">New habit</h1>
+            <button class="save-btn" data-action="save-habit">Save</button>
+        </header>
+
+        <section class="icon-picker">
+            <button class="icon-preview icon-preview-active" data-action="open-icon-picker">
+                <span class="icon-preview-emoji">🇩🇪</span>
+            </button>
+            <div class="icon-picker-text">
+                <p class="icon-picker-label">Icon & color</p>
+                <p class="icon-picker-hint">Tap to change</p>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">NAME</label>
+            <input type="text" class="form-input form-input-field" placeholder="Enter habit name…" maxlength="40">
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">TYPE</label>
+            <div class="type-switch">
+                <button class="type-option">
+                    <span class="type-option-title">Yes / No</span>
+                    <span class="type-option-hint">Did you do it today?</span>
+                </button>
+                <button class="type-option type-option-active">
+                    <span class="type-option-title">Counter</span>
+                    <span class="type-option-hint">How much today?</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">TARGET</label>
+            <div class="target">
+                <div class="target-row">
+                    <div class="target-goal">
+                        <label class="target-sublabel">Goal</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" class="target-input" placeholder="0">
+                    </div>
+                    <div class="target-unit">
+                        <label class="target-sublabel">Unit</label>
+                        <button class="target-unit-btn" data-action="open-unit-picker">
+                            <span>Choose unit</span>
+                            <img src="icons/chevron-down.svg" alt="" class="target-unit-arrow">
+                        </button>
+                    </div>
+                </div>
+                <div class="target-step">
+                    <span class="target-step-label">Each tap adds</span>
+                    <div class="target-step-controls">
+                        <button class="step-btn step-btn-minus" data-action="step-decrement">
+                            <img src="icons/minus.svg" alt="">
+                        </button>
+                        <span class="step-value">1</span>
+                        <button class="step-btn step-btn-plus" data-action="step-increment">
+                            <img src="icons/plus.svg" alt="">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">SCHEDULE</label>
+            <div class="schedule">
+                <div class="schedule-days">
+                    <button class="schedule-day schedule-day-active">M</button>
+                    <button class="schedule-day schedule-day-active">T</button>
+                    <button class="schedule-day schedule-day-active">W</button>
+                    <button class="schedule-day schedule-day-active">T</button>
+                    <button class="schedule-day schedule-day-active">F</button>
+                    <button class="schedule-day schedule-day-active">S</button>
+                    <button class="schedule-day schedule-day-active">S</button>
+                </div>
+                <div class="schedule-presets">
+                    <button class="preset preset-active">Every day</button>
+                    <button class="preset">Weekdays</button>
+                    <button class="preset">Weekends</button>
+                    <button class="preset">Custom</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">REMINDER</label>
+            <div class="reminder">
+                <button class="reminder-info" data-action="open-time-picker">
+                    <img src="icons/bell.svg" alt="" class="reminder-icon">
+                    <span class="reminder-time reminder-time-off">Off</span>
+                </button>
+                <button class="toggle">
+                    <span class="toggle-thumb"></span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- 05 — HABIT DETAIL BINARY -->
+    <main class="screen detail-screen" data-screen="habit-detail-binary" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="back-to-main">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">Habit details</h1>
+            <div class="form-header-spacer"></div>
+        </header>
+
+        <section class="detail-card">
+            <header class="detail-head">
+                <div class="detail-icon detail-icon-purple">💪</div>
+                <div class="detail-head-text">
+                    <h2 class="detail-name">Gym – Push day</h2>
+                    <p class="detail-meta">Mon / Wed / Fri</p>
+                </div>
+            </header>
+
+            <ul class="stats-grid">
+                <li class="stat">
+                    <span class="stat-label">Current streak</span>
+                    <span class="stat-value stat-value-streak">
+                        <span class="stat-emoji">🔥</span>
+                        <span>14</span>
+                    </span>
+                </li>
+                <li class="stat">
+                    <span class="stat-label">Best<br>streak</span>
+                    <span class="stat-value">21</span>
+                </li>
+                <li class="stat">
+                    <span class="stat-label">Done</span>
+                    <span class="stat-value">87%</span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="heatmap">
+            <header class="heatmap-header">
+                <h3 class="heatmap-title">April 2026</h3>
+                <div class="heatmap-nav">
+    <button class="heatmap-nav-btn" data-action="heatmap-prev"><img src="icons/chevron-left.svg" alt="Previous month"></button>
+    <button class="heatmap-nav-btn" data-action="heatmap-next"><img src="icons/chevron-right.svg" alt="Next month"></button>
+</div>
+            </header>
+
+            <div class="heatmap-weekdays">
+                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+            </div>
+
+            <div class="heatmap-divider"></div>
+
+            <div class="heatmap-grid">
+                <div class="heatmap-cell heatmap-cell-other">30</div>
+                <div class="heatmap-cell heatmap-cell-other">31</div>
+                <div class="heatmap-cell heatmap-cell-done">1</div>
+                <div class="heatmap-cell">2</div>
+                <div class="heatmap-cell heatmap-cell-done">3</div>
+                <div class="heatmap-cell">4</div>
+                <div class="heatmap-cell">5</div>
+                <div class="heatmap-cell heatmap-cell-done">6</div>
+                <div class="heatmap-cell">7</div>
+                <div class="heatmap-cell heatmap-cell-missed">8</div>
+                <div class="heatmap-cell">9</div>
+                <div class="heatmap-cell heatmap-cell-done">10</div>
+                <div class="heatmap-cell">11</div>
+                <div class="heatmap-cell">12</div>
+                <div class="heatmap-cell heatmap-cell-done">13</div>
+                <div class="heatmap-cell">14</div>
+                <div class="heatmap-cell heatmap-cell-done">15</div>
+                <div class="heatmap-cell">16</div>
+                <div class="heatmap-cell heatmap-cell-skipped">17</div>
+                <div class="heatmap-cell">18</div>
+                <div class="heatmap-cell">19</div>
+                <div class="heatmap-cell heatmap-cell-done">20</div>
+                <div class="heatmap-cell">21</div>
+                <div class="heatmap-cell heatmap-cell-done">22</div>
+                <div class="heatmap-cell">23</div>
+                <div class="heatmap-cell heatmap-cell-done">24</div>
+                <div class="heatmap-cell heatmap-cell-today">25</div>
+                <div class="heatmap-cell heatmap-cell-other">26</div>
+                <div class="heatmap-cell heatmap-cell-other">27</div>
+                <div class="heatmap-cell heatmap-cell-other">28</div>
+                <div class="heatmap-cell heatmap-cell-other">29</div>
+                <div class="heatmap-cell heatmap-cell-other">30</div>
+                <div class="heatmap-cell heatmap-cell-other">1</div>
+                <div class="heatmap-cell heatmap-cell-other">2</div>
+                <div class="heatmap-cell heatmap-cell-other">3</div>
+            </div>
+
+            <div class="heatmap-divider"></div>
+
+            <ul class="heatmap-legend">
+                <li class="legend-item"><span class="legend-dot legend-dot-done"></span><span class="legend-label">Done</span></li>
+                <li class="legend-item"><span class="legend-dot legend-dot-skipped"></span><span class="legend-label">Skipped</span></li>
+                <li class="legend-item"><span class="legend-dot legend-dot-missed"></span><span class="legend-label">Missed</span></li>
+            </ul>
+        </section>
+
+        <div class="detail-actions">
+    <button class="action-btn" data-action="edit-habit">
+        <img src="icons/edit.svg" alt="" class="action-edit-icon">
+        <span>Edit</span>
+    </button>
+    <button class="action-btn" data-action="skip-today">
+        <img src="icons/skip.svg" alt="" class="action-skip-icon">
+        <span>Skip today</span>
+    </button>
+</div>
+
+<button class="action-btn action-btn-delete" data-action="open-delete-alert">
+    <img src="icons/trash.svg" alt="" class="action-delete-icon">
+    <span>Delete habit</span>
+</button>
+    </main>
+
+
+    <!-- 06 — HABIT DETAIL COUNTER -->
+    <main class="screen detail-screen" data-screen="habit-detail-counter" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="back-to-main">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">Habit details</h1>
+            <div class="form-header-spacer"></div>
+        </header>
+
+        <section class="detail-card">
+            <header class="detail-head">
+                <div class="detail-icon detail-icon-purple">💧</div>
+                <div class="detail-head-text">
+                    <h2 class="detail-name">Drink water</h2>
+                    <p class="detail-meta">Every day / 8 glasses</p>
+                </div>
+            </header>
+
+            <div class="today-block">
+                <div class="today-block-head">
+                    <span class="today-block-label">Today</span>
+                    <span class="today-block-percent">62%</span>
+                </div>
+                <div class="today-block-progress">
+                    <span class="today-block-value">5</span>
+                    <span class="today-block-target">/ 8 glasses</span>
+                </div>
+                <div class="today-block-bar">
+                    <div class="today-block-bar-fill" style="width: 62.5%;"></div>
+                </div>
+            </div>
+
+            <ul class="stats-grid">
+                <li class="stat">
+                    <span class="stat-label">Streak</span>
+                    <span class="stat-value stat-value-streak">
+                        <span class="stat-emoji">🔥</span>
+                        <span>7</span>
+                    </span>
+                </li>
+                <li class="stat">
+                    <span class="stat-label">Average</span>
+                    <span class="stat-value">6.8</span>
+                </li>
+                <li class="stat">
+                    <span class="stat-label">Best</span>
+                    <span class="stat-value">11</span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="chart">
+            <header class="chart-header">
+                <h3 class="chart-title">Last 7 days</h3>
+                <span class="chart-unit">glasses</span>
+            </header>
+
+            <div class="chart-bars">
+                <div class="bar-col"><span class="bar-value">6</span><div class="bar bar-purple" style="height: 48px;"></div></div>
+                <div class="bar-col"><span class="bar-value">8</span><div class="bar bar-lime" style="height: 64px;"></div></div>
+                <div class="bar-col"><span class="bar-value">7</span><div class="bar bar-purple" style="height: 56px;"></div></div>
+                <div class="bar-col"><span class="bar-value">4</span><div class="bar bar-purple" style="height: 32px;"></div></div>
+                <div class="bar-col"><span class="bar-value">8</span><div class="bar bar-lime" style="height: 64px;"></div></div>
+                <div class="bar-col"><span class="bar-value">9</span><div class="bar bar-lime" style="height: 72px;"></div></div>
+                <div class="bar-col bar-col-today"><span class="bar-value">5</span><div class="bar bar-purple" style="height: 40px;"></div></div>
+            </div>
+
+            <div class="chart-divider"></div>
+
+            <div class="chart-weekdays">
+                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span class="chart-weekday-today">S</span>
+            </div>
+        </section>
+
+        <div class="detail-actions">
+    <button class="action-btn" data-action="edit-habit">
+        <img src="icons/edit.svg" alt="" class="action-edit-icon">
+        <span>Edit</span>
+    </button>
+    <button class="action-btn" data-action="skip-today">
+        <img src="icons/skip.svg" alt="" class="action-skip-icon">
+        <span>Skip today</span>
+    </button>
+</div>
+
+<button class="action-btn action-btn-delete" data-action="open-delete-alert">
+    <img src="icons/trash.svg" alt="" class="action-delete-icon">
+    <span>Delete habit</span>
+</button>
+    </main>
+
+
+    <!-- 07 — SETTINGS -->
+    <main class="screen settings-screen" data-screen="settings" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="back-to-main">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">Settings</h1>
+            <div class="form-header-spacer"></div>
+        </header>
+
+        <section class="settings-group">
+            <label class="form-label">APPEARANCE</label>
+            <div class="settings-card theme-card">
+                <p class="theme-card-label">Theme</p>
+                <div class="theme-options">
+                    <button class="theme-option theme-option-active">
+                        <img src="icons/moon-lime.svg" alt="" class="theme-option-icon">
+                        <span class="theme-option-name">Default</span>
+                    </button>
+                    <button class="theme-option">
+                        <img src="icons/moon-grey.svg" alt="" class="theme-option-icon">
+                        <span class="theme-option-name">Minimal</span>
+                        <span class="theme-soon-badge">SOON</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-group">
+            <label class="form-label">NOTIFICATIONS</label>
+            <div class="settings-card">
+                <div class="settings-row">
+    <span class="settings-row-label">Enable reminders</span>
+    <button class="toggle toggle-on" data-action="toggle-reminders-setting">
+        <span class="toggle-thumb"></span>
+    </button>
+</div>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button" data-action="open-sound-picker">
+                    <span class="settings-row-label">Sound</span>
+                    <span class="settings-row-value">
+                        <span>Gentle chime</span>
+                        <img src="icons/chevron-down.svg" alt="" class="settings-row-chevron">
+                    </span>
+                </button>
+            </div>
+        </section>
+
+        <section class="settings-group">
+            <label class="form-label">WEEK</label>
+            <div class="settings-card">
+                <button class="settings-row settings-row-button" data-action="open-start-week-picker">
+                    <span class="settings-row-label">Start week on</span>
+                    <span class="settings-row-value">
+                        <span>Monday</span>
+                        <img src="icons/chevron-down.svg" alt="" class="settings-row-chevron">
+                    </span>
+                </button>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button" data-action="open-time-format-picker">
+                    <span class="settings-row-label">Time format</span>
+                    <span class="settings-row-value">
+                        <span>24-hour</span>
+                        <img src="icons/chevron-down.svg" alt="" class="settings-row-chevron">
+                    </span>
+                </button>
+            </div>
+        </section>
+
+        <section class="settings-group">
+            <label class="form-label">YOUR DATA</label>
+            <div class="settings-card">
+                <button class="settings-row settings-row-button settings-row-export" data-action="export-data">
+                    <span class="settings-export">
+                        <img src="icons/download.svg" alt="" class="settings-export-icon">
+                        <span class="settings-export-text">
+                            <span class="settings-row-label">Export data</span>
+                            <span class="settings-export-hint">Download a backup file</span>
+                        </span>
+                    </span>
+                    <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
+                </button>
+            </div>
+        </section>
+
+        <section class="settings-group">
+            <label class="form-label">ABOUT</label>
+            <div class="settings-card">
+                <div class="settings-row">
+                    <span class="settings-row-label">Version</span>
+                    <span class="settings-row-value">1.0.0</span>
+                </div>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button" data-action="open-feedback">
+                    <span class="settings-row-label">Send feedback</span>
+                    <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
+                </button>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button" data-action="open-privacy">
+                    <span class="settings-row-label">Privacy</span>
+                    <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
+                </button>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- 08 — PRIVACY -->
+    <main class="screen privacy-screen" data-screen="privacy" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="open-settings">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">Privacy</h1>
+            <div class="form-header-spacer"></div>
+        </header>
+
+        <section class="privacy-hero">
+            <div class="privacy-hero-icon">
+                <span class="privacy-hero-icon-mask"></span>
+            </div>
+            <h2 class="privacy-hero-title">Your data stays with you</h2>
+            <p class="privacy-hero-subtitle">Everything you track lives only on your device. We have no servers, no accounts, no analytics.</p>
+        </section>
+
+        <section class="settings-group">
+            <label class="form-label">WHAT WE DO</label>
+            <div class="settings-card">
+                <div class="privacy-row privacy-row-do">
+                    <img src="icons/check.svg" alt="" class="privacy-icon-check">
+                    <span class="privacy-row-text">Store habits and history locally on your device</span>
+                </div>
+                <div class="settings-divider"></div>
+                <div class="privacy-row privacy-row-do">
+                    <img src="icons/check.svg" alt="" class="privacy-icon-check">
+                    <span class="privacy-row-text">Send reminders through your device's notifications</span>
+                </div>
+                <div class="settings-divider"></div>
+                <div class="privacy-row privacy-row-do">
+                    <img src="icons/check.svg" alt="" class="privacy-icon-check">
+                    <span class="privacy-row-text">Let you export your data as a file you control</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-group">
+            <label class="form-label">WHAT WE DON'T DO</label>
+            <div class="settings-card">
+                <div class="privacy-row privacy-row-dont">
+                    <span class="privacy-icon-close" aria-hidden="true"></span>
+                    <span class="privacy-row-text">Require an account or email</span>
+                </div>
+                <div class="settings-divider"></div>
+                <div class="privacy-row privacy-row-dont">
+                    <span class="privacy-icon-close" aria-hidden="true"></span>
+                    <span class="privacy-row-text">Send your data to any server</span>
+                </div>
+                <div class="settings-divider"></div>
+                <div class="privacy-row privacy-row-dont">
+                    <span class="privacy-icon-close" aria-hidden="true"></span>
+                    <span class="privacy-row-text">Track you with analytics or cookies</span>
+                </div>
+                <div class="settings-divider"></div>
+                <div class="privacy-row privacy-row-dont">
+                    <span class="privacy-icon-close" aria-hidden="true"></span>
+                    <span class="privacy-row-text">Show ads or sell your data</span>
+                </div>
+            </div>
+        </section>
+
+        <p class="privacy-updated">Last updated: April 25, 2026</p>
+    </main>
+
+
+    <!-- 16 — FEEDBACK -->
+    <main class="screen feedback-screen" data-screen="feedback" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="open-settings">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">Feedback</h1>
+            <button class="save-btn save-btn-disabled" data-action="send-feedback">Send</button>
+        </header>
+
+        <section class="form-group">
+            <label class="form-label">WHAT'S THIS ABOUT?</label>
+            <div class="feedback-categories">
+                <button class="feedback-chip" data-action="feedback-category" data-category="idea">
+    <span class="feedback-chip-emoji">💡</span>
+    <span class="feedback-chip-label">Idea</span>
+</button>
+<button class="feedback-chip" data-action="feedback-category" data-category="bug">
+    <span class="feedback-chip-emoji">🐛</span>
+    <span class="feedback-chip-label">Bug</span>
+</button>
+<button class="feedback-chip" data-action="feedback-category" data-category="love">
+    <span class="feedback-chip-emoji">❤️</span>
+    <span class="feedback-chip-label">Love note</span>
+</button>
+<button class="feedback-chip" data-action="feedback-category" data-category="other">
+    <span class="feedback-chip-emoji">🙋</span>
+    <span class="feedback-chip-label">Other</span>
+</button>
+            </div>
+        </section>
+
+        <section class="form-group">
+            <label class="form-label">YOUR MESSAGE</label>
+            <textarea
+                class="feedback-textarea"
+                placeholder="Tell me what you think. Ideas, bugs, anything on your mind…"
+                maxlength="1000"
+                rows="8"
+            ></textarea>
+            <div class="feedback-counter">0 / 1000</div>
+        </section>
+
+        <div class="feedback-info">
+            <span class="feedback-info-icon" aria-hidden="true"></span>
+            <p class="feedback-info-text">Your message opens in your email app. Nothing is sent to a server.</p>
+        </div>
+    </main>
+
+		<!-- 17 — STATISTIC -->
+<main class="screen statistic-screen" data-screen="statistic" hidden>
+    <header class="form-header">
+        <button class="icon-btn" data-action="back-to-main">
+            <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+        </button>
+        <h1 class="form-title">Statistic</h1>
+        <div class="form-header-spacer"></div>
+    </header>
+
+    <div class="stat-tabs">
+        <button class="stat-tab stat-tab-active" data-action="stat-tab" data-tab="weekly">Weekly</button>
+        <button class="stat-tab" data-action="stat-tab" data-tab="overall">Overall</button>
+    </div>
+
+    <!-- WEEKLY -->
+    <section class="stat-section" data-stat-section="weekly">
+        <p class="form-label">HABITS</p>
+        <div class="stat-weekly-list"></div>
+    </section>
+
+    <!-- OVERALL -->
+    <section class="stat-section" data-stat-section="overall" hidden>
+        <p class="form-label">HABITS</p>
+        <div class="stat-summary">
+            <div class="stat-summary-card">
+                <p class="stat-summary-label">Total habits</p>
+                <p class="stat-summary-value" data-stat="total-habits">0</p>
+            </div>
+            <div class="stat-summary-card">
+                <p class="stat-summary-label">Success rate</p>
+                <p class="stat-summary-value" data-stat="success-rate">0%</p>
+            </div>
+            <div class="stat-summary-card">
+                <p class="stat-summary-label">Best streak</p>
+                <p class="stat-summary-value" data-stat="best-streak">0 <span>days</span></p>
+            </div>
+            <div class="stat-summary-card">
+                <p class="stat-summary-label">Total done</p>
+                <p class="stat-summary-value" data-stat="total-done">0</p>
+            </div>
+        </div>
+
+        <p class="form-label">LAST 12 WEEKS</p>
+        <div class="stat-overall-list"></div>
+    </section>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn nav-btn-active">
+            <img src="icons/stats.svg" alt="" class="nav-icon-img">
+            <span class="nav-label">Statistic</span>
+        </button>
+
+        <button class="nav-btn nav-btn-primary" data-action="new-habit">
+            <img src="icons/plus.svg" alt="" class="nav-plus">
+            <span class="nav-label">New habit</span>
+        </button>
+
+        <button class="nav-btn" data-action="open-settings">
+            <img src="icons/settings.svg" alt="" class="nav-icon-img">
+            <span class="nav-label">Settings</span>
+        </button>
+    </nav>
+</main>
+
+
+    <!-- ============================================
+         SHEETS
+         ============================================ -->
+
+    <div class="sheet-backdrop" hidden></div>
+
+    <!-- 09 — ICON & COLOR -->
+<div class="sheet sheet-icon-color" data-sheet="icon-color" hidden>
+    <div class="sheet-handle"></div>
+
+    <header class="sheet-header">
+        <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+        <h2 class="sheet-title">Icon & color</h2>
+        <button class="sheet-action sheet-action-save" data-action="save-icon-picker">Save</button>
+    </header>
+
+    <div class="picker-preview">
+        <div class="picker-preview-box">✨</div>
+    </div>
+
+    <section class="picker-group">
+        <label class="form-label">COLOR</label>
+        <div class="color-options">
+            <button class="color-option color-option-active" style="background: var(--habit-grey);"></button>
+            <button class="color-option" style="background: var(--habit-purple);"></button>
+            <button class="color-option" style="background: var(--habit-lime);"></button>
+            <button class="color-option" style="background: var(--habit-yellow);"></button>
+            <button class="color-option" style="background: var(--habit-red);"></button>
+        </div>
+    </section>
+
+    <section class="picker-group">
+        <label class="form-label">ICON</label>
+        <div class="icon-options">
+            <button class="icon-option icon-option-active">✨</button>
+            <button class="icon-option">💪</button>
+            <button class="icon-option">🏃</button>
+            <button class="icon-option">🧘</button>
+            <button class="icon-option">🚴</button>
+            <button class="icon-option">⚽</button>
+            <button class="icon-option">🥊</button>
+            <button class="icon-option">👟</button>
+            <button class="icon-option">💧</button>
+            <button class="icon-option">🥦</button>
+            <button class="icon-option">🍎</button>
+            <button class="icon-option">☕</button>
+            <button class="icon-option">💊</button>
+            <button class="icon-option">🥗</button>
+            <button class="icon-option">🍵</button>
+            <button class="icon-option">📖</button>
+            <button class="icon-option">✏️</button>
+            <button class="icon-option">🎨</button>
+            <button class="icon-option">🎸</button>
+            <button class="icon-option">💻</button>
+            <button class="icon-option">💬</button>
+            <button class="icon-option">🧠</button>
+            <button class="icon-option">😴</button>
+            <button class="icon-option">🌅</button>
+            <button class="icon-option">🌙</button>
+            <button class="icon-option">🎯</button>
+            <button class="icon-option">⭐</button>
+            <button class="icon-option">🔥</button>
+        </div>
+    </section>
+</div>
+
+    <!-- 10 — UNIT -->
+    <div class="sheet" data-sheet="unit" hidden>
+        <div class="sheet-handle"></div>
+
+        <header class="sheet-header sheet-header-compact">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+            <h2 class="sheet-title">Unit</h2>
+            <div></div>
+        </header>
+
+        <ul class="picker-list">
+            <li>
+                <button class="picker-item picker-item-active" data-action="select-unit">
+                    <span class="picker-item-icon">💧</span>
+                    <span class="picker-item-label">ml</span>
+                    <span class="picker-item-check" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li><button class="picker-item" data-action="select-unit"><span class="picker-item-icon">⏱️</span><span class="picker-item-label">min</span></button></li>
+            <li><button class="picker-item" data-action="select-unit"><span class="picker-item-icon">📖</span><span class="picker-item-label">pages</span></button></li>
+            <li><button class="picker-item" data-action="select-unit"><span class="picker-item-icon">🔁</span><span class="picker-item-label">reps</span></button></li>
+            <li><button class="picker-item" data-action="select-unit"><span class="picker-item-icon">👟</span><span class="picker-item-label">steps</span></button></li>
+            <li><button class="picker-item" data-action="select-unit"><span class="picker-item-icon">🏃</span><span class="picker-item-label">km</span></button></li>
+            <li><button class="picker-item" data-action="select-unit"><span class="picker-item-icon">📚</span><span class="picker-item-label">cards</span></button></li>
+        </ul>
+    </div>
+
+    <!-- 11 — TIME FORMAT -->
+    <div class="sheet" data-sheet="time-format" hidden>
+        <div class="sheet-handle"></div>
+
+        <header class="sheet-header sheet-header-compact">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+            <h2 class="sheet-title">Time format</h2>
+            <div></div>
+        </header>
+
+        <ul class="picker-list">
+            <li>
+                <button class="picker-item picker-item-multiline picker-item-active" data-action="select-time-format">
+                    <span class="picker-item-text">
+                        <span class="picker-item-label">24-hour</span>
+                        <span class="picker-item-hint">13:00, 22:00</span>
+                    </span>
+                    <span class="picker-item-check" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="picker-item picker-item-multiline" data-action="select-time-format">
+                    <span class="picker-item-text">
+                        <span class="picker-item-label">12-hour</span>
+                        <span class="picker-item-hint">1:00 PM, 10:30 AM</span>
+                    </span>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 12 — START WEEK -->
+    <div class="sheet" data-sheet="start-week" hidden>
+        <div class="sheet-handle"></div>
+
+        <header class="sheet-header sheet-header-compact">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+            <h2 class="sheet-title">Start week on</h2>
+            <div></div>
+        </header>
+
+        <ul class="picker-list">
+            <li>
+                <button class="picker-item picker-item-active" data-action="select-start-week">
+                    <span class="picker-item-label">Monday</span>
+                    <span class="picker-item-check" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li><button class="picker-item" data-action="select-start-week"><span class="picker-item-label">Sunday</span></button></li>
+            <li><button class="picker-item" data-action="select-start-week"><span class="picker-item-label">Saturday</span></button></li>
+        </ul>
+    </div>
+
+    <!-- 13 — TIME -->
+    <div class="sheet" data-sheet="time" hidden>
+        <div class="sheet-handle"></div>
+
+        <header class="sheet-header">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+            <h2 class="sheet-title">Remind me at</h2>
+            <button class="sheet-action sheet-action-save" data-action="save-time-picker">Save</button>
+        </header>
+
+        <div class="time-wheel">
+            <div class="time-col">
+                <span class="time-cell time-cell-far">07</span>
+                <span class="time-cell time-cell-near" data-action="time-step">08</span>
+                <span class="time-cell time-cell-active">09</span>
+                <span class="time-cell time-cell-near" data-action="time-step">10</span>
+                <span class="time-cell time-cell-far">11</span>
+            </div>
+
+            <span class="time-colon">:</span>
+
+            <div class="time-col">
+                <span class="time-cell time-cell-far">58</span>
+                <span class="time-cell time-cell-near" data-action="time-step">59</span>
+                <span class="time-cell time-cell-active">00</span>
+                <span class="time-cell time-cell-near" data-action="time-step">01</span>
+                <span class="time-cell time-cell-far">02</span>
+            </div>
+
+            <div class="time-col time-col-period">
+                <span class="time-cell time-cell-far">PM</span>
+                <span class="time-cell time-cell-empty"></span>
+                <span class="time-cell time-cell-active" data-action="time-period">AM</span>
+                <span class="time-cell time-cell-empty"></span>
+                <span class="time-cell time-cell-far">PM</span>
+            </div>
+        </div>
+
+        <div class="time-row-card">
+            <button class="settings-row settings-row-button">
+                <span class="settings-row-label">Sound</span>
+                <span class="settings-row-value">
+                    <span>Gentle chime</span>
+                    <img src="icons/chevron-down.svg" alt="" class="settings-row-chevron">
+                </span>
+            </button>
+        </div>
+
+        <div class="time-row-card">
+            <div class="settings-row">
+                <span class="settings-row-label">Vibrate</span>
+                <button class="toggle toggle-on">
+                    <span class="toggle-thumb"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 14 — SOUND -->
+    <div class="sheet" data-sheet="sound" hidden>
+        <div class="sheet-handle"></div>
+
+        <header class="sheet-header sheet-header-compact">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+            <h2 class="sheet-title">Sound</h2>
+            <div></div>
+        </header>
+
+        <ul class="picker-list">
+            <li>
+                <button class="picker-item picker-item-active" data-action="select-sound">
+                    <span class="picker-sound-icon picker-sound-icon-bell" aria-hidden="true"></span>
+                    <span class="picker-item-label">Gentle chime</span>
+                    <span class="picker-item-check" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <button class="picker-item" data-action="select-sound">
+                    <span class="picker-sound-icon picker-sound-icon-bell" aria-hidden="true"></span>
+                    <span class="picker-item-label">Bell</span>
+                </button>
+            </li>
+            <li>
+                <button class="picker-item" data-action="select-sound">
+                    <span class="picker-sound-icon picker-sound-icon-bell" aria-hidden="true"></span>
+                    <span class="picker-item-label">Chirp</span>
+                </button>
+            </li>
+            <li>
+                <button class="picker-item picker-item-disabled" data-action="select-sound">
+                    <span class="picker-sound-icon picker-sound-icon-close" aria-hidden="true"></span>
+                    <span class="picker-item-label">None (vibration only)</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+
+
+    <!-- ============================================
+         ALERT
+         ============================================ -->
+
+    <!-- 15 — DELETE HABIT -->
+    <div class="alert" data-alert="delete-habit" hidden>
+        <div class="alert-icon">
+            <span class="alert-icon-trash" aria-hidden="true"></span>
+        </div>
+
+        <h2 class="alert-title">Delete habit?</h2>
+        <p class="alert-message">All history will be removed. This can't be undone.</p>
+
+        <div class="alert-actions">
+    <button class="alert-btn alert-btn-destructive" data-action="confirm-delete-habit">Delete</button>
+    <button class="alert-btn alert-btn-cancel" data-action="cancel-alert">Cancel</button>
+</div>
+    </div>
+
+
+    <!-- ============================================
+         JAVASCRIPT
+    ============================================ -->
+<script src="js/storage.js" defer></script>
+<script src="js/render.js" defer></script>
+<script src="js/habits.js" defer></script>
+<script src="js/detail.js" defer></script>
+<script src="js/form.js" defer></script>
+<script src="js/pickers.js" defer></script>
+<script src="js/settings.js" defer></script>
+<script src="js/statistic.js" defer></script>
+<script src="js/feedback.js" defer></script>
+<script src="js/router.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+/*
+ * Components — переиспользуемые блоки.
+ */
+
+ /* ============================================
+   SECTION HEADER
+   ============================================ */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.section-meta {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-top: auto;
+}
+
+/* ============================================
+   ICON BUTTON
+   ============================================ */
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: transform 0.15s ease;
+}
+
+.icon-btn:active {
+    transform: scale(0.92);
+}
+
+.icon-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+
+/* ============================================
+   PILL BUTTON
+   ============================================ */
+
+.pill-btn {
+    background: var(--brand-lime);
+    color: var(--bg-primary);
+    border-radius: var(--radius-full);
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.15s ease;
+}
+
+.pill-btn:active {
+    transform: scale(0.96);
+}
+
+
+/* ============================================
+   BOTTOM NAV — навигация снизу экрана.
+   margin-top: auto прижимает к низу .screen flex-column
+   ============================================ */
+
+.bottom-nav {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 12px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    margin-bottom: 16px;
+}
+
+.nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 4px;
+    color: var(--text-secondary);
+    transition: transform 0.15s ease;
+}
+
+.nav-btn:active {
+    transform: scale(0.95);
+}
+
+.nav-icon-img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.nav-label {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.nav-btn-primary {
+    flex: 0 0 auto;
+    background: var(--brand-lime);
+    border-radius: var(--radius-full);
+    padding: 17px 24px;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.nav-btn-primary .nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bg-primary);
+}
+
+.nav-plus {
+    width: 10px;
+    height: 10px;
+    filter: brightness(0);
+}
+
+.nav-btn-active .nav-icon-img,
+.nav-btn-active .nav-label {
+    filter: brightness(0) invert(1);
+}
+
+.nav-btn-active .nav-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+
+/* ============================================
+   ANIMATIONS — разные классы для разных событий
+   ============================================ */
+
+/* Чекбокс binary привычки — bounce при отметке */
+.habit-check {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease;
+}
+
+.habit-check-done {
+    animation: check-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes check-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+
+/* Counter — bounce значения при инкременте */
+.counter-value {
+    transition: transform 0.15s ease;
+}
+
+.counter-bump .counter-value {
+    animation: counter-bump 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes counter-bump {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+
+/* Sheet — slide-up + fade */
+.sheet {
+    animation: sheet-up 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes sheet-up {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+
+/* Backdrop — fade */
+.sheet-backdrop {
+    animation: backdrop-fade 0.2s ease;
+}
+
+@keyframes backdrop-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+/* Alert — fade + scale */
+.alert {
+    animation: alert-pop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes alert-pop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+
+/* Habit/counter карточки — лёгкий tap-effect */
+.habit, .counter, .stat-week-card, .stat-overall-card {
+    transition: transform 0.1s ease;
+}
+
+.habit:active, .counter:active, .stat-week-card:active, .stat-overall-card:active {
+    transform: scale(0.98);
+}
+
+
+/* Save button и кнопки в bottom nav — tap-effect */
+.save-btn,
+.nav-btn-primary,
+.empty-cta {
+    transition: transform 0.15s ease;
+}
+
+.save-btn:active,
+.nav-btn-primary:active,
+.empty-cta:active {
+    transform: scale(0.96);
+}
+
+
+/* Stat tab переключение */
+.stat-tab {
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+
+/* Schedule day — tap effect при выборе */
+.schedule-day {
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.schedule-day:active {
+    transform: scale(0.92);
+}
+
+
+/* Toggle — плавная смена цвета */
+.toggle {
+    transition: background 0.2s ease;
+}

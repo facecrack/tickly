@@ -1,0 +1,181 @@
+/*
+ * Settings — экран настроек.
+ * Префикс классов: .settings-*, .theme-*
+ */
+
+
+/* ============================================
+   SETTINGS GROUP — обёртка для каждой секции
+   ============================================ */
+
+.settings-group {
+    margin-bottom: 32px;
+}
+
+
+/* ============================================
+   SETTINGS CARD — общая карточка для группы
+   ============================================ */
+
+.settings-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+
+/* ============================================
+   THEME — выбор темы (Default / Minimal SOON)
+   ============================================ */
+
+.theme-card {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.theme-card-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.theme-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.theme-option {
+    background: var(--bg-primary);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+		padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+}
+
+.theme-option-active {
+    border-color: var(--brand-lime);
+}
+
+.theme-option-icon {
+    width: 22px;
+    height: 24px;
+}
+
+.theme-option-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.theme-option:not(.theme-option-active) .theme-option-name {
+    color: var(--text-secondary);
+}
+
+.theme-soon-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--brand-purple-25);
+    color: var(--brand-purple);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+}
+
+
+/* ============================================
+   SETTINGS ROW — строка внутри карточки
+   ============================================ */
+
+.settings-row {
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: transparent;
+    text-align: left;
+}
+
+.settings-row-button {
+    cursor: pointer;
+}
+
+.settings-row-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.settings-row-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.settings-row-chevron {
+    width: 12px;
+    height: 12px;
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.settings-row-chevron-right {
+    width: 12px;
+    height: 12px;
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.settings-divider {
+    height: 1px;
+    background: var(--bg-elevated);
+    margin: 0 16px;
+}
+
+
+/* ============================================
+   EXPORT — отдельная строка с иконкой и подзаголовком
+   ============================================ */
+
+.settings-row .settings-export {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-export-icon {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
+.settings-export-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-export-hint {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* Export — увеличенная высота из-за двух строк текста */
+.settings-row-export {
+    height: 64px;
+}

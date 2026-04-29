@@ -1,0 +1,97 @@
+/*
+ * Alert — модальное окно подтверждения опасного действия.
+ * Используется для Delete habit и других destructive действий.
+ */
+
+
+/* ============================================
+   ALERT — карточка по центру экрана
+   ============================================ */
+
+.alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100vw - 40px);
+    max-width: 360px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    z-index: 2;
+    text-align: center;
+}
+
+
+/* ============================================
+   ICON — большой красный квадрат с корзиной
+   ============================================ */
+
+.alert-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--status-red-25);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.alert-icon-trash {
+    width: 22px;
+    height: 24px;
+    background-color: var(--status-red);
+    -webkit-mask: url('../../icons/trash.svg') no-repeat center / contain;
+    mask: url('../../icons/trash.svg') no-repeat center / contain;
+}
+
+
+/* ============================================
+   TEXT
+   ============================================ */
+
+.alert-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.alert-message {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 16px;
+}
+
+
+/* ============================================
+   ACTIONS — две кнопки в столбик
+   ============================================ */
+
+.alert-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 8px;
+}
+
+.alert-btn {
+    height: 48px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+}
+
+.alert-btn-destructive {
+    background: var(--status-red);
+    color: var(--text-primary);
+}
+
+.alert-btn-cancel {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}

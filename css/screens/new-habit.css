@@ -1,0 +1,485 @@
+/*
+ * New habit — экран создания привычки (Yes/No и Counter).
+ */
+
+
+/* ============================================
+   FORM HEADER — ← New habit Save
+   ============================================ */
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.form-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.icon-btn-img {
+    width: 14px !important;
+    height: 14px !important;
+    filter: brightness(0) invert(1);
+}
+
+.save-btn {
+    padding: 0 16px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--brand-lime);
+    color: var(--bg-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.save-btn-disabled {
+    background: var(--brand-lime-25);
+    color: var(--brand-lime);
+    opacity: 0.5;
+}
+
+
+/* ============================================
+   FORM GROUP
+   ============================================ */
+
+.form-group {
+    margin-bottom: 32px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+
+/* ============================================
+   ICON PICKER
+   ============================================ */
+
+.icon-picker {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    justify-content: center;
+}
+
+.icon-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--text-secondary);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-preview-active {
+    border-color: var(--brand-purple);
+    background: var(--brand-purple-25);
+}
+
+.icon-preview-emoji {
+    font-size: 36px;
+}
+
+.icon-picker-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.icon-picker-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.icon-picker-hint {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+
+/* ============================================
+   FORM INPUT — поле NAME
+   ============================================ */
+
+.form-input {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-input-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-input-caret {
+    width: 2px;
+    height: 16px;
+    background: var(--brand-lime);
+    animation: caret-blink 1s step-end infinite;
+}
+
+@keyframes caret-blink {
+    50% { opacity: 0; }
+}
+
+
+/* ============================================
+   TYPE SWITCH — Yes/No vs Counter
+   ============================================ */
+
+.type-switch {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.type-option {
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.type-option-active {
+    background: var(--bg-primary);
+}
+
+.type-option-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.type-option-active .type-option-title {
+    color: var(--text-primary);
+}
+
+.type-option-hint {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+
+/* ============================================
+   TARGET — Goal + Unit + Each tap adds (только Counter)
+   ============================================ */
+
+.target {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.target-row {
+    display: grid;
+    grid-template-columns: 40fr 60fr;
+    gap: 8px;
+}
+
+.target-goal,
+.target-unit {
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    padding: 8px 16px 16px 16px;  /* top 8, right 16, bottom 16, left 16 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.target-sublabel {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.target-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 20px !important;
+    height: 20px !important;
+
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 100%;
+    display: block;
+}
+
+/* Убираем стрелочки браузера у number-input */
+.target-input::-webkit-outer-spin-button,
+.target-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.target-unit-btn {
+    background: transparent;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.target-unit-btn span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.target-unit-arrow {
+    width: 12px;
+    /* Серый */
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.target-step {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.target-step-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.target-step-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.step-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-btn img {
+    width: 10px;
+    height: 10px;
+}
+
+.step-btn-minus {
+    background: var(--bg-elevated);
+}
+
+.step-btn-minus img {
+    /* Серый */
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.step-btn-plus {
+    background: var(--brand-lime);
+}
+
+.step-btn-plus img {
+    /* Чёрный */
+    filter: brightness(0);
+}
+
+.step-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    min-width: 16px;
+    text-align: center;
+}
+
+/* ============================================
+   SCHEDULE
+   ============================================ */
+
+.schedule {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.schedule-days {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-day {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--text-secondary);
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.schedule-day-active {
+    background: var(--brand-lime);
+    border-color: var(--brand-lime);
+    color: var(--bg-primary);
+}
+
+.schedule-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.preset {
+    padding: 8px 12px;
+    border-radius: var(--radius-full);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.preset-active {
+    background: var(--brand-lime-25);
+    color: var(--brand-lime);
+}
+
+
+/* ============================================
+   REMINDER
+   ============================================ */
+
+.reminder {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.reminder-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reminder-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
+}
+
+.reminder-time {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.reminder-time-off {
+    color: var(--text-secondary);
+}
+
+
+/* ============================================
+   TOGGLE
+   ============================================ */
+
+.toggle {
+    width: 40px;
+    height: 24px;
+    border-radius: var(--radius-full);
+    background: var(--text-secondary);
+    padding: 2px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.toggle-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: var(--text-primary);
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.2s, background 0.2s;
+}
+
+.toggle-on {
+    background: var(--brand-lime);
+}
+
+.toggle-on .toggle-thumb {
+    left: 18px;
+    background: var(--bg-primary);
+}
+
+.form-input-text.form-input-placeholder {
+    color: var(--text-secondary);
+}
+
+.form-input-field {
+    width: 100%;
+    background: var(--bg-card);
+    border: none;
+    outline: none;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    height: 56px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    caret-color: var(--brand-lime);
+}
+
+.form-input-field::placeholder {
+    color: var(--text-secondary);
+}
