@@ -98,6 +98,7 @@ window.hideSheet = hideSheet;
 window.showAlert = showAlertModal;
 window.hideAlert = hideAlertModal;
 window.getPreviousScreen = () => previousScreen;
+window.setPreviousScreen = (name) => { previousScreen = name; };
 
 
 // Регистрация Service Worker для PWA

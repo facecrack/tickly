@@ -126,6 +126,7 @@ document.addEventListener('click', (event) => {
             const prev = window.getPreviousScreen();
             if (prev === 'statistic') {
                 statistic.open();
+                window.setPreviousScreen('main');
             } else if ((prev === 'habit-detail-binary' || prev === 'habit-detail-counter') && detail.currentId()) {
                 detail.open(detail.currentId());
             } else {
