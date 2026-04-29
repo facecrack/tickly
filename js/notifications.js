@@ -1,91 +1,111 @@
 /*
- * Notifications — локальные уведомления через ServiceWorkerRegistration.
- * Работают пока браузер активен; для фоновых push нужен сервер.
+ * Notifications — Web Push через Cloudflare Worker.
+ *
+ * После деплоя воркера вставь сюда его URL:
  */
+const PUSH_WORKER = 'https://tickly-push.YOUR_ACCOUNT.workers.dev';
 
-const pendingTimers = new Set();
 
-
-function getTodayDayKey() {
-    const keys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    return keys[new Date().getDay()];
-}
-
+// ─── PUBLIC API ───────────────────────────────────────────────────────────────
 
 async function requestPermission() {
     if (!('Notification' in window)) return false;
     if (Notification.permission === 'granted') return true;
-    if (Notification.permission === 'denied') return false;
-    const result = await Notification.requestPermission();
-    return result === 'granted';
+    if (Notification.permission === 'denied')  return false;
+    return (await Notification.requestPermission()) === 'granted';
 }
 
-
-function cancelReminders() {
-    pendingTimers.forEach((id) => clearTimeout(id));
-    pendingTimers.clear();
-}
-
-
-function scheduleReminders() {
-    cancelReminders();
-
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+async function scheduleReminders() {
+    if (!workerConfigured()) return;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (Notification.permission !== 'granted') return;
 
     const appSettings = storage.getSettings();
     if (!appSettings.remindersEnabled) return;
 
-    const habits = storage.getHabits();
-    const now = new Date();
-    const today = storage.getTodayString();
-    const todayKey = getTodayDayKey();
+    try {
+        const sub = await getOrCreateSubscription();
+        if (!sub) return;
+        await syncWithWorker(sub);
+    } catch (e) {
+        console.warn('Push sync failed:', e);
+    }
+}
 
-    habits.forEach((habit) => {
-        if (!habit.reminder?.enabled) return;
-        if (!habit.schedule.includes(todayKey)) return;
+async function cancelReminders() {
+    if (!workerConfigured()) return;
+    try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (!sub) return;
 
-        const [h, m] = habit.reminder.time.split(':').map(Number);
-        const fireAt = new Date();
-        fireAt.setHours(h, m, 0, 0);
+        await fetch(`${PUSH_WORKER}/unsubscribe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: sub.endpoint })
+        });
 
-        const delay = fireAt.getTime() - now.getTime();
-        if (delay < 0) return;
-
-        const timerId = setTimeout(() => {
-            pendingTimers.delete(timerId);
-
-            const fresh = storage.getHabit(habit.id);
-            if (!fresh) return;
-
-            const entry = fresh.entries[today];
-            const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (fresh.target || 1));
-            if (isDone) return;
-
-            fireNotification(fresh);
-        }, delay);
-
-        pendingTimers.add(timerId);
-    });
+        await sub.unsubscribe();
+    } catch (e) {
+        console.warn('Unsubscribe failed:', e);
+    }
 }
 
 
-function fireNotification(habit) {
-    const base = new URL('./', location.href).href;
-    const opts = {
-        body: 'Time to check in!',
-        icon: base + 'icons/app-icon-192.png',
-        badge: base + 'icons/app-icon-192.png',
-        tag: 'habit-' + habit.id,
-        data: { habitId: habit.id }
-    };
+// ─── INTERNAL ─────────────────────────────────────────────────────────────────
 
-    const title = habit.icon + ' ' + habit.name;
+function workerConfigured() {
+    return PUSH_WORKER && !PUSH_WORKER.includes('YOUR_ACCOUNT');
+}
 
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.ready.then((reg) => reg.showNotification(title, opts));
-    } else {
-        new Notification(title, opts);
+async function getOrCreateSubscription() {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+
+    if (!sub) {
+        const vapidKey = await fetchVapidPublicKey();
+        if (!vapidKey) return null;
+
+        sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: vapidKey
+        });
     }
+
+    return sub;
+}
+
+async function fetchVapidPublicKey() {
+    try {
+        const res = await fetch(`${PUSH_WORKER}/public-key`);
+        const { key } = await res.json();
+        return key;
+    } catch {
+        return null;
+    }
+}
+
+async function syncWithWorker(sub) {
+    const reminders = buildReminders();
+    const timezone  = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    await fetch(`${PUSH_WORKER}/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub.toJSON(), reminders, timezone })
+    });
+}
+
+function buildReminders() {
+    return storage.getHabits()
+        .filter(h => h.reminder?.enabled)
+        .map(h => ({
+            habitId: h.id,
+            name:    h.name,
+            icon:    h.icon,
+            time:    h.reminder.time,
+            days:    h.schedule
+        }));
 }
 
 

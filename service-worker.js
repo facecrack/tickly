@@ -114,6 +114,20 @@ self.addEventListener('fetch', (event) => {
 });
 
 
+self.addEventListener('push', (event) => {
+    const data  = event.data?.json() ?? {};
+    const title = data.title ?? 'Tickly';
+    const opts  = {
+        body:  data.body  ?? 'Time to check in!',
+        icon:  SCOPE + 'icons/app-icon-192.png',
+        badge: SCOPE + 'icons/app-icon-192.png',
+        tag:   data.habitId ?? 'tickly',
+        data:  { url: SCOPE }
+    };
+    event.waitUntil(self.registration.showNotification(title, opts));
+});
+
+
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     event.waitUntil(

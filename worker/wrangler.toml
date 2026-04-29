@@ -1,0 +1,10 @@
+name = "tickly-push"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[[kv_namespaces]]
+binding = "PUSH_KV"
+id = "REPLACE_WITH_YOUR_KV_ID"
+
+[triggers]
+crons = ["* * * * *"]
