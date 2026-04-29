@@ -165,14 +165,16 @@ function saveHabit() {
     }
 
     if (editingHabitId) {
-        // Edit mode — update
-        storage.updateHabit(editingHabitId, habitData);
+        const savedId = editingHabitId;
+        storage.updateHabit(savedId, habitData);
         editingHabitId = null;
+        notifications.scheduleReminders();
+        detail.open(savedId);
     } else {
         storage.addHabit(habitData);
+        notifications.scheduleReminders();
+        render.main();
     }
-
-    render.main();
 }
 
 

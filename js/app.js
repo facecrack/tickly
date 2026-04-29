@@ -104,8 +104,18 @@ window.setPreviousScreen = (name) => { previousScreen = name; };
 // Регистрация Service Worker для PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/habit-tracker/service-worker.js')
-            .then((reg) => console.log('SW зарегистрирован:', reg.scope))
+        navigator.serviceWorker.register('./service-worker.js')
+            .then((reg) => {
+                console.log('SW зарегистрирован:', reg.scope);
+                notifications.scheduleReminders();
+            })
             .catch((err) => console.warn('SW регистрация не удалась:', err));
     });
 }
+
+// Перепланируем уведомления при возврате в приложение
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        notifications.scheduleReminders();
+    }
+});

@@ -44,9 +44,18 @@ function renderSettings() {
 
 
 function toggleReminders() {
-    const settings = storage.getSettings();
-    storage.updateSettings({ remindersEnabled: !settings.remindersEnabled });
+    const current = storage.getSettings();
+    const enabling = !current.remindersEnabled;
+    storage.updateSettings({ remindersEnabled: enabling });
     renderSettings();
+
+    if (enabling) {
+        notifications.requestPermission().then((granted) => {
+            if (granted) notifications.scheduleReminders();
+        });
+    } else {
+        notifications.cancelReminders();
+    }
 }
 
 
