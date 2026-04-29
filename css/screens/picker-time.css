@@ -1,59 +1,107 @@
 /*
- * Time picker — выбор времени напоминания (циферблат-колесо).
+ * Time picker — scroll-wheel выбор времени напоминания.
  */
 
 
 /* ============================================
-   TIME WHEEL — главный блок с цифрами
+   TIME WHEEL
    ============================================ */
 
 .time-wheel {
+    position: relative;
     background: var(--bg-primary);
     border-radius: var(--radius-md);
-    height: 190px;
     padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 4px;
     margin-bottom: 8px;
+    height: 220px;
+    overflow: hidden;
 }
 
-.time-col {
+/* Линии выделения центрального элемента */
+.time-wheel::before,
+.time-wheel::after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    height: 1px;
+    background: var(--bg-elevated);
+    z-index: 2;
+    pointer-events: none;
+}
+.time-wheel::before { top:  88px; }
+.time-wheel::after  { bottom: 88px; }
+
+
+/* ============================================
+   COLUMN
+   ============================================ */
+
+.time-col-wrap {
+    position: relative;
+    width: 72px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.time-col-period-wrap {
+    width: 56px;
+}
+
+.time-col-scroll {
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.time-col-scroll::-webkit-scrollbar { display: none; }
+
+/* Fade сверху и снизу */
+.time-col-wrap::before,
+.time-col-wrap::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 88px;
+    z-index: 1;
+    pointer-events: none;
+}
+.time-col-wrap::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--bg-primary) 10%, transparent 100%);
+}
+.time-col-wrap::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--bg-primary) 10%, transparent 100%);
+}
+
+
+/* ============================================
+   ITEMS
+   ============================================ */
+
+.time-item {
+    height: 44px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    flex: 0 0 auto;
-}
-
-.time-cell {
-    line-height: 1;
-    font-weight: 500;
-    text-align: center;
-    min-width: 44px;
-}
-
-.time-cell-active {
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.time-cell-near {
+    justify-content: center;
     font-size: 22px;
-    color: var(--text-secondary);
+    font-weight: 500;
+    color: var(--text-primary);
+    scroll-snap-align: center;
+    user-select: none;
 }
 
-.time-cell-far {
-    font-size: 20px;
-    color: var(--bg-card);
-    /* Сливается с фоном — еле видно */
-}
-
-.time-cell-empty {
-    /* Пустой плейсхолдер для выравнивания */
-    height: 22px;
+/* Пустые паддинг-блоки сверху и снизу — чтобы крайние значения
+   можно было прокрутить в центр */
+.time-pad {
+    height: 88px;
+    flex-shrink: 0;
 }
 
 .time-colon {
@@ -61,11 +109,13 @@
     font-weight: 600;
     color: var(--text-primary);
     line-height: 1;
+    flex-shrink: 0;
+    z-index: 3;
 }
 
 
 /* ============================================
-   TIME ROW CARD — обёртка для Sound и Vibrate
+   TIME ROW CARD — Sound / Vibrate
    ============================================ */
 
 .time-row-card {

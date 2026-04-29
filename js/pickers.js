@@ -92,68 +92,122 @@ function cancelPicker() {
 
 
 // ============================================
-// TIME PICKER
+// TIME PICKER — scroll wheel
 // ============================================
+
+const ITEM_H = 44;
+let scrollDebounce = null;
+let scrollListenerAttached = false;
 
 function openTimePicker() {
     const [h, m] = formState.reminder.time.split(':').map(Number);
     pickerDraft = { hour24: h, minute: m };
-    renderTimePicker();
+
+    buildTimeWheels();
     showSheet('time');
+
+    // Прокрутить к нужному значению после рендера
+    requestAnimationFrame(() => requestAnimationFrame(scrollToCurrentTime));
 }
 
 
-function renderTimePicker() {
-    const sheet = document.querySelector('[data-sheet="time"]');
-    if (!sheet) return;
+function buildTimeWheels() {
+    const use12h = storage.getSettings().timeFormat === '12h';
 
-    const cols = sheet.querySelectorAll('.time-col');
-    const hourCol = cols[0];
-    const minCol = cols[1];
-    const periodCol = cols[2];
+    const hourScroll   = document.querySelector('[data-col="hour"] .time-col-scroll');
+    const minScroll    = document.querySelector('[data-col="minute"] .time-col-scroll');
+    const periodWrap   = document.querySelector('[data-col="period"]');
+    const periodScroll = document.querySelector('[data-col="period"] .time-col-scroll');
 
-    const hour12 = pickerDraft.hour24 % 12 === 0 ? 12 : pickerDraft.hour24 % 12;
-    const period = pickerDraft.hour24 < 12 ? 'AM' : 'PM';
+    if (!hourScroll || !minScroll) return;
 
-    const hourCells = hourCol.querySelectorAll('.time-cell');
-    hourCells[0].textContent = pad((hour12 - 2 + 11) % 12 + 1);
-    hourCells[1].textContent = pad((hour12 - 1 + 11) % 12 + 1);
-    hourCells[2].textContent = pad(hour12);
-    hourCells[3].textContent = pad((hour12) % 12 + 1);
-    hourCells[4].textContent = pad((hour12 + 1) % 12 + 1);
+    periodWrap.hidden = !use12h;
 
-    const minCells = minCol.querySelectorAll('.time-cell');
-    minCells[0].textContent = pad((pickerDraft.minute - 2 + 60) % 60);
-    minCells[1].textContent = pad((pickerDraft.minute - 1 + 60) % 60);
-    minCells[2].textContent = pad(pickerDraft.minute);
-    minCells[3].textContent = pad((pickerDraft.minute + 1) % 60);
-    minCells[4].textContent = pad((pickerDraft.minute + 2) % 60);
+    // Часы
+    const hours = use12h
+        ? Array.from({ length: 12 }, (_, i) => pad(i + 1))   // 01–12
+        : Array.from({ length: 24 }, (_, i) => pad(i));       // 00–23
 
-    const periodCells = periodCol.querySelectorAll('.time-cell');
-    periodCells[2].textContent = period;
-}
+    hourScroll.innerHTML =
+        '<div class="time-pad"></div>' +
+        hours.map(v => `<div class="time-item">${v}</div>`).join('') +
+        '<div class="time-pad"></div>';
 
+    // Минуты
+    const minutes = Array.from({ length: 60 }, (_, i) => pad(i));
+    minScroll.innerHTML =
+        '<div class="time-pad"></div>' +
+        minutes.map(v => `<div class="time-item">${v}</div>`).join('') +
+        '<div class="time-pad"></div>';
 
-function timeStep(direction, column) {
-    if (column === 'hour') {
-        pickerDraft.hour24 = (pickerDraft.hour24 + direction + 24) % 24;
-    } else if (column === 'minute') {
-        pickerDraft.minute = (pickerDraft.minute + direction + 60) % 60;
+    // AM/PM
+    if (use12h) {
+        periodScroll.innerHTML =
+            '<div class="time-pad"></div>' +
+            '<div class="time-item">AM</div>' +
+            '<div class="time-item">PM</div>' +
+            '<div class="time-pad"></div>';
     }
-    renderTimePicker();
+
+    // Слушатель scroll — один раз на весь sheet
+    if (!scrollListenerAttached) {
+        document.querySelector('[data-sheet="time"]').addEventListener('scroll', () => {
+            clearTimeout(scrollDebounce);
+            scrollDebounce = setTimeout(readTimeWheels, 200);
+        }, { capture: true, passive: true });
+        scrollListenerAttached = true;
+    }
 }
 
 
-function timeTogglePeriod() {
-    pickerDraft.hour24 = (pickerDraft.hour24 + 12) % 24;
-    renderTimePicker();
+function scrollToCurrentTime() {
+    const use12h = storage.getSettings().timeFormat === '12h';
+    const h = pickerDraft.hour24;
+    const m = pickerDraft.minute;
+
+    const hourScroll   = document.querySelector('[data-col="hour"] .time-col-scroll');
+    const minScroll    = document.querySelector('[data-col="minute"] .time-col-scroll');
+    const periodScroll = document.querySelector('[data-col="period"] .time-col-scroll');
+
+    if (!hourScroll || !minScroll) return;
+
+    if (use12h) {
+        const hour12 = h % 12 === 0 ? 12 : h % 12;
+        hourScroll.scrollTop = (hour12 - 1) * ITEM_H;
+        if (periodScroll) periodScroll.scrollTop = (h >= 12 ? 1 : 0) * ITEM_H;
+    } else {
+        hourScroll.scrollTop = h * ITEM_H;
+    }
+    minScroll.scrollTop = m * ITEM_H;
+}
+
+
+function readTimeWheels() {
+    const use12h = storage.getSettings().timeFormat === '12h';
+
+    const hourScroll   = document.querySelector('[data-col="hour"] .time-col-scroll');
+    const minScroll    = document.querySelector('[data-col="minute"] .time-col-scroll');
+    const periodScroll = document.querySelector('[data-col="period"] .time-col-scroll');
+
+    if (!hourScroll || !minScroll) return;
+
+    const hourIdx = Math.round(hourScroll.scrollTop / ITEM_H);
+    const minIdx  = Math.round(minScroll.scrollTop  / ITEM_H);
+
+    if (use12h) {
+        const hour12  = (hourIdx % 12) + 1;  // 1–12
+        const isPM    = periodScroll ? Math.round(periodScroll.scrollTop / ITEM_H) === 1 : false;
+        pickerDraft.hour24 = (hour12 % 12) + (isPM ? 12 : 0);
+    } else {
+        pickerDraft.hour24 = hourIdx % 24;
+    }
+    pickerDraft.minute = minIdx % 60;
 }
 
 
 function saveTimePicker() {
-    const h = pad(pickerDraft.hour24);
-    const m = pad(pickerDraft.minute);
-    formState.reminder.time = `${h}:${m}`;
+    readTimeWheels();  // Читаем финальную позицию перед сохранением
+    formState.reminder.time    = `${pad(pickerDraft.hour24)}:${pad(pickerDraft.minute)}`;
     formState.reminder.enabled = true;
     hideSheet();
     renderForm();

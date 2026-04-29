@@ -58,27 +58,6 @@ document.addEventListener('click', (event) => {
         return;
     }
 
-    // TIME STEP
-    const timeStepCell = event.target.closest('[data-action="time-step"]');
-    if (timeStepCell) {
-        const col = timeStepCell.closest('.time-col');
-        const allCells = col.querySelectorAll('.time-cell');
-        const idx = Array.from(allCells).indexOf(timeStepCell);
-        const direction = idx === 1 ? -1 : 1;
-        const allCols = col.parentElement.querySelectorAll('.time-col');
-        const colIdx = Array.from(allCols).indexOf(col);
-        const column = colIdx === 0 ? 'hour' : 'minute';
-        pickers.timeStep(direction, column);
-        return;
-    }
-
-    // TIME PERIOD
-    const timePeriod = event.target.closest('[data-action="time-period"]');
-    if (timePeriod) {
-        pickers.timeTogglePeriod();
-        return;
-    }
-
     // SELECT UNIT
     const unitItem = event.target.closest('[data-action="select-unit"]');
     if (unitItem) {

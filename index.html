@@ -936,30 +936,15 @@
         </header>
 
         <div class="time-wheel">
-            <div class="time-col">
-                <span class="time-cell time-cell-far">07</span>
-                <span class="time-cell time-cell-near" data-action="time-step">08</span>
-                <span class="time-cell time-cell-active">09</span>
-                <span class="time-cell time-cell-near" data-action="time-step">10</span>
-                <span class="time-cell time-cell-far">11</span>
+            <div class="time-col-wrap" data-col="hour">
+                <div class="time-col-scroll"></div>
             </div>
-
             <span class="time-colon">:</span>
-
-            <div class="time-col">
-                <span class="time-cell time-cell-far">58</span>
-                <span class="time-cell time-cell-near" data-action="time-step">59</span>
-                <span class="time-cell time-cell-active">00</span>
-                <span class="time-cell time-cell-near" data-action="time-step">01</span>
-                <span class="time-cell time-cell-far">02</span>
+            <div class="time-col-wrap" data-col="minute">
+                <div class="time-col-scroll"></div>
             </div>
-
-            <div class="time-col time-col-period">
-                <span class="time-cell time-cell-far">PM</span>
-                <span class="time-cell time-cell-empty"></span>
-                <span class="time-cell time-cell-active" data-action="time-period">AM</span>
-                <span class="time-cell time-cell-empty"></span>
-                <span class="time-cell time-cell-far">PM</span>
+            <div class="time-col-wrap time-col-period-wrap" data-col="period">
+                <div class="time-col-scroll"></div>
             </div>
         </div>
 
