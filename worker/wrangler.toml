@@ -4,7 +4,7 @@ compatibility_date = "2024-09-23"
 
 [[kv_namespaces]]
 binding = "PUSH_KV"
-id = "REPLACE_WITH_YOUR_KV_ID"
+id = "662d968a6c21452883c674053c5897ca"
 
 [triggers]
 crons = ["* * * * *"]

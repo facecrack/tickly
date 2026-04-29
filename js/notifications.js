@@ -3,7 +3,7 @@
  *
  * После деплоя воркера вставь сюда его URL:
  */
-const PUSH_WORKER = 'https://tickly-push.YOUR_ACCOUNT.workers.dev';
+const PUSH_WORKER = 'https://tickly-push.alexandrovvvsasha-831.workers.dev';
 
 
 // ─── PUBLIC API ───────────────────────────────────────────────────────────────
