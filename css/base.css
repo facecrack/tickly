@@ -74,7 +74,21 @@ input, textarea {
 
 
 /* ============================================
-   BODY — базовые стили страницы
+   GLOBAL TEXT
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6,
+p, span, a, button, label, li {
+    line-height: 1;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+
+/* ============================================
+   BODY
    ============================================ */
 
 body {
@@ -83,27 +97,25 @@ body {
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100dvh;
-
-    /* Отключаем 300ms-зум при double-tap, оставляем pinch-zoom */
     touch-action: manipulation;
 
-    /* Safe area для iPhone — bottom handled by bottom-nav margin */
-    padding-top: env(safe-area-inset-top);
+    /* Safe area — только стороны; top обрабатывается в .screen, bottom в navbar */
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
 }
 
 
 /* ============================================
-   SCREEN — общий контейнер любого экрана.
-   Flex-колонка чтобы bottom-nav прижимался к низу через margin-top:auto.
+   SCREEN
    ============================================ */
 
 .screen {
     max-width: 390px;
     margin: 0 auto;
-    padding: 16px 20px;
-    min-height: 100dvh;
+    /* top padding учитывает статус-бар iPhone */
+    padding: calc(16px + env(safe-area-inset-top)) 20px 16px;
+    /* min-height вычитает safe-area-top чтобы экран влезал в body без лишнего скролла */
+    min-height: calc(100dvh - env(safe-area-inset-top));
     display: flex;
     flex-direction: column;
     animation: screen-fade 0.2s ease;
@@ -119,105 +131,4 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-
-/* ============================================
-   GLOBAL TEXT
-   ============================================ */
-
-h1, h2, h3, h4, h5, h6,
-p, span, a, button, label, li {
-    line-height: 1;
-}
-
-[hidden] {
-    display: none !important;
-}
-
-html {
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-}
-
-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    color: inherit;
-    font-size: inherit;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-ul, ol {
-    list-style: none;
-}
-
-img, svg {
-    display: block;
-    max-width: 100%;
-}
-
-input, textarea {
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-    background: none;
-    border: none;
-    outline: none;
-}
-
-
-/* ============================================
-   BODY — базовые стили страницы
-   ============================================ */
-
-body {
-    font-family: 'Fixel Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 500;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100dvh;
-
-    /* Safe area для iPhone — отступы под челку и home indicator */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-}
-
-
-/* ============================================
-   SCREEN — общий контейнер любого экрана.
-   Flex-колонка чтобы bottom-nav прижимался к низу через margin-top:auto.
-   ============================================ */
-
-.screen {
-    max-width: 390px;
-    margin: 0 auto;
-    padding: 16px 20px;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-}
-
-
-/* ============================================
-   GLOBAL TEXT — единый line-height для всех текстов
-   ============================================ */
-
-h1, h2, h3, h4, h5, h6,
-p, span, a, button, label, li {
-    line-height: 1;
-}
-
-/* hidden атрибут должен ВСЕГДА скрывать элемент,
-   даже если на нём кастомный display через классы */
-[hidden] {
-    display: none !important;
 }
