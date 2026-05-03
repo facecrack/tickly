@@ -228,7 +228,7 @@ function renderBinaries(binaries) {
                     ${streak > 0 ? `<p class="habit-streak">${streak} day streak</p>` : ''}
                 </div>
                 <button class="habit-check ${isDone ? 'habit-check-done' : ''}" data-action="habit-toggle">
-                    ${isDone ? '<img src="icons/check.svg" alt="Done">' : ''}
+                    <span class="habit-check-circle">${isDone ? '<img src="icons/check.svg" alt="Done">' : ''}</span>
                 </button>
             </li>
         `;
