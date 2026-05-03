@@ -96,17 +96,98 @@ function cancelPicker() {
 // ============================================
 
 const ITEM_H = 44;
-let scrollDebounce = null;
-let scrollListenerAttached = false;
+let twHour = null, twMin = null, twPeriod = null;
+
+
+class TimeWheel {
+    constructor(el, count) {
+        this.el = el;
+        this.count = count;
+        this._raf = null;
+        this._wheelTimer = null;
+        this._attach();
+    }
+
+    _attach() {
+        let startY, startTop, lastY, lastT, vel;
+
+        this.el.addEventListener('touchstart', e => {
+            if (this._raf) cancelAnimationFrame(this._raf);
+            startY = lastY = e.touches[0].clientY;
+            startTop = this.el.scrollTop;
+            vel = 0;
+            lastT = performance.now();
+        }, { passive: true });
+
+        this.el.addEventListener('touchmove', e => {
+            const y = e.touches[0].clientY;
+            const now = performance.now();
+            const dt = now - lastT || 1;
+            vel = (lastY - y) / dt;
+            lastY = y;
+            lastT = now;
+            this.el.scrollTop = startTop + (startY - y);
+        }, { passive: true });
+
+        this.el.addEventListener('touchend', () => this._settle(vel), { passive: true });
+
+        this.el.addEventListener('wheel', e => {
+            e.preventDefault();
+            this.el.scrollTop += e.deltaY;
+            clearTimeout(this._wheelTimer);
+            this._wheelTimer = setTimeout(() => this._settle(0), 150);
+        }, { passive: false });
+
+        // Тап по элементу — проскроллить к нему
+        this.el.addEventListener('click', e => {
+            const item = e.target.closest('.time-item');
+            if (!item) return;
+            const items = this.el.querySelectorAll('.time-item');
+            const idx = Array.from(items).indexOf(item);
+            if (idx >= 0) this._animateTo(idx * ITEM_H);
+        });
+    }
+
+    _settle(vel) {
+        const momentum = vel * 80;
+        const raw = this.el.scrollTop + momentum;
+        const max = (this.count - 1) * ITEM_H;
+        const target = Math.round(Math.max(0, Math.min(raw, max)) / ITEM_H) * ITEM_H;
+        this._animateTo(target);
+    }
+
+    _animateTo(target) {
+        if (this._raf) cancelAnimationFrame(this._raf);
+        const start = this.el.scrollTop;
+        const diff = target - start;
+        if (Math.abs(diff) < 1) { this.el.scrollTop = target; return; }
+        const dur = Math.min(380, Math.abs(diff) * 1.8);
+        const t0 = performance.now();
+        const step = now => {
+            const p = Math.min(1, (now - t0) / dur);
+            const e = 1 - Math.pow(1 - p, 3);
+            this.el.scrollTop = start + diff * e;
+            if (p < 1) this._raf = requestAnimationFrame(step);
+        };
+        this._raf = requestAnimationFrame(step);
+    }
+
+    scrollToIndex(i, animate = true) {
+        const target = Math.max(0, Math.min(i, this.count - 1)) * ITEM_H;
+        animate ? this._animateTo(target) : (this.el.scrollTop = target);
+    }
+
+    getIndex() {
+        return Math.max(0, Math.min(this.count - 1, Math.round(this.el.scrollTop / ITEM_H)));
+    }
+}
+
 
 function openTimePicker() {
     const [h, m] = formState.reminder.time.split(':').map(Number);
     pickerDraft = { hour24: h, minute: m };
-
     buildTimeWheels();
     showSheet('time');
-
-    // Прокрутить к нужному значению после рендера
     requestAnimationFrame(() => requestAnimationFrame(scrollToCurrentTime));
 }
 
@@ -114,48 +195,40 @@ function openTimePicker() {
 function buildTimeWheels() {
     const use12h = storage.getSettings().timeFormat === '12h';
 
-    const hourScroll   = document.querySelector('[data-col="hour"] .time-col-scroll');
-    const minScroll    = document.querySelector('[data-col="minute"] .time-col-scroll');
-    const periodWrap   = document.querySelector('[data-col="period"]');
-    const periodScroll = document.querySelector('[data-col="period"] .time-col-scroll');
+    const hourEl   = document.querySelector('[data-col="hour"] .time-col-scroll');
+    const minEl    = document.querySelector('[data-col="minute"] .time-col-scroll');
+    const periodWrap = document.querySelector('[data-col="period"]');
+    const periodEl = document.querySelector('[data-col="period"] .time-col-scroll');
 
-    if (!hourScroll || !minScroll) return;
-
+    if (!hourEl || !minEl) return;
     periodWrap.hidden = !use12h;
 
-    // Часы
     const hours = use12h
-        ? Array.from({ length: 12 }, (_, i) => pad(i + 1))   // 01–12
-        : Array.from({ length: 24 }, (_, i) => pad(i));       // 00–23
+        ? Array.from({ length: 12 }, (_, i) => pad(i + 1))
+        : Array.from({ length: 24 }, (_, i) => pad(i));
 
-    hourScroll.innerHTML =
+    hourEl.innerHTML =
         '<div class="time-pad"></div>' +
         hours.map(v => `<div class="time-item">${v}</div>`).join('') +
         '<div class="time-pad"></div>';
 
-    // Минуты
-    const minutes = Array.from({ length: 60 }, (_, i) => pad(i));
-    minScroll.innerHTML =
+    minEl.innerHTML =
         '<div class="time-pad"></div>' +
-        minutes.map(v => `<div class="time-item">${v}</div>`).join('') +
+        Array.from({ length: 60 }, (_, i) => `<div class="time-item">${pad(i)}</div>`).join('') +
         '<div class="time-pad"></div>';
 
-    // AM/PM
-    if (use12h) {
-        periodScroll.innerHTML =
+    twHour = new TimeWheel(hourEl, hours.length);
+    twMin  = new TimeWheel(minEl, 60);
+
+    if (use12h && periodEl) {
+        periodEl.innerHTML =
             '<div class="time-pad"></div>' +
             '<div class="time-item">AM</div>' +
             '<div class="time-item">PM</div>' +
             '<div class="time-pad"></div>';
-    }
-
-    // Слушатель scroll — один раз на весь sheet
-    if (!scrollListenerAttached) {
-        document.querySelector('[data-sheet="time"]').addEventListener('scroll', () => {
-            clearTimeout(scrollDebounce);
-            scrollDebounce = setTimeout(readTimeWheels, 200);
-        }, { capture: true, passive: true });
-        scrollListenerAttached = true;
+        twPeriod = new TimeWheel(periodEl, 2);
+    } else {
+        twPeriod = null;
     }
 }
 
@@ -165,48 +238,39 @@ function scrollToCurrentTime() {
     const h = pickerDraft.hour24;
     const m = pickerDraft.minute;
 
-    const hourScroll   = document.querySelector('[data-col="hour"] .time-col-scroll');
-    const minScroll    = document.querySelector('[data-col="minute"] .time-col-scroll');
-    const periodScroll = document.querySelector('[data-col="period"] .time-col-scroll');
-
-    if (!hourScroll || !minScroll) return;
+    if (!twHour || !twMin) return;
 
     if (use12h) {
         const hour12 = h % 12 === 0 ? 12 : h % 12;
-        hourScroll.scrollTop = (hour12 - 1) * ITEM_H;
-        if (periodScroll) periodScroll.scrollTop = (h >= 12 ? 1 : 0) * ITEM_H;
+        twHour.scrollToIndex(hour12 - 1, false);
+        if (twPeriod) twPeriod.scrollToIndex(h >= 12 ? 1 : 0, false);
     } else {
-        hourScroll.scrollTop = h * ITEM_H;
+        twHour.scrollToIndex(h, false);
     }
-    minScroll.scrollTop = m * ITEM_H;
+    twMin.scrollToIndex(m, false);
 }
 
 
 function readTimeWheels() {
     const use12h = storage.getSettings().timeFormat === '12h';
+    if (!twHour || !twMin) return;
 
-    const hourScroll   = document.querySelector('[data-col="hour"] .time-col-scroll');
-    const minScroll    = document.querySelector('[data-col="minute"] .time-col-scroll');
-    const periodScroll = document.querySelector('[data-col="period"] .time-col-scroll');
-
-    if (!hourScroll || !minScroll) return;
-
-    const hourIdx = Math.round(hourScroll.scrollTop / ITEM_H);
-    const minIdx  = Math.round(minScroll.scrollTop  / ITEM_H);
+    const hourIdx = twHour.getIndex();
+    const minIdx  = twMin.getIndex();
 
     if (use12h) {
-        const hour12  = (hourIdx % 12) + 1;  // 1–12
-        const isPM    = periodScroll ? Math.round(periodScroll.scrollTop / ITEM_H) === 1 : false;
+        const hour12 = hourIdx + 1;  // 1–12
+        const isPM   = twPeriod ? twPeriod.getIndex() === 1 : false;
         pickerDraft.hour24 = (hour12 % 12) + (isPM ? 12 : 0);
     } else {
-        pickerDraft.hour24 = hourIdx % 24;
+        pickerDraft.hour24 = hourIdx;
     }
-    pickerDraft.minute = minIdx % 60;
+    pickerDraft.minute = minIdx;
 }
 
 
 function saveTimePicker() {
-    readTimeWheels();  // Читаем финальную позицию перед сохранением
+    readTimeWheels();
     formState.reminder.time    = `${pad(pickerDraft.hour24)}:${pad(pickerDraft.minute)}`;
     formState.reminder.enabled = true;
     hideSheet();

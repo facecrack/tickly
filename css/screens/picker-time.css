@@ -55,12 +55,8 @@
 
 .time-col-scroll {
     height: 220px;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    overflow: hidden;
 }
-.time-col-scroll::-webkit-scrollbar { display: none; }
 
 /* Fade сверху и снизу */
 .time-col-wrap::before,
@@ -94,8 +90,8 @@
     font-size: 22px;
     font-weight: 500;
     color: var(--text-primary);
-    scroll-snap-align: center;
     user-select: none;
+    cursor: pointer;
 }
 
 /* Пустые паддинг-блоки сверху и снизу — чтобы крайние значения
