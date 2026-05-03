@@ -239,6 +239,10 @@ document.addEventListener('click', (event) => {
             settings.export();
             break;
 
+        case 'import-data':
+            settings.import();
+            break;
+
 						case 'feedback-category':
     feedback.selectCategory(actionEl.dataset.category);
     break;

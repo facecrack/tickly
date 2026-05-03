@@ -75,6 +75,29 @@ function exportData() {
 }
 
 
+function importData() {
+    const input = document.getElementById('import-file-input');
+    input.onchange = function () {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!data.habits) throw new Error('Invalid format');
+                storage.saveData(data);
+                window.location.reload();
+            } catch {
+                alert('Could not read the file. Make sure it\'s a valid Tickly backup.');
+            }
+        };
+        reader.readAsText(file);
+        input.value = '';
+    };
+    input.click();
+}
+
+
 function formatSound(value) {
     const map = {
         'gentle-chime': 'Gentle chime',
@@ -98,5 +121,6 @@ function capitalize(s) {
 window.settings = {
     render: renderSettings,
     toggleReminders: toggleReminders,
-    export: exportData
+    export: exportData,
+    import: importData
 };

@@ -564,16 +564,28 @@
             <div class="settings-card">
                 <button class="settings-row settings-row-button settings-row-export" data-action="export-data">
                     <span class="settings-export">
-                        <img src="icons/download.svg" alt="" class="settings-export-icon">
+                        <img src="icons/export.svg" alt="" class="settings-export-icon">
                         <span class="settings-export-text">
                             <span class="settings-row-label">Export data</span>
-                            <span class="settings-export-hint">Download a backup file</span>
+                            <span class="settings-export-hint">Save a backup to your device</span>
+                        </span>
+                    </span>
+                    <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
+                </button>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button settings-row-export" data-action="import-data">
+                    <span class="settings-export">
+                        <img src="icons/import.svg" alt="" class="settings-export-icon">
+                        <span class="settings-export-text">
+                            <span class="settings-row-label">Import data</span>
+                            <span class="settings-export-hint">Restore from a backup file</span>
                         </span>
                     </span>
                     <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
                 </button>
             </div>
         </section>
+        <input type="file" id="import-file-input" accept=".json" style="display:none">
 
         <section class="settings-group">
             <label class="form-label">ABOUT</label>
