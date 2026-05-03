@@ -127,6 +127,7 @@ class TimeWheel {
             lastY = y;
             lastT = now;
             this.el.scrollTop = startTop + (startY - y);
+            this._updateSelected();
         }, { passive: true });
 
         this.el.addEventListener('touchend', () => this._settle(vel), { passive: true });
@@ -134,17 +135,24 @@ class TimeWheel {
         this.el.addEventListener('wheel', e => {
             e.preventDefault();
             this.el.scrollTop += e.deltaY;
+            this._updateSelected();
             clearTimeout(this._wheelTimer);
             this._wheelTimer = setTimeout(() => this._settle(0), 150);
         }, { passive: false });
 
-        // Тап по элементу — проскроллить к нему
         this.el.addEventListener('click', e => {
             const item = e.target.closest('.time-item');
             if (!item) return;
             const items = this.el.querySelectorAll('.time-item');
             const idx = Array.from(items).indexOf(item);
             if (idx >= 0) this._animateTo(idx * ITEM_H);
+        });
+    }
+
+    _updateSelected() {
+        const idx = this.getIndex();
+        this.el.querySelectorAll('.time-item').forEach((el, i) => {
+            el.classList.toggle('time-item-selected', i === idx);
         });
     }
 
@@ -160,13 +168,18 @@ class TimeWheel {
         if (this._raf) cancelAnimationFrame(this._raf);
         const start = this.el.scrollTop;
         const diff = target - start;
-        if (Math.abs(diff) < 1) { this.el.scrollTop = target; return; }
+        if (Math.abs(diff) < 1) {
+            this.el.scrollTop = target;
+            this._updateSelected();
+            return;
+        }
         const dur = Math.min(380, Math.abs(diff) * 1.8);
         const t0 = performance.now();
         const step = now => {
             const p = Math.min(1, (now - t0) / dur);
             const e = 1 - Math.pow(1 - p, 3);
             this.el.scrollTop = start + diff * e;
+            this._updateSelected();
             if (p < 1) this._raf = requestAnimationFrame(step);
         };
         this._raf = requestAnimationFrame(step);
@@ -174,7 +187,12 @@ class TimeWheel {
 
     scrollToIndex(i, animate = true) {
         const target = Math.max(0, Math.min(i, this.count - 1)) * ITEM_H;
-        animate ? this._animateTo(target) : (this.el.scrollTop = target);
+        if (animate) {
+            this._animateTo(target);
+        } else {
+            this.el.scrollTop = target;
+            this._updateSelected();
+        }
     }
 
     getIndex() {
