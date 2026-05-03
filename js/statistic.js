@@ -325,16 +325,23 @@ function calculateBestStreak(habit) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const target = habit.target || 1;
+    const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
     for (let i = 365; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
+        const dayKey = dayKeys[d.getDay()];
+        if (!habit.schedule.includes(dayKey)) continue;
         const key = formatDateKey(d);
         const entry = habit.entries[key];
+        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
 
-        if (entry === 'done' || (typeof entry === 'number' && entry >= target)) {
-            temp++;
-            if (temp > best) best = temp;
+        if (isDone || isSkipped) {
+            if (isDone) {
+                temp++;
+                if (temp > best) best = temp;
+            }
         } else {
             temp = 0;
         }

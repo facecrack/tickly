@@ -294,7 +294,9 @@ function calculateStats(habit) {
     today.setHours(0, 0, 0, 0);
     const target = habit.target || 1;
 
-    // Current streak — от сегодня назад
+    const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+    // Current streak — от сегодня назад, пропускаем незапланированные дни
     let currentStreak = 0;
     const todayEntry = entries[formatDateKey(today)];
     const todayDone = todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target);
@@ -302,28 +304,36 @@ function calculateStats(habit) {
     for (let i = startOffset; i < 365; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
+        const dayKey = dayKeys[d.getDay()];
+        if (!habit.schedule.includes(dayKey)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
+        const isSkipped = entry === 'Skipped' || entry === 'skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
-        if (isDone) {
-            currentStreak++;
+        if (isDone || isSkipped) {
+            if (isDone) currentStreak++;
         } else {
             break;
         }
     }
 
-    // Best streak за последний год
+    // Best streak за последний год, пропускаем незапланированные дни
     let bestStreak = 0;
     let tempStreak = 0;
     for (let i = 365; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
+        const dayKey = dayKeys[d.getDay()];
+        if (!habit.schedule.includes(dayKey)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
+        const isSkipped = entry === 'Skipped' || entry === 'skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
-        if (isDone) {
-            tempStreak++;
-            if (tempStreak > bestStreak) bestStreak = tempStreak;
+        if (isDone || isSkipped) {
+            if (isDone) {
+                tempStreak++;
+                if (tempStreak > bestStreak) bestStreak = tempStreak;
+            }
         } else {
             tempStreak = 0;
         }

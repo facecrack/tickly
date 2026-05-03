@@ -240,6 +240,7 @@ function calculateStreak(habit) {
     let streak = 0;
     const today = new Date();
     const target = habit.target || 1;
+    const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
     const todayEntry = habit.entries[formatDateKey(today)];
     const todayDone = todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target);
@@ -249,12 +250,16 @@ function calculateStreak(habit) {
         const date = new Date(today);
         date.setDate(today.getDate() - i);
 
+        const dayKey = dayKeys[date.getDay()];
+        if (!habit.schedule.includes(dayKey)) continue;
+
         const key = formatDateKey(date);
         const entry = habit.entries[key];
+        const isSkipped = entry === 'Skipped' || entry === 'skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
 
-        if (isDone) {
-            streak++;
+        if (isDone || isSkipped) {
+            if (isDone) streak++;
         } else {
             break;
         }
