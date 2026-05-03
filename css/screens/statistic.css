@@ -2,10 +2,6 @@
  * Statistic — экран статистики (Weekly + Overall).
  */
 
-[data-screen="statistic"] {
-    padding-bottom: 100px;
-}
-
 
 /* ============================================
    TABS — переключатель Weekly / Overall
