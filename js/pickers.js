@@ -385,7 +385,9 @@ function selectSound(label) {
         'Chirp': 'chirp',
         'None (vibration only)': 'none'
     };
-    storage.updateSettings({ sound: map[label] });
+    const key = map[label];
+    storage.updateSettings({ sound: key });
+    sounds.play(key);
     hideSheet();
     const settingsScreen = document.querySelector('[data-screen="settings"]');
     if (settingsScreen && !settingsScreen.hidden) {
