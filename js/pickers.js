@@ -120,6 +120,7 @@ class TimeWheel {
         }, { passive: true });
 
         this.el.addEventListener('touchmove', e => {
+            e.preventDefault();
             const y = e.touches[0].clientY;
             const now = performance.now();
             const dt = now - lastT || 1;
@@ -128,7 +129,7 @@ class TimeWheel {
             lastT = now;
             this.el.scrollTop = startTop + (startY - y);
             this._updateSelected();
-        }, { passive: true });
+        }, { passive: false });
 
         this.el.addEventListener('touchend', () => this._settle(vel), { passive: true });
 
