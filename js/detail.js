@@ -296,7 +296,10 @@ function calculateStats(habit) {
 
     // Current streak — от сегодня назад
     let currentStreak = 0;
-    for (let i = 0; i < 365; i++) {
+    const todayEntry = entries[formatDateKey(today)];
+    const todayDone = todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target);
+    const startOffset = todayDone ? 0 : 1;
+    for (let i = startOffset; i < 365; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
         const key = formatDateKey(d);

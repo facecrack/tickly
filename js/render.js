@@ -239,15 +239,19 @@ function renderBinaries(binaries) {
 function calculateStreak(habit) {
     let streak = 0;
     const today = new Date();
+    const target = habit.target || 1;
 
-    for (let i = 0; i < 365; i++) {
+    const todayEntry = habit.entries[formatDateKey(today)];
+    const todayDone = todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target);
+    const startOffset = todayDone ? 0 : 1;
+
+    for (let i = startOffset; i < 365; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() - i);
 
         const key = formatDateKey(date);
         const entry = habit.entries[key];
-
-        const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
+        const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
 
         if (isDone) {
             streak++;
