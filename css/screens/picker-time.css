@@ -44,8 +44,9 @@
 .time-col-wrap {
     position: relative;
     width: 72px;
-    height: 100%;
+    height: 220px;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .time-col-period-wrap {
@@ -53,7 +54,7 @@
 }
 
 .time-col-scroll {
-    height: 100%;
+    height: 220px;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;

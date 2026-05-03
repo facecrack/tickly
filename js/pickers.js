@@ -388,8 +388,6 @@ window.pickers = {
     saveIcon: saveIconPicker,
     cancel: cancelPicker,
     openTime: openTimePicker,
-    timeStep: timeStep,
-    timeTogglePeriod: timeTogglePeriod,
     saveTime: saveTimePicker,
     openUnit: openUnitPicker,
     selectUnit: selectUnit,
