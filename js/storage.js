@@ -15,6 +15,7 @@ const DEFAULT_DATA = {
         theme: 'default',
         remindersEnabled: true,
         sound: 'gentle-chime',
+        vibrate: true,
         startWeekOn: 'monday',
         timeFormat: '24h'
     },

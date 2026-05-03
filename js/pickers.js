@@ -206,6 +206,7 @@ function openTimePicker() {
     const [h, m] = formState.reminder.time.split(':').map(Number);
     pickerDraft = { hour24: h, minute: m };
     buildTimeWheels();
+    renderTimePickerRows();
     showSheet('time');
     requestAnimationFrame(() => requestAnimationFrame(scrollToCurrentTime));
 }
@@ -386,7 +387,39 @@ function selectSound(label) {
     };
     storage.updateSettings({ sound: map[label] });
     hideSheet();
-    settings.render();
+    const settingsScreen = document.querySelector('[data-screen="settings"]');
+    if (settingsScreen && !settingsScreen.hidden) {
+        settings.render();
+    } else {
+        renderTimePickerRows();
+    }
+}
+
+
+function renderTimePickerRows() {
+    const s = storage.getSettings();
+    const soundLabel = document.querySelector('.time-picker-sound-label');
+    if (soundLabel) soundLabel.textContent = formatSoundLabel(s.sound);
+    const vibrateToggle = document.querySelector('.time-picker-vibrate-toggle');
+    if (vibrateToggle) vibrateToggle.classList.toggle('toggle-on', s.vibrate !== false);
+}
+
+
+function formatSoundLabel(value) {
+    const map = {
+        'gentle-chime': 'Gentle chime',
+        'bell': 'Bell',
+        'chirp': 'Chirp',
+        'none': 'None (vibration only)'
+    };
+    return map[value] || value;
+}
+
+
+function toggleVibrate() {
+    const s = storage.getSettings();
+    storage.updateSettings({ vibrate: !s.vibrate });
+    renderTimePickerRows();
 }
 
 
@@ -476,6 +509,7 @@ window.pickers = {
     selectUnit: selectUnit,
     openSound: openSoundPicker,
     selectSound: selectSound,
+    toggleVibrate: toggleVibrate,
     openStartWeek: openStartWeekPicker,
     selectStartWeek: selectStartWeek,
     openTimeFormat: openTimeFormatPicker,

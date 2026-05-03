@@ -223,6 +223,10 @@ document.addEventListener('click', (event) => {
             pickers.openSound();
             break;
 
+        case 'toggle-vibrate':
+            pickers.toggleVibrate();
+            break;
+
         case 'open-start-week-picker':
             pickers.openStartWeek();
             break;
