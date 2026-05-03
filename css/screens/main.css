@@ -2,6 +2,11 @@
  * Main screen — стили главного экрана.
  */
 
+[data-screen="main"],
+[data-screen="main-empty"] {
+    padding-bottom: 100px;
+}
+
 
 /* ============================================
    HEADER — дата и приветствие

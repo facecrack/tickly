@@ -92,7 +92,7 @@
     transform: translateX(-50%);
     width: calc(100% - 40px);
     max-width: 350px;
-    z-index: 100;
+    z-index: 10;
 }
 
 .nav-btn {
