@@ -304,7 +304,7 @@ function calculateSuccessPercent(habit) {
     const cursor = new Date(created);
     while (cursor <= today) {
         const dayKey = dayKeys[(cursor.getDay() + 6) % 7];
-        if (habit.schedule.includes(dayKey)) {
+        if (habit.schedule.includes(dayKey) && !isInPauseWindow(habit, cursor)) {
             scheduledDays++;
             const key = formatDateKey(cursor);
             const entry = habit.entries[key];
@@ -367,23 +367,29 @@ function moodColor(percent) {
 function getCurrentWeekDays() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const monday = new Date(today);
-    const dayOfWeek = (today.getDay() + 6) % 7;
-    monday.setDate(today.getDate() - dayOfWeek);
 
-    const dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    const dayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const s = storage.getSettings();
+    const startOn = s.startWeekOn || 'monday';
+    const startDayJs = { monday: 1, sunday: 0, saturday: 6 }[startOn] ?? 1;
+
+    const startOfWeek = new Date(today);
+    const diff = (today.getDay() - startDayJs + 7) % 7;
+    startOfWeek.setDate(today.getDate() - diff);
+
+    const allLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const allDayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const days = [];
 
     for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
+        const d = new Date(startOfWeek);
+        d.setDate(startOfWeek.getDate() + i);
         d.setHours(0, 0, 0, 0);
+        const dow = d.getDay();
         days.push({
             date: d,
             key: formatDateKey(d),
-            letter: dayLetters[i],
-            dayKey: dayKeys[i]
+            letter: allLetters[dow],
+            dayKey: allDayKeys[dow]
         });
     }
 

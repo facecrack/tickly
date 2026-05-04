@@ -39,7 +39,8 @@ function changeCounter(habitId, delta) {
         storage.setEntry(habitId, today, newValue);
     }
 
-    render.main();
+    const allHabits = storage.getHabits();
+    render.counters(allHabits.filter(h => h.type === 'counter'));
 
     // Bump анимация на изменённой карточке
     requestAnimationFrame(() => {

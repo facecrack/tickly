@@ -226,9 +226,13 @@ function renderHeatmap(habit) {
 
 
 function changeHeatmapMonth(delta) {
-    heatmapMonthOffset += delta;
     const habit = storage.getHabit(currentDetailHabitId);
-    if (habit) renderHeatmap(habit);
+    if (!habit) return;
+    const created = parseLocalDate(habit.createdAt);
+    const now = new Date();
+    const monthsBack = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
+    heatmapMonthOffset = Math.max(-monthsBack, heatmapMonthOffset + delta);
+    renderHeatmap(habit);
 }
 
 
@@ -363,7 +367,7 @@ function calculateStats(habit) {
         const cursor = new Date(created);
         while (cursor <= today) {
             const dayKey = dayKeys[(cursor.getDay() + 6) % 7];
-            if (habit.schedule.includes(dayKey)) {
+            if (habit.schedule.includes(dayKey) && !isInPauseWindow(habit, cursor)) {
                 scheduled++;
                 const key = formatDateKey(cursor);
                 if (entries[key] === 'done') done++;

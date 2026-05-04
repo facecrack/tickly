@@ -483,3 +483,17 @@
 .form-input-field::placeholder {
     color: var(--text-secondary);
 }
+
+
+/* ============================================
+   SCHEDULE ERROR
+   ============================================ */
+
+@keyframes schedule-error-flash {
+    0%, 100% { box-shadow: 0 0 0 0px var(--status-red); }
+    30%, 70% { box-shadow: 0 0 0 2px var(--status-red); }
+}
+
+.schedule-error {
+    animation: schedule-error-flash 0.7s ease;
+}

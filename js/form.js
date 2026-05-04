@@ -51,7 +51,7 @@ function openEditForm(habitId) {
         unit: habit.unit || '',
         step: habit.step || 1,
         schedule: [...habit.schedule],
-        reminder: { ...habit.reminder }
+        reminder: { enabled: false, time: '09:00', ...(habit.reminder || {}) }
     };
 
     if (formState.type === 'binary') {
@@ -75,12 +75,13 @@ function updateFormTitle(text) {
 function setType(newType) {
     if (newType !== 'binary' && newType !== 'counter') return;
     formState.type = newType;
-
+    const savedPrev = window.getPreviousScreen();
     if (newType === 'binary') {
         showScreen('new-habit-binary');
     } else {
         showScreen('new-habit-counter');
     }
+    window.setPreviousScreen(savedPrev);
     updateFormTitle(editingHabitId ? 'Edit habit' : 'New habit');
     renderForm();
 }
@@ -147,7 +148,15 @@ function changeStep(delta) {
 function saveHabit() {
     const name = formState.name.trim();
     if (!name) return;
-    if (formState.schedule.length === 0) return;
+    if (formState.schedule.length === 0) {
+        const screenName = formState.type === 'binary' ? 'new-habit-binary' : 'new-habit-counter';
+        const scheduleEl = document.querySelector(`[data-screen="${screenName}"] .schedule`);
+        if (scheduleEl) {
+            scheduleEl.classList.add('schedule-error');
+            setTimeout(() => scheduleEl.classList.remove('schedule-error'), 700);
+        }
+        return;
+    }
 
     const habitData = {
         name: name,
@@ -275,7 +284,11 @@ function arraysEqual(a, b) {
 
 
 function formatReminderTime(time) {
-    return time;
+    if (storage.getSettings().timeFormat !== '12h') return time;
+    const [h, m] = time.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
 }
 
 

@@ -157,18 +157,21 @@ function renderCounters(counters) {
     const list = document.querySelector('[data-screen="main"] .counters-list');
     const meta = document.querySelector('[data-screen="main"] .counters .section-meta');
 
-    if (counters.length === 0) {
+    const todayDayKey = getTodayDayKey();
+    const scheduled = counters.filter(h => h.schedule.includes(todayDayKey));
+
+    if (scheduled.length === 0) {
         section.hidden = true;
         return;
     }
     section.hidden = false;
 
-    const activeCount = counters.filter(h => !h.paused).length;
+    const activeCount = scheduled.filter(h => !h.paused).length;
     meta.textContent = `${activeCount} ${activeCount === 1 ? 'counter' : 'counters'}`;
 
     const todayKey = storage.getTodayString();
 
-    list.innerHTML = counters.map((habit) => {
+    list.innerHTML = scheduled.map((habit) => {
         if (habit.paused) {
             return `
                 <li class="counter counter-paused" data-habit-id="${habit.id}" data-action="open-detail">
@@ -256,10 +259,13 @@ function renderBinaries(binaries) {
 
         const todayEntry = habit.entries[todayKey];
         const isDone = todayEntry === 'done';
+        const isSkipped = todayEntry === 'Skipped' || todayEntry === 'skipped';
         const streak = calculateStreak(habit);
 
+        const stateClass = isDone ? 'habit-done' : isSkipped ? 'habit-skipped' : '';
+
         return `
-            <li class="habit ${isDone ? 'habit-done' : ''}" data-habit-id="${habit.id}" data-action="open-detail">
+            <li class="habit ${stateClass}" data-habit-id="${habit.id}" data-action="open-detail">
                 <div class="habit-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                 <div class="habit-info">
                     <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
