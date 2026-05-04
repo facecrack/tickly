@@ -239,7 +239,7 @@ function renderHeatmap12Weeks(habit) {
                 cellClass += ' stat-heatmap-cell-missed';
             }
 
-            const style = `grid-row: ${row + 1}; grid-column: ${col + 1};`;
+            const style = `grid-row: ${row + 1}; grid-column: ${12 - col};`;
             cells.push(`<div class="${cellClass}" style="${style}"></div>`);
         }
     }
