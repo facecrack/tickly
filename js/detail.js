@@ -231,7 +231,7 @@ function changeHeatmapMonth(delta) {
     const created = parseLocalDate(habit.createdAt);
     const now = new Date();
     const monthsBack = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
-    heatmapMonthOffset = Math.max(-monthsBack, heatmapMonthOffset + delta);
+    heatmapMonthOffset = Math.max(-monthsBack, Math.min(0, heatmapMonthOffset + delta));
     renderHeatmap(habit);
 }
 
