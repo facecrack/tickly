@@ -198,7 +198,7 @@ function renderHeatmap(habit) {
             cell.classList.add('heatmap-cell-other');
         } else if (isDone) {
             cell.classList.add('heatmap-cell-done');
-        } else if (isSkipped) {
+        } else if (isSkipped || isInPauseWindow(habit, d)) {
             cell.classList.add('heatmap-cell-skipped');
         } else if (isToday) {
             // Сегодня и не done — белая обводка

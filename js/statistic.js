@@ -182,7 +182,7 @@ function renderStatOverallCard(habit) {
             <div class="stat-overall-divider"></div>
             <div class="stat-overall-legend">
                 <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-done"></span>Done</div>
-                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-skipped"></span>Skipped</div>
+                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-skipped"></span>Skipped / Paused</div>
                 <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-missed"></span>Missed</div>
             </div>
         </div>
@@ -231,7 +231,7 @@ function renderHeatmap12Weeks(habit) {
                 // пустая
             } else if (isDone) {
                 cellClass += ' stat-heatmap-cell-done';
-            } else if (isSkipped) {
+            } else if (isSkipped || isInPauseWindow(habit, cellDate)) {
                 cellClass += ' stat-heatmap-cell-skipped';
             } else if (isToday) {
                 cellClass += ' stat-heatmap-cell-today';
