@@ -130,7 +130,7 @@
     background-color: #E5A632;
     -webkit-mask: url('../../icons/info.svg') no-repeat center / contain;
     mask: url('../../icons/info.svg') no-repeat center / contain;
-    margin-top: 3px;
+    margin-top: 8px;
 }
 
 .privacy-warning-text {
