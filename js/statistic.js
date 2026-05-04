@@ -332,6 +332,7 @@ function calculateBestStreak(habit) {
         d.setDate(today.getDate() - i);
         const dayKey = dayKeys[d.getDay()];
         if (!habit.schedule.includes(dayKey)) continue;
+        if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = habit.entries[key];
         const isSkipped = entry === 'Skipped' || entry === 'skipped';

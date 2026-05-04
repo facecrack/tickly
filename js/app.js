@@ -90,6 +90,7 @@ if (backdrop) {
 
 
 render.main();
+dragdrop.init();
 
 
 window.showScreen = showScreen;

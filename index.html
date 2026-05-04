@@ -379,6 +379,8 @@
             </ul>
         </section>
 
+        <div class="detail-paused-banner" hidden>⏸ Habit paused</div>
+
         <div class="detail-actions">
     <button class="action-btn" data-action="edit-habit">
         <img src="icons/edit.svg" alt="" class="action-edit-icon">
@@ -389,6 +391,11 @@
         <span>Skip today</span>
     </button>
 </div>
+
+<button class="action-btn action-btn-pause detail-pause-btn" data-action="pause-habit">
+    <span class="action-pause-icon">⏸</span>
+    <span class="detail-pause-label">Pause habit</span>
+</button>
 
 <button class="action-btn action-btn-delete" data-action="open-delete-alert">
     <img src="icons/trash.svg" alt="" class="action-delete-icon">
@@ -472,6 +479,8 @@
             </div>
         </section>
 
+        <div class="detail-paused-banner" hidden>⏸ Habit paused</div>
+
         <div class="detail-actions">
     <button class="action-btn" data-action="edit-habit">
         <img src="icons/edit.svg" alt="" class="action-edit-icon">
@@ -482,6 +491,11 @@
         <span>Skip today</span>
     </button>
 </div>
+
+<button class="action-btn action-btn-pause detail-pause-btn" data-action="pause-habit">
+    <span class="action-pause-icon">⏸</span>
+    <span class="detail-pause-label">Pause habit</span>
+</button>
 
 <button class="action-btn action-btn-delete" data-action="open-delete-alert">
     <img src="icons/trash.svg" alt="" class="action-delete-icon">
@@ -1054,6 +1068,7 @@
 <script src="js/statistic.js" defer></script>
 <script src="js/feedback.js" defer></script>
 <script src="js/notifications.js" defer></script>
+<script src="js/dragdrop.js" defer></script>
 <script src="js/router.js" defer></script>
 <script src="js/app.js" defer></script>
 </body>

@@ -48,6 +48,28 @@ function renderBinaryDetail(habit) {
     const meta = screen.querySelector('.detail-meta');
     if (meta) meta.textContent = formatSchedule(habit.schedule);
 
+    // Pause state
+    const banner = screen.querySelector('.detail-paused-banner');
+    if (banner) banner.hidden = !habit.paused;
+
+    const skipBtn = screen.querySelector('[data-action="skip-today"]');
+    if (skipBtn) skipBtn.hidden = !!habit.paused;
+
+    const pauseBtn = screen.querySelector('.detail-pause-btn');
+    if (pauseBtn) {
+        if (habit.paused) {
+            pauseBtn.dataset.action = 'resume-habit';
+            pauseBtn.querySelector('.detail-pause-label').textContent = 'Resume habit';
+            pauseBtn.classList.add('action-btn-resume');
+            pauseBtn.classList.remove('action-btn-pause');
+        } else {
+            pauseBtn.dataset.action = 'pause-habit';
+            pauseBtn.querySelector('.detail-pause-label').textContent = 'Pause habit';
+            pauseBtn.classList.add('action-btn-pause');
+            pauseBtn.classList.remove('action-btn-resume');
+        }
+    }
+
     // Stats
     const stats = calculateStats(habit);
     const statValues = screen.querySelectorAll('.stats-grid .stat-value');
@@ -82,6 +104,28 @@ function renderCounterDetail(habit) {
 
     const meta = screen.querySelector('.detail-meta');
     if (meta) meta.textContent = `${formatSchedule(habit.schedule)} / ${habit.target} ${habit.unit}`;
+
+    // Pause state
+    const banner = screen.querySelector('.detail-paused-banner');
+    if (banner) banner.hidden = !habit.paused;
+
+    const skipBtn = screen.querySelector('[data-action="skip-today"]');
+    if (skipBtn) skipBtn.hidden = !!habit.paused;
+
+    const pauseBtn = screen.querySelector('.detail-pause-btn');
+    if (pauseBtn) {
+        if (habit.paused) {
+            pauseBtn.dataset.action = 'resume-habit';
+            pauseBtn.querySelector('.detail-pause-label').textContent = 'Resume habit';
+            pauseBtn.classList.add('action-btn-resume');
+            pauseBtn.classList.remove('action-btn-pause');
+        } else {
+            pauseBtn.dataset.action = 'pause-habit';
+            pauseBtn.querySelector('.detail-pause-label').textContent = 'Pause habit';
+            pauseBtn.classList.add('action-btn-pause');
+            pauseBtn.classList.remove('action-btn-resume');
+        }
+    }
 
     // Today block
     const today = storage.getTodayString();
@@ -296,7 +340,7 @@ function calculateStats(habit) {
 
     const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-    // Current streak — от сегодня назад, пропускаем незапланированные дни
+    // Current streak — от сегодня назад, пропускаем незапланированные дни и паузу
     let currentStreak = 0;
     const todayEntry = entries[formatDateKey(today)];
     const todayDone = todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target);
@@ -306,6 +350,7 @@ function calculateStats(habit) {
         d.setDate(today.getDate() - i);
         const dayKey = dayKeys[d.getDay()];
         if (!habit.schedule.includes(dayKey)) continue;
+        if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
         const isSkipped = entry === 'Skipped' || entry === 'skipped';
@@ -317,7 +362,7 @@ function calculateStats(habit) {
         }
     }
 
-    // Best streak за последний год, пропускаем незапланированные дни
+    // Best streak за последний год, пропускаем незапланированные дни и паузу
     let bestStreak = 0;
     let tempStreak = 0;
     for (let i = 365; i >= 0; i--) {
@@ -325,6 +370,7 @@ function calculateStats(habit) {
         d.setDate(today.getDate() - i);
         const dayKey = dayKeys[d.getDay()];
         if (!habit.schedule.includes(dayKey)) continue;
+        if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
         const isSkipped = entry === 'Skipped' || entry === 'skipped';

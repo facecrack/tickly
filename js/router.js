@@ -219,6 +219,14 @@ document.addEventListener('click', (event) => {
             hideAlert();
             break;
 
+        case 'pause-habit':
+            habits.pause(detail.currentId());
+            break;
+
+        case 'resume-habit':
+            habits.resume(detail.currentId());
+            break;
+
         case 'open-sound-picker':
             pickers.openSound();
             break;

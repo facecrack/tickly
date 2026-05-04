@@ -72,6 +72,25 @@ function deleteHabit(habitId) {
 }
 
 
+function pauseHabit(habitId) {
+    storage.updateHabit(habitId, {
+        paused: true,
+        pausedAt: storage.getTodayString(),
+        resumedAt: null
+    });
+    detail.open(habitId);
+}
+
+
+function resumeHabit(habitId) {
+    storage.updateHabit(habitId, {
+        paused: false,
+        resumedAt: storage.getTodayString()
+    });
+    detail.open(habitId);
+}
+
+
 // ============================================
 // ДОСТУПНОСТЬ
 // ============================================
@@ -80,5 +99,7 @@ window.habits = {
     toggle: toggleHabit,
     changeCounter: changeCounter,
     skipToday: skipToday,
-    deleteHabit: deleteHabit
+    deleteHabit: deleteHabit,
+    pause: pauseHabit,
+    resume: resumeHabit
 };

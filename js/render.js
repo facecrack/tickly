@@ -78,13 +78,14 @@ function calculateDayMood(habits, day) {
     let done = 0;
 
     habits.forEach((habit) => {
+        if (isInPauseWindow(habit, day.date)) return;
         const created = parseLocalDate(habit.createdAt);
         if (day.date < created) return;
         if (!habit.schedule.includes(day.dayKey)) return;
 
         const entry = habit.entries[day.key];
         const isSkipped = entry === 'Skipped' || entry === 'skipped';
-        if (isSkipped) return;  // skipped не учитывается ни в числителе, ни в знаменателе
+        if (isSkipped) return;
 
         scheduled++;
         const target = habit.target || 1;
@@ -120,6 +121,17 @@ function parseLocalDate(str) {
 }
 
 
+// Проверяет, попадает ли дата в период паузы привычки
+function isInPauseWindow(habit, date) {
+    if (!habit.pausedAt) return false;
+    const pausedFrom = parseLocalDate(habit.pausedAt);
+    if (date < pausedFrom) return false;
+    if (habit.paused) return true;
+    if (habit.resumedAt) return date < parseLocalDate(habit.resumedAt);
+    return false;
+}
+
+
 function renderMainDate() {
     const date = new Date();
     const formatted = date.toLocaleDateString('en-US', {
@@ -151,11 +163,25 @@ function renderCounters(counters) {
     }
     section.hidden = false;
 
-    meta.textContent = `${counters.length} ${counters.length === 1 ? 'counter' : 'counters'}`;
+    const activeCount = counters.filter(h => !h.paused).length;
+    meta.textContent = `${activeCount} ${activeCount === 1 ? 'counter' : 'counters'}`;
 
     const todayKey = storage.getTodayString();
 
     list.innerHTML = counters.map((habit) => {
+        if (habit.paused) {
+            return `
+                <li class="counter counter-paused" data-habit-id="${habit.id}" data-action="open-detail">
+                    <header class="counter-header">
+                        <div class="counter-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
+                        <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
+                        <button class="drag-handle" aria-label="Drag to reorder">⠿</button>
+                    </header>
+                    <p class="counter-paused-label">⏸ Paused</p>
+                </li>
+            `;
+        }
+
         const rawValue = habit.entries[todayKey];
         const isSkipped = rawValue === 'Skipped';
         const value = typeof rawValue === 'number' ? rawValue : 0;
@@ -166,10 +192,11 @@ function renderCounters(counters) {
         const isComplete = !isSkipped && value >= target;
 
         return `
-    				<li class="counter ${isComplete ? 'counter-done' : ''}" data-habit-id="${habit.id}" data-action="open-detail">
+            <li class="counter ${isComplete ? 'counter-done' : ''}" data-habit-id="${habit.id}" data-action="open-detail">
                 <header class="counter-header">
                     <div class="counter-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                     <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
+                    <button class="drag-handle" aria-label="Drag to reorder">⠿</button>
                 </header>
 
                 <div class="counter-progress">
@@ -212,16 +239,31 @@ function renderBinaries(binaries) {
 
     const todayKey = storage.getTodayString();
 
-    const doneCount = scheduled.filter((h) => h.entries[todayKey] === 'done').length;
-    meta.textContent = `${doneCount} of ${scheduled.length} done`;
+    const activeScheduled = scheduled.filter((h) => !h.paused);
+    const doneCount = activeScheduled.filter((h) => h.entries[todayKey] === 'done').length;
+    meta.textContent = `${doneCount} of ${activeScheduled.length} done`;
 
     list.innerHTML = scheduled.map((habit) => {
+        if (habit.paused) {
+            return `
+                <li class="habit habit-paused" data-habit-id="${habit.id}" data-action="open-detail">
+                    <button class="drag-handle" aria-label="Drag to reorder">⠿</button>
+                    <div class="habit-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
+                    <div class="habit-info">
+                        <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
+                        <p class="habit-streak">⏸ Paused</p>
+                    </div>
+                </li>
+            `;
+        }
+
         const todayEntry = habit.entries[todayKey];
         const isDone = todayEntry === 'done';
         const streak = calculateStreak(habit);
 
         return `
             <li class="habit ${isDone ? 'habit-done' : ''}" data-habit-id="${habit.id}" data-action="open-detail">
+                <button class="drag-handle" aria-label="Drag to reorder">⠿</button>
                 <div class="habit-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                 <div class="habit-info">
                     <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
@@ -252,6 +294,7 @@ function calculateStreak(habit) {
 
         const dayKey = dayKeys[date.getDay()];
         if (!habit.schedule.includes(dayKey)) continue;
+        if (isInPauseWindow(habit, date)) continue;
 
         const key = formatDateKey(date);
         const entry = habit.entries[key];

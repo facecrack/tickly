@@ -143,6 +143,33 @@ function deleteHabit(id) {
 
 
 /**
+ * Переставить привычки внутри одной секции (binary или counter).
+ * newIds — новый порядок ID для этой секции.
+ * Привычки другого типа остаются на своих позициях в массиве.
+ */
+function reorderHabitsInSection(newIds) {
+    const data = loadData();
+    const habits = data.habits;
+
+    // Найти индексы этих привычек в исходном массиве (отсортированные)
+    const sectionIndices = newIds
+        .map(id => habits.findIndex(h => h.id === id))
+        .filter(i => i !== -1)
+        .sort((a, b) => a - b);
+
+    // Поставить переупорядоченные привычки на те же индексы
+    const reordered = [...habits];
+    newIds.forEach((id, i) => {
+        const habit = habits.find(h => h.id === id);
+        if (habit) reordered[sectionIndices[i]] = habit;
+    });
+
+    data.habits = reordered;
+    saveData(data);
+}
+
+
+/**
  * Записать значение для привычки на дату.
  * Для binary: value — это "done" / "skipped" / "missed"
  * Для counter: value — это число
@@ -223,5 +250,6 @@ window.storage = {
     setEntry,
     getSettings,
     updateSettings,
-    getTodayString
+    getTodayString,
+    reorderHabitsInSection
 };
