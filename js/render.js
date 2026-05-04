@@ -260,7 +260,6 @@ function renderBinaries(binaries) {
 
         return `
             <li class="habit ${isDone ? 'habit-done' : ''}" data-habit-id="${habit.id}" data-action="open-detail">
-                <button class="drag-handle" aria-label="Drag to reorder"></button>
                 <div class="habit-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                 <div class="habit-info">
                     <h3 class="habit-name">${escapeHtml(habit.name)}</h3>

@@ -421,26 +421,18 @@ function formatDateKey(date) {
 
 
 function updatePauseBtn(screen, isPaused) {
-    const btn = screen.querySelector('.detail-pause-btn');
-    if (!btn) return;
-    const icon = btn.querySelector('.action-pause-icon');
-    const label = btn.querySelector('.detail-pause-label');
-    const skipBtn = screen.querySelector('[data-action="skip-today"]');
+    const pauseBtn  = screen.querySelector('.detail-pause-btn');
+    const skipBtn   = screen.querySelector('.detail-skip-btn');
+    const resumeBtn = screen.querySelector('.detail-resume-btn');
 
     if (isPaused) {
-        btn.dataset.action = 'resume-habit';
-        if (icon) icon.src = 'icons/resume.svg';
-        if (label) label.textContent = 'Resume habit';
-        btn.classList.remove('action-btn-pause');
-        btn.classList.add('action-btn-resume');
-        if (skipBtn) skipBtn.hidden = true;
+        if (pauseBtn)  pauseBtn.hidden  = true;
+        if (skipBtn)   skipBtn.hidden   = true;
+        if (resumeBtn) resumeBtn.hidden = false;
     } else {
-        btn.dataset.action = 'pause-habit';
-        if (icon) icon.src = 'icons/pause.svg';
-        if (label) label.textContent = 'Pause habit';
-        btn.classList.remove('action-btn-resume');
-        btn.classList.add('action-btn-pause');
-        if (skipBtn) skipBtn.hidden = false;
+        if (pauseBtn)  pauseBtn.hidden  = false;
+        if (skipBtn)   skipBtn.hidden   = false;
+        if (resumeBtn) resumeBtn.hidden = true;
     }
 }
 

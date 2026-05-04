@@ -430,6 +430,10 @@
     margin-bottom: 8px;
 }
 
+.detail-actions [hidden] {
+    display: none;
+}
+
 .action-btn {
     background: var(--bg-card);
     border-radius: var(--radius-md);
