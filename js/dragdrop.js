@@ -1,30 +1,99 @@
 /*
- * Drag & Drop — touch-based reordering of habit cards.
+ * Drag & Drop — long-press на карточке запускает перетаскивание.
  */
 
 let dragState = null;
+let longPressTimer = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let preventNextClick = false;
 
 function initDragDrop() {
-    document.addEventListener('touchstart', dragStart, { passive: false });
-    document.addEventListener('touchmove', dragMove, { passive: false });
-    document.addEventListener('touchend', dragEnd);
-    document.addEventListener('touchcancel', dragEnd);
-    // Prevent drag-handle taps from opening the detail screen
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('touchend', onTouchEnd);
+    document.addEventListener('touchcancel', onTouchEnd);
+
+    // Блокируем клик по карточке если только что закончили drag
     document.addEventListener('click', e => {
-        if (e.target.closest('.drag-handle')) e.stopPropagation();
-    });
+        if (preventNextClick) {
+            preventNextClick = false;
+            e.stopPropagation();
+        }
+    }, true);
 }
 
-function dragStart(e) {
-    const handle = e.target.closest('.drag-handle');
-    if (!handle) return;
+function onTouchStart(e) {
+    // Если нажали на кнопку внутри карточки (check, +, −) — не трогаем
+    if (e.target.closest('button')) return;
 
-    const item = handle.closest('[data-habit-id]');
-    if (!item) return;
-
-    e.preventDefault();
+    const item = e.target.closest('[data-habit-id]');
+    if (!item || !item.closest('.today-list, .counters-list')) return;
 
     const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+
+    longPressTimer = setTimeout(() => {
+        longPressTimer = null;
+        beginDrag(touch, item);
+    }, 300);
+}
+
+function onTouchMove(e) {
+    if (dragState) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        dragState.lastTouchY = touch.clientY;
+        dragState.ghost.style.top = (touch.clientY - dragState.offsetY) + 'px';
+        updateDropTarget(touch.clientY);
+        return;
+    }
+
+    // Отмена long-press если палец сдвинулся
+    if (longPressTimer) {
+        const touch = e.touches[0];
+        if (Math.abs(touch.clientX - touchStartX) > 6 || Math.abs(touch.clientY - touchStartY) > 6) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    }
+}
+
+function onTouchEnd() {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+
+    if (!dragState) return;
+
+    const { item, list, ghost, currentTarget } = dragState;
+
+    list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    item.classList.remove('drag-placeholder');
+    ghost.remove();
+
+    if (currentTarget) {
+        const allItems = Array.from(list.querySelectorAll('[data-habit-id]'));
+        const sourceIndex = allItems.indexOf(item);
+        const targetIndex = allItems.indexOf(currentTarget);
+
+        if (sourceIndex > targetIndex) {
+            list.insertBefore(item, currentTarget);
+        } else {
+            currentTarget.after(item);
+        }
+
+        const ids = Array.from(list.querySelectorAll('[data-habit-id]')).map(el => el.dataset.habitId);
+        storage.reorderHabitsInSection(ids);
+        preventNextClick = true;
+    }
+
+    dragState = null;
+}
+
+function beginDrag(touch, item) {
     const rect = item.getBoundingClientRect();
 
     const ghost = item.cloneNode(true);
@@ -33,6 +102,8 @@ function dragStart(e) {
     document.body.appendChild(ghost);
 
     item.classList.add('drag-placeholder');
+
+    if (navigator.vibrate) navigator.vibrate(15);
 
     dragState = {
         item,
@@ -44,15 +115,7 @@ function dragStart(e) {
     };
 }
 
-function dragMove(e) {
-    if (!dragState) return;
-    e.preventDefault();
-
-    const touch = e.touches[0];
-    dragState.lastTouchY = touch.clientY;
-
-    dragState.ghost.style.top = (touch.clientY - dragState.offsetY) + 'px';
-
+function updateDropTarget(touchY) {
     const items = Array.from(dragState.list.querySelectorAll('[data-habit-id]'))
         .filter(el => el !== dragState.item);
 
@@ -61,7 +124,7 @@ function dragMove(e) {
 
     items.forEach(el => {
         const r = el.getBoundingClientRect();
-        const dist = Math.abs(touch.clientY - (r.top + r.height / 2));
+        const dist = Math.abs(touchY - (r.top + r.height / 2));
         if (dist < closestDist) {
             closestDist = dist;
             closest = el;
@@ -73,34 +136,6 @@ function dragMove(e) {
         closest.classList.add('drag-over');
         dragState.currentTarget = closest;
     }
-}
-
-function dragEnd() {
-    if (!dragState) return;
-
-    const { item, list, ghost, currentTarget, lastTouchY } = dragState;
-
-    list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-    item.classList.remove('drag-placeholder');
-    ghost.remove();
-
-    if (currentTarget) {
-        const allItems = Array.from(list.querySelectorAll('[data-habit-id]'));
-        const sourceIndex = allItems.indexOf(item);
-        const targetIndex = allItems.indexOf(currentTarget);
-
-        // Тащим вверх → ставим перед целью; тащим вниз → ставим после
-        if (sourceIndex > targetIndex) {
-            list.insertBefore(item, currentTarget);
-        } else {
-            currentTarget.after(item);
-        }
-
-        const ids = Array.from(list.querySelectorAll('[data-habit-id]')).map(el => el.dataset.habitId);
-        storage.reorderHabitsInSection(ids);
-    }
-
-    dragState = null;
 }
 
 window.dragdrop = { init: initDragDrop };

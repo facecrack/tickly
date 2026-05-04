@@ -175,8 +175,7 @@ function renderCounters(counters) {
                     <header class="counter-header">
                         <div class="counter-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                         <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
-                        <button class="drag-handle" aria-label="Drag to reorder"></button>
-                    </header>
+                        </header>
                     <p class="counter-paused-label">⏸ Paused</p>
                 </li>
             `;
@@ -196,7 +195,6 @@ function renderCounters(counters) {
                 <header class="counter-header">
                     <div class="counter-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                     <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
-                    <button class="drag-handle" aria-label="Drag to reorder"></button>
                 </header>
 
                 <div class="counter-progress">
@@ -247,7 +245,6 @@ function renderBinaries(binaries) {
         if (habit.paused) {
             return `
                 <li class="habit habit-paused" data-habit-id="${habit.id}" data-action="open-detail">
-                    <button class="drag-handle" aria-label="Drag to reorder"></button>
                     <div class="habit-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                     <div class="habit-info">
                         <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
