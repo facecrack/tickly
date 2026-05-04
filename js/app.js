@@ -91,6 +91,7 @@ if (backdrop) {
 
 render.main();
 dragdrop.init();
+habits.initRepeat();
 
 
 window.showScreen = showScreen;

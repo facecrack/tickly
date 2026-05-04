@@ -14,6 +14,7 @@ function toggleHabit(habitId) {
         storage.setEntry(habitId, today, null);
     } else {
         storage.setEntry(habitId, today, 'done');
+        if (navigator.vibrate) navigator.vibrate(10);
     }
 
     render.main();
@@ -93,6 +94,41 @@ function resumeHabit(habitId) {
 
 
 // ============================================
+// LONG-PRESS REPEAT — удержание +/−
+// ============================================
+
+let _holdTimer = null;
+let _holdInterval = null;
+
+function initCounterRepeat() {
+    document.addEventListener('touchstart', (e) => {
+        const btn = e.target.closest('.counter-btn-plus, .counter-btn-minus');
+        if (!btn) return;
+        const li = btn.closest('[data-habit-id]');
+        if (!li) return;
+        const habitId = li.dataset.habitId;
+        const delta = btn.classList.contains('counter-btn-plus') ? 1 : -1;
+
+        _holdTimer = setTimeout(() => {
+            _holdTimer = null;
+            _holdInterval = setInterval(() => changeCounter(habitId, delta), 80);
+        }, 500);
+    }, { passive: true });
+
+    document.addEventListener('touchend', _stopHold, { passive: true });
+    document.addEventListener('touchcancel', _stopHold, { passive: true });
+    document.addEventListener('touchmove', (e) => {
+        if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
+    }, { passive: true });
+}
+
+function _stopHold() {
+    if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
+    if (_holdInterval) { clearInterval(_holdInterval); _holdInterval = null; }
+}
+
+
+// ============================================
 // ДОСТУПНОСТЬ
 // ============================================
 
@@ -102,5 +138,6 @@ window.habits = {
     skipToday: skipToday,
     deleteHabit: deleteHabit,
     pause: pauseHabit,
-    resume: resumeHabit
+    resume: resumeHabit,
+    initRepeat: initCounterRepeat
 };
