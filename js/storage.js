@@ -103,7 +103,6 @@ function addHabit(habitData) {
         id: 'habit_' + Date.now(),
         createdAt: getTodayString(),
         entries: {},
-        notes: {},
         ...habitData
     };
 
@@ -195,23 +194,6 @@ function setEntry(habitId, dateString, value) {
 }
 
 
-/**
- * Сохранить заметку для привычки на дату (null = удалить).
- */
-function setNote(habitId, dateString, text) {
-    const data = loadData();
-    const habit = data.habits.find((h) => h.id === habitId);
-    if (!habit) return;
-    if (!habit.notes) habit.notes = {};
-    if (!text) {
-        delete habit.notes[dateString];
-    } else {
-        habit.notes[dateString] = text;
-    }
-    saveData(data);
-}
-
-
 // ============================================
 // РАБОТА С НАСТРОЙКАМИ
 // ============================================
@@ -269,6 +251,5 @@ window.storage = {
     getSettings,
     updateSettings,
     getTodayString,
-    reorderHabitsInSection,
-    setNote
+    reorderHabitsInSection
 };

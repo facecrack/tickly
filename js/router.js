@@ -198,16 +198,6 @@ document.addEventListener('click', (event) => {
             detail.changeMonth(1);
             break;
 
-        case 'open-note': {
-            const date = actionEl.dataset.date;
-            if (date) detail.openNote(detail.currentId(), date);
-            break;
-        }
-
-        case 'save-note':
-            detail.saveNote();
-            break;
-
         case 'edit-habit':
             form.openEdit(detail.currentId());
             break;

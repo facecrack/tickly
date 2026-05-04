@@ -111,15 +111,13 @@ function initCounterRepeat() {
 
         _holdTimer = setTimeout(() => {
             _holdTimer = null;
-            _holdInterval = setInterval(() => changeCounter(habitId, delta), 80);
+            _holdInterval = setInterval(() => changeCounter(habitId, delta), 150);
         }, 500);
     }, { passive: true });
 
     document.addEventListener('touchend', _stopHold, { passive: true });
     document.addEventListener('touchcancel', _stopHold, { passive: true });
-    document.addEventListener('touchmove', (e) => {
-        if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
-    }, { passive: true });
+    document.addEventListener('touchmove', _stopHold, { passive: true });
 }
 
 function _stopHold() {

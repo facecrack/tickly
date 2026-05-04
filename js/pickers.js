@@ -105,10 +105,18 @@ class TimeWheel {
         this.count = count;
         this._raf = null;
         this._wheelTimer = null;
+        this._ac = new AbortController();
         this._attach();
     }
 
+    destroy() {
+        this._ac.abort();
+        if (this._raf) cancelAnimationFrame(this._raf);
+        clearTimeout(this._wheelTimer);
+    }
+
     _attach() {
+        const sig = this._ac.signal;
         let startY, startTop, lastY, lastT, vel;
 
         this.el.addEventListener('touchstart', e => {
@@ -117,7 +125,7 @@ class TimeWheel {
             startTop = this.el.scrollTop;
             vel = 0;
             lastT = performance.now();
-        }, { passive: true });
+        }, { passive: true, signal: sig });
 
         this.el.addEventListener('touchmove', e => {
             e.preventDefault();
@@ -129,9 +137,9 @@ class TimeWheel {
             lastT = now;
             this.el.scrollTop = startTop + (startY - y);
             this._updateSelected();
-        }, { passive: false });
+        }, { passive: false, signal: sig });
 
-        this.el.addEventListener('touchend', () => this._settle(vel), { passive: true });
+        this.el.addEventListener('touchend', () => this._settle(vel), { passive: true, signal: sig });
 
         this.el.addEventListener('wheel', e => {
             e.preventDefault();
@@ -139,7 +147,7 @@ class TimeWheel {
             this._updateSelected();
             clearTimeout(this._wheelTimer);
             this._wheelTimer = setTimeout(() => this._settle(0), 150);
-        }, { passive: false });
+        }, { passive: false, signal: sig });
 
         this.el.addEventListener('click', e => {
             const item = e.target.closest('.time-item');
@@ -147,7 +155,7 @@ class TimeWheel {
             const items = this.el.querySelectorAll('.time-item');
             const idx = Array.from(items).indexOf(item);
             if (idx >= 0) this._animateTo(idx * ITEM_H);
-        });
+        }, { signal: sig });
     }
 
     _updateSelected() {
@@ -213,6 +221,10 @@ function openTimePicker() {
 
 
 function buildTimeWheels() {
+    if (twHour)   { twHour.destroy();   twHour   = null; }
+    if (twMin)    { twMin.destroy();    twMin    = null; }
+    if (twPeriod) { twPeriod.destroy(); twPeriod = null; }
+
     const use12h = storage.getSettings().timeFormat === '12h';
 
     const hourEl   = document.querySelector('[data-col="hour"] .time-col-scroll');
@@ -394,6 +406,7 @@ function selectSound(label) {
         settings.render();
     } else {
         renderTimePickerRows();
+        showSheet('time');
     }
 }
 
