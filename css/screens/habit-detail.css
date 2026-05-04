@@ -254,6 +254,19 @@
     font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
+    position: relative;
+}
+
+.heatmap-cell-has-note::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
 }
 
 .heatmap-cell-other {
@@ -516,4 +529,57 @@
 
 .action-btn-resume .action-pause-icon {
     filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
+}
+
+
+/* ============================================
+   NOTE SHEET
+   ============================================ */
+
+.note-sheet-status {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 0 16px 12px;
+    margin: 0;
+}
+
+.note-sheet-textarea {
+    display: block;
+    width: calc(100% - 32px);
+    margin: 0 16px;
+    background: var(--bg-elevated);
+    border: none;
+    outline: none;
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-primary);
+    caret-color: var(--brand-lime);
+    resize: none;
+    min-height: 140px;
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+
+.note-sheet-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.bar-col-has-note .bar-value::after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    margin-left: 3px;
+    vertical-align: middle;
+    opacity: 0.7;
+}
+
+[data-action="open-note"] {
+    cursor: pointer;
 }

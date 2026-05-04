@@ -209,6 +209,14 @@ function renderHeatmap(habit) {
         }
         // иначе — серый дефолт (не habit day, прошедший)
 
+        if (!isFuture && !isBeforeCreated) {
+            cell.dataset.action = 'open-note';
+            cell.dataset.date = dateKey;
+            if (habit.notes && habit.notes[dateKey]) {
+                cell.classList.add('heatmap-cell-has-note');
+            }
+        }
+
         grid.appendChild(cell);
     }
 
@@ -273,8 +281,9 @@ function renderChart(habit) {
         const todayClass = d.isToday ? 'bar-col-today' : '';
         // Skipped — короткая серая полоска вместо нулевого столбика, но значение = 0
         const finalHeight = d.isSkipped ? 8 : heightPx;
+        const hasNote = habit.notes && habit.notes[d.key];
         return `
-            <div class="bar-col ${todayClass}">
+            <div class="bar-col ${todayClass}${hasNote ? ' bar-col-has-note' : ''}" data-action="open-note" data-date="${d.key}">
                 <span class="bar-value">${d.value}</span>
                 <div class="bar ${colorClass}" style="height: ${finalHeight}px;"></div>
             </div>
@@ -442,11 +451,76 @@ function updatePauseBtn(screen, isPaused) {
 
 
 // ============================================
+// NOTE SHEET
+// ============================================
+
+let _noteState = { habitId: null, dateKey: null };
+
+function openNote(habitId, dateKey) {
+    _noteState = { habitId, dateKey };
+    const habit = storage.getHabit(habitId);
+    if (!habit) return;
+
+    const sheet = document.querySelector('[data-sheet="note"]');
+    if (!sheet) return;
+
+    sheet.querySelector('.note-sheet-title').textContent = formatNoteDate(dateKey);
+    sheet.querySelector('.note-sheet-status').textContent = formatNoteStatus(habit, dateKey);
+    const textarea = sheet.querySelector('.note-sheet-textarea');
+    textarea.value = (habit.notes || {})[dateKey] || '';
+
+    showSheet('note');
+    requestAnimationFrame(() => textarea.focus());
+}
+
+function saveNote() {
+    const { habitId, dateKey } = _noteState;
+    const textarea = document.querySelector('[data-sheet="note"] .note-sheet-textarea');
+    if (!textarea) return;
+    storage.setNote(habitId, dateKey, textarea.value.trim() || null);
+    hideSheet();
+    const habit = storage.getHabit(habitId);
+    if (!habit) return;
+    if (habit.type === 'binary') renderHeatmap(habit);
+    else renderChart(habit);
+}
+
+function formatNoteDate(dateKey) {
+    const [y, m, d] = dateKey.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric'
+    });
+}
+
+function formatNoteStatus(habit, dateKey) {
+    const entry = habit.entries[dateKey];
+    const date = parseLocalDate(dateKey);
+    if (isInPauseWindow(habit, date)) return 'Paused';
+
+    const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const isScheduled = habit.schedule.includes(dayKeys[date.getDay()]);
+
+    if (habit.type === 'counter') {
+        if (typeof entry === 'number') return `${entry} / ${habit.target} ${habit.unit}`;
+        return isScheduled ? 'Not logged' : 'Rest day';
+    }
+
+    if (entry === 'done') return 'Done';
+    if (entry === 'Skipped' || entry === 'skipped') return 'Skipped';
+    if (!isScheduled) return 'Rest day';
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return date >= today ? '—' : 'Missed';
+}
+
+
+// ============================================
 // ДОСТУПНОСТЬ
 // ============================================
 
 window.detail = {
     open: openHabitDetail,
     changeMonth: changeHeatmapMonth,
-    currentId: () => currentDetailHabitId
+    currentId: () => currentDetailHabitId,
+    openNote: openNote,
+    saveNote: saveNote
 };
