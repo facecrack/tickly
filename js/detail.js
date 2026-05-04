@@ -425,18 +425,22 @@ function updatePauseBtn(screen, isPaused) {
     if (!btn) return;
     const icon = btn.querySelector('.action-pause-icon');
     const label = btn.querySelector('.detail-pause-label');
+    const skipBtn = screen.querySelector('[data-action="skip-today"]');
+
     if (isPaused) {
         btn.dataset.action = 'resume-habit';
-        if (icon) { icon.src = 'icons/resume.svg'; icon.style.filter = ''; }
+        if (icon) icon.src = 'icons/resume.svg';
         if (label) label.textContent = 'Resume habit';
         btn.classList.remove('action-btn-pause');
         btn.classList.add('action-btn-resume');
+        if (skipBtn) skipBtn.hidden = true;
     } else {
         btn.dataset.action = 'pause-habit';
-        if (icon) { icon.src = 'icons/pause.svg'; icon.style.filter = ''; }
+        if (icon) icon.src = 'icons/pause.svg';
         if (label) label.textContent = 'Pause habit';
         btn.classList.remove('action-btn-resume');
         btn.classList.add('action-btn-pause');
+        if (skipBtn) skipBtn.hidden = false;
     }
 }
 

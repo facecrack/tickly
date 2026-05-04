@@ -491,19 +491,23 @@
 }
 
 .action-btn-pause {
-    background: rgba(229, 166, 50, 0.12);
-    color: #E5A632;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    width: 100%;
+    margin-bottom: 8px;
 }
 
 .action-pause-icon {
     width: 18px;
     height: 18px;
-    filter: brightness(0) saturate(100%) invert(70%) sepia(40%) saturate(600%) hue-rotate(5deg) brightness(100%);
+    filter: brightness(0) invert(1);
 }
 
 .action-btn-resume {
-    background: rgba(178, 240, 65, 0.12);
+    background: rgba(178, 240, 65, 0.15);
     color: var(--brand-lime);
+    width: 100%;
+    margin-bottom: 8px;
 }
 
 .action-btn-resume .action-pause-icon {

@@ -85,8 +85,12 @@ function dragEnd() {
     ghost.remove();
 
     if (currentTarget) {
-        const r = currentTarget.getBoundingClientRect();
-        if (lastTouchY < r.top + r.height / 2) {
+        const allItems = Array.from(list.querySelectorAll('[data-habit-id]'));
+        const sourceIndex = allItems.indexOf(item);
+        const targetIndex = allItems.indexOf(currentTarget);
+
+        // Тащим вверх → ставим перед целью; тащим вниз → ставим после
+        if (sourceIndex > targetIndex) {
             list.insertBefore(item, currentTarget);
         } else {
             currentTarget.after(item);
