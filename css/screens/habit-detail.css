@@ -493,21 +493,19 @@
 .action-btn-pause {
     background: rgba(229, 166, 50, 0.12);
     color: #E5A632;
-    margin-bottom: 8px;
-    width: 100%;
 }
 
-.action-btn-pause .action-pause-icon {
-    font-size: 14px;
+.action-pause-icon {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) saturate(100%) invert(70%) sepia(40%) saturate(600%) hue-rotate(5deg) brightness(100%);
 }
 
 .action-btn-resume {
     background: rgba(178, 240, 65, 0.12);
     color: var(--brand-lime);
-    margin-bottom: 8px;
-    width: 100%;
 }
 
 .action-btn-resume .action-pause-icon {
-    font-size: 14px;
+    filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
 }

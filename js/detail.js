@@ -52,23 +52,7 @@ function renderBinaryDetail(habit) {
     const banner = screen.querySelector('.detail-paused-banner');
     if (banner) banner.hidden = !habit.paused;
 
-    const skipBtn = screen.querySelector('[data-action="skip-today"]');
-    if (skipBtn) skipBtn.hidden = !!habit.paused;
-
-    const pauseBtn = screen.querySelector('.detail-pause-btn');
-    if (pauseBtn) {
-        if (habit.paused) {
-            pauseBtn.dataset.action = 'resume-habit';
-            pauseBtn.querySelector('.detail-pause-label').textContent = 'Resume habit';
-            pauseBtn.classList.add('action-btn-resume');
-            pauseBtn.classList.remove('action-btn-pause');
-        } else {
-            pauseBtn.dataset.action = 'pause-habit';
-            pauseBtn.querySelector('.detail-pause-label').textContent = 'Pause habit';
-            pauseBtn.classList.add('action-btn-pause');
-            pauseBtn.classList.remove('action-btn-resume');
-        }
-    }
+    updatePauseBtn(screen, habit.paused);
 
     // Stats
     const stats = calculateStats(habit);
@@ -109,23 +93,7 @@ function renderCounterDetail(habit) {
     const banner = screen.querySelector('.detail-paused-banner');
     if (banner) banner.hidden = !habit.paused;
 
-    const skipBtn = screen.querySelector('[data-action="skip-today"]');
-    if (skipBtn) skipBtn.hidden = !!habit.paused;
-
-    const pauseBtn = screen.querySelector('.detail-pause-btn');
-    if (pauseBtn) {
-        if (habit.paused) {
-            pauseBtn.dataset.action = 'resume-habit';
-            pauseBtn.querySelector('.detail-pause-label').textContent = 'Resume habit';
-            pauseBtn.classList.add('action-btn-resume');
-            pauseBtn.classList.remove('action-btn-pause');
-        } else {
-            pauseBtn.dataset.action = 'pause-habit';
-            pauseBtn.querySelector('.detail-pause-label').textContent = 'Pause habit';
-            pauseBtn.classList.add('action-btn-pause');
-            pauseBtn.classList.remove('action-btn-resume');
-        }
-    }
+    updatePauseBtn(screen, habit.paused);
 
     // Today block
     const today = storage.getTodayString();
@@ -449,6 +417,27 @@ function formatDateKey(date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+}
+
+
+function updatePauseBtn(screen, isPaused) {
+    const btn = screen.querySelector('.detail-pause-btn');
+    if (!btn) return;
+    const icon = btn.querySelector('.action-pause-icon');
+    const label = btn.querySelector('.detail-pause-label');
+    if (isPaused) {
+        btn.dataset.action = 'resume-habit';
+        if (icon) { icon.src = 'icons/resume.svg'; icon.style.filter = ''; }
+        if (label) label.textContent = 'Resume habit';
+        btn.classList.remove('action-btn-pause');
+        btn.classList.add('action-btn-resume');
+    } else {
+        btn.dataset.action = 'pause-habit';
+        if (icon) { icon.src = 'icons/pause.svg'; icon.style.filter = ''; }
+        if (label) label.textContent = 'Pause habit';
+        btn.classList.remove('action-btn-resume');
+        btn.classList.add('action-btn-pause');
+    }
 }
 
 
