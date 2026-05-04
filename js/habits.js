@@ -99,6 +99,7 @@ function resumeHabit(habitId) {
 
 let _holdTimer = null;
 let _holdInterval = null;
+let _longPressActive = false;
 
 function initCounterRepeat() {
     document.addEventListener('touchstart', (e) => {
@@ -109,8 +110,10 @@ function initCounterRepeat() {
         const habitId = li.dataset.habitId;
         const delta = btn.classList.contains('counter-btn-plus') ? 1 : -1;
 
+        _longPressActive = false;
         _holdTimer = setTimeout(() => {
             _holdTimer = null;
+            _longPressActive = true;
             _holdInterval = setInterval(() => changeCounter(habitId, delta), 150);
         }, 500);
     }, { passive: true });
@@ -118,6 +121,16 @@ function initCounterRepeat() {
     document.addEventListener('touchend', _stopHold, { passive: true });
     document.addEventListener('touchcancel', _stopHold, { passive: true });
     document.addEventListener('touchmove', _stopHold, { passive: true });
+
+    // Suppress the synthetic click that fires after touchend following a long-press.
+    // Runs in capture phase (before router.js) to block both the extra increment
+    // and the open-detail that would fire if the click lands on the card.
+    document.addEventListener('click', (e) => {
+        if (_longPressActive) {
+            _longPressActive = false;
+            e.stopPropagation();
+        }
+    }, true);
 }
 
 function _stopHold() {
