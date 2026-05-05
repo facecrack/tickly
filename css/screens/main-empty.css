@@ -74,7 +74,6 @@
 .empty-card-center {
     position: relative;
     z-index: 2;
-    border-color: var(--brand-lime);
     animation: empty-float-center 6.0s ease-in-out -1.8s infinite;
 }
 
@@ -119,27 +118,27 @@
 
 @keyframes empty-float-1 {
     0%, 100% { transform: translate(-58px, -50px) rotate(-12deg); }
-    50%       { transform: translate(-58px, -59px) rotate(-10deg); }
+    50%       { transform: translate(-58px, -55px) rotate(-11deg); }
 }
 
 @keyframes empty-float-2 {
     0%, 100% { transform: translate(62px, -40px) rotate(12deg); }
-    50%       { transform: translate(62px, -49px) rotate(10deg); }
+    50%       { transform: translate(62px, -45px) rotate(11deg); }
 }
 
 @keyframes empty-float-3 {
     0%, 100% { transform: translate(-55px, 48px) rotate(8deg); }
-    50%       { transform: translate(-55px, 39px) rotate(6deg); }
+    50%       { transform: translate(-55px, 43px) rotate(7deg); }
 }
 
 @keyframes empty-float-4 {
     0%, 100% { transform: translate(50px, 55px) rotate(-8deg); }
-    50%       { transform: translate(50px, 46px) rotate(-10deg); }
+    50%       { transform: translate(50px, 50px) rotate(-9deg); }
 }
 
 @keyframes empty-float-center {
     0%, 100% { transform: scale(1); }
-    50%       { transform: scale(1.06); }
+    50%       { transform: scale(1.03); }
 }
 
 
