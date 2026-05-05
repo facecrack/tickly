@@ -269,6 +269,9 @@ function renderBinaries(binaries) {
                         <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
                         <p class="habit-streak">Paused</p>
                     </div>
+                    <button class="habit-check" data-action="habit-toggle">
+                        <span class="habit-check-circle"></span>
+                    </button>
                 </li>
             `;
         }
@@ -279,13 +282,14 @@ function renderBinaries(binaries) {
         const streak = calculateStreak(habit);
 
         const stateClass = isDone ? 'habit-done' : isSkipped ? 'habit-skipped' : '';
+        const subLabel = isSkipped ? '<p class="habit-streak">Skipped</p>' : streak > 0 ? `<p class="habit-streak">${streak} day streak</p>` : '';
 
         return `
             <li class="habit ${stateClass}" data-habit-id="${habit.id}" data-action="open-detail">
                 <div class="habit-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                 <div class="habit-info">
                     <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
-                    ${streak > 0 ? `<p class="habit-streak">${streak} day streak</p>` : ''}
+                    ${subLabel}
                 </div>
                 <button class="habit-check ${isDone ? 'habit-check-done' : ''}" data-action="habit-toggle">
                     <span class="habit-check-circle">${isDone ? '<img src="icons/check.svg" alt="Done">' : ''}</span>
@@ -380,7 +384,14 @@ function updateBinary(habitId) {
     const infoEl = li.querySelector('.habit-info');
     if (infoEl) {
         let streakEl = infoEl.querySelector('.habit-streak');
-        if (streak > 0) {
+        if (isSkipped) {
+            if (!streakEl) {
+                streakEl = document.createElement('p');
+                streakEl.className = 'habit-streak';
+                infoEl.appendChild(streakEl);
+            }
+            streakEl.textContent = 'Skipped';
+        } else if (streak > 0) {
             if (!streakEl) {
                 streakEl = document.createElement('p');
                 streakEl.className = 'habit-streak';

@@ -8,6 +8,15 @@ function toggleHabit(habitId) {
     if (!habit || habit.type !== 'binary') return;
 
     const today = storage.getTodayString();
+
+    if (habit.paused) {
+        storage.updateHabit(habitId, { paused: false, resumedAt: today });
+        storage.setEntry(habitId, today, 'done');
+        if (navigator.vibrate) navigator.vibrate(10);
+        render.updateBinary(habitId);
+        return;
+    }
+
     const current = habit.entries[today];
 
     if (current === 'done') {
