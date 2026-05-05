@@ -25,6 +25,13 @@ function changeCounter(habitId, delta) {
     const habit = storage.getHabit(habitId);
     if (!habit || habit.type !== 'counter') return;
 
+    if (habit.paused) {
+        storage.updateHabit(habitId, {
+            paused: false,
+            resumedAt: storage.getTodayString()
+        });
+    }
+
     const today = storage.getTodayString();
     const raw = habit.entries[today];
 

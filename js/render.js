@@ -185,18 +185,26 @@ function renderCounters(counters) {
                         <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
                     </header>
                     <div class="counter-progress">
-                        <span class="counter-value counter-value-skipped">paused</span>
+                        <span class="counter-value counter-value-skipped">Paused</span>
                         <span class="counter-target">/ ${target} ${escapeHtml(habit.unit || '')}</span>
                     </div>
                     <div class="counter-bar">
                         <div class="counter-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="counter-buttons">
+                        <button class="counter-btn counter-btn-minus" data-action="counter-decrement">
+                            <img src="icons/minus.svg" alt="Decrease">
+                        </button>
+                        <button class="counter-btn counter-btn-plus" data-action="counter-increment">
+                            <img src="icons/plus.svg" alt="Increase">
+                        </button>
                     </div>
                 </li>
             `;
         }
 
         const percent = isSkipped ? 0 : Math.min(100, (value / target) * 100);
-        const displayValue = isSkipped ? 'skipped' : value;
+        const displayValue = isSkipped ? 'Skipped' : value;
         const valueClass = isSkipped ? 'counter-value counter-value-skipped' : 'counter-value';
         const isComplete = !isSkipped && value >= target;
         const stateClass = isComplete ? 'counter-done' : isSkipped ? 'counter-skipped' : '';
@@ -414,15 +422,21 @@ function updateCounter(habitId) {
 
     const valueEl = li.querySelector('.counter-value');
     if (valueEl) {
-        valueEl.textContent = isSkipped ? 'skipped' : value;
-        valueEl.className = isSkipped ? 'counter-value counter-value-skipped' : 'counter-value';
+        if (habit.paused) {
+            valueEl.textContent = 'Paused';
+            valueEl.className = 'counter-value counter-value-skipped';
+        } else {
+            valueEl.textContent = isSkipped ? 'Skipped' : value;
+            valueEl.className = isSkipped ? 'counter-value counter-value-skipped' : 'counter-value';
+        }
     }
 
     const fill = li.querySelector('.counter-bar-fill');
-    if (fill) fill.style.width = (isSkipped ? 0 : percent) + '%';
+    if (fill) fill.style.width = (isSkipped || habit.paused ? 0 : percent) + '%';
 
-    li.classList.toggle('counter-done', isComplete);
-    li.classList.toggle('counter-skipped', isSkipped && !isComplete);
+    li.classList.toggle('counter-done', isComplete && !habit.paused);
+    li.classList.toggle('counter-skipped', isSkipped && !isComplete && !habit.paused);
+    li.classList.toggle('counter-paused', !!habit.paused);
 }
 
 
