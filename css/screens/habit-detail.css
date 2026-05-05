@@ -198,7 +198,7 @@
 
 .heatmap-nav {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 }
 
 .heatmap-nav-btn {
@@ -366,7 +366,7 @@
 .chart-nav {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .chart-nav-btn {

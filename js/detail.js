@@ -159,6 +159,15 @@ function renderHeatmap(habit) {
     const monthName = targetMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     title.textContent = monthName;
 
+    // Кнопки навигации: next — на текущем месяце, prev — на месяце создания
+    const heatmapNextBtn = screen.querySelector('[data-action="heatmap-next"]');
+    if (heatmapNextBtn) heatmapNextBtn.disabled = heatmapMonthOffset === 0;
+    const heatmapPrevBtn = screen.querySelector('[data-action="heatmap-prev"]');
+    if (heatmapPrevBtn) {
+        const monthsBack = (today.getFullYear() - created.getFullYear()) * 12 + (today.getMonth() - created.getMonth());
+        heatmapPrevBtn.disabled = heatmapMonthOffset <= -monthsBack;
+    }
+
     grid.innerHTML = '';
 
     const year = targetMonth.getFullYear();
