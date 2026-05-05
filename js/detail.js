@@ -99,24 +99,26 @@ function renderCounterDetail(habit) {
     const today = storage.getTodayString();
     const rawValue = habit.entries[today];
     const isSkipped = rawValue === 'Skipped' || rawValue === 'skipped';
+    const isPaused = !!habit.paused;
+    const isInactive = isSkipped || isPaused;
     const todayValue = typeof rawValue === 'number' ? rawValue : 0;
     const target = habit.target || 1;
-    const percent = isSkipped ? 0 : Math.min(100, Math.round((todayValue / target) * 100));
+    const percent = isInactive ? 0 : Math.min(100, Math.round((todayValue / target) * 100));
 
     const todayPercent = screen.querySelector('.today-block-percent');
     if (todayPercent) todayPercent.textContent = percent + '%';
 
     const todayValueEl = screen.querySelector('.today-block-value');
     if (todayValueEl) {
-        todayValueEl.textContent = isSkipped ? 'Skipped' : todayValue;
-        todayValueEl.classList.toggle('today-block-value-skipped', isSkipped);
+        todayValueEl.textContent = isPaused ? 'Paused' : isSkipped ? 'Skipped' : todayValue;
+        todayValueEl.classList.toggle('today-block-value-skipped', isInactive);
     }
 
     const todayTarget = screen.querySelector('.today-block-target');
     if (todayTarget) todayTarget.textContent = `/ ${target} ${habit.unit}`;
 
     const todayBar = screen.querySelector('.today-block-bar-fill');
-    if (todayBar) todayBar.style.width = (isSkipped ? 0 : percent) + '%';
+    if (todayBar) todayBar.style.width = (isInactive ? 0 : percent) + '%';
 
     // Stats
     const stats = calculateStats(habit);
