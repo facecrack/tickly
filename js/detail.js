@@ -135,8 +135,6 @@ function renderCounterDetail(habit) {
     // Bar chart за 7 дней
     renderChart(habit);
 
-    const chartUnit = screen.querySelector('.chart-unit');
-    if (chartUnit) chartUnit.textContent = habit.unit;
 }
 
 
@@ -283,9 +281,11 @@ function renderChart(habit) {
         chartTitle.textContent = `${fmt(days[0].date)} – ${fmt(days[6].date)}`;
     }
 
-    // Кнопка "вперёд" задизейблена на текущей неделе
+    // Кнопки навигации: next задизейблена на текущей неделе, prev — на 8-й (max)
     const nextBtn = screen.querySelector('[data-action="chart-next"]');
     if (nextBtn) nextBtn.disabled = chartOffset === 0;
+    const prevBtn = screen.querySelector('[data-action="chart-prev"]');
+    if (prevBtn) prevBtn.disabled = chartOffset >= 7;
 
     const target = habit.target || 1;
     const maxValue = Math.max(target, ...days.map((d) => d.value));
@@ -318,7 +318,7 @@ function renderChart(habit) {
 function changeChartWeek(delta) {
     const habit = storage.getHabit(currentDetailHabitId);
     if (!habit) return;
-    chartOffset = Math.max(0, chartOffset + delta);
+    chartOffset = Math.max(0, Math.min(7, chartOffset + delta));
     renderChart(habit);
 }
 
