@@ -73,7 +73,8 @@ function renderStatWeeklyCard(habit) {
         const isFuture = dayDate > today;
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
         const isSkipped = entry === 'Skipped' || entry === 'skipped';
-        const isMissed = isHabitDay && !isDone && !isSkipped && !isFuture && !isBeforeCreated && !isToday;
+        const isPaused = isInPauseWindow(habit, dayDate);
+        const isMissed = isHabitDay && !isDone && !isSkipped && !isPaused && !isFuture && !isBeforeCreated && !isToday;
 
         let circleClass = 'stat-week-day-circle';
         let icon = '';
@@ -81,7 +82,7 @@ function renderStatWeeklyCard(habit) {
         if (isDone) {
             circleClass += ' stat-week-day-circle-done';
             icon = '<svg class="stat-week-day-icon" viewBox="0 0 14 14" fill="none"><path d="M2 7l3 3 7-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        } else if (isSkipped) {
+        } else if (isSkipped || isPaused) {
             circleClass += ' stat-week-day-circle-skipped';
         } else if (isToday) {
             circleClass += ' stat-week-day-circle-today';

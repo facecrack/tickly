@@ -250,10 +250,12 @@ function renderChart(habit) {
     for (let i = 6; i >= 0; i--) {
         const d = new Date(now);
         d.setDate(now.getDate() - i);
+        d.setHours(0, 0, 0, 0);
         const key = formatDateKey(d);
         const rawValue = habit.entries[key];
-        const isSkipped = rawValue === 'Skipped' || rawValue === 'skipped';
-        const value = typeof rawValue === 'number' ? rawValue : 0;
+        const isPaused = isInPauseWindow(habit, d);
+        const isSkipped = rawValue === 'Skipped' || rawValue === 'skipped' || isPaused;
+        const value = typeof rawValue === 'number' && !isPaused ? rawValue : 0;
         days.push({
             date: d,
             key: key,

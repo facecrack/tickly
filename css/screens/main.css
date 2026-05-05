@@ -258,6 +258,10 @@
     opacity: 0.5;
 }
 
+.counter-skipped {
+    opacity: var(--opacity-completed);
+}
+
 .counter-done .counter-bar-fill {
     background: var(--brand-lime);
 }

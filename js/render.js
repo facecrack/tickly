@@ -172,29 +172,37 @@ function renderCounters(counters) {
     const todayKey = storage.getTodayString();
 
     list.innerHTML = scheduled.map((habit) => {
+        const rawValue = habit.entries[todayKey];
+        const isSkipped = rawValue === 'Skipped';
+        const value = typeof rawValue === 'number' ? rawValue : 0;
+        const target = habit.target || 1;
+
         if (habit.paused) {
             return `
                 <li class="counter counter-paused" data-habit-id="${habit.id}" data-action="open-detail">
                     <header class="counter-header">
                         <div class="counter-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                         <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
-                        </header>
-                    <p class="counter-paused-label">Paused</p>
+                    </header>
+                    <div class="counter-progress">
+                        <span class="counter-value counter-value-skipped">paused</span>
+                        <span class="counter-target">/ ${target} ${escapeHtml(habit.unit || '')}</span>
+                    </div>
+                    <div class="counter-bar">
+                        <div class="counter-bar-fill" style="width: 0%;"></div>
+                    </div>
                 </li>
             `;
         }
 
-        const rawValue = habit.entries[todayKey];
-        const isSkipped = rawValue === 'Skipped';
-        const value = typeof rawValue === 'number' ? rawValue : 0;
-        const target = habit.target || 1;
         const percent = isSkipped ? 0 : Math.min(100, (value / target) * 100);
         const displayValue = isSkipped ? 'skipped' : value;
         const valueClass = isSkipped ? 'counter-value counter-value-skipped' : 'counter-value';
         const isComplete = !isSkipped && value >= target;
+        const stateClass = isComplete ? 'counter-done' : isSkipped ? 'counter-skipped' : '';
 
         return `
-            <li class="counter ${isComplete ? 'counter-done' : ''}" data-habit-id="${habit.id}" data-action="open-detail">
+            <li class="counter ${stateClass}" data-habit-id="${habit.id}" data-action="open-detail">
                 <header class="counter-header">
                     <div class="counter-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                     <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
@@ -414,6 +422,7 @@ function updateCounter(habitId) {
     if (fill) fill.style.width = (isSkipped ? 0 : percent) + '%';
 
     li.classList.toggle('counter-done', isComplete);
+    li.classList.toggle('counter-skipped', isSkipped && !isComplete);
 }
 
 
