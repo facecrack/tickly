@@ -73,7 +73,7 @@ function renderStatWeeklyCard(habit) {
         const isFuture = dayDate > today;
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
         const isSkipped = entry === 'Skipped' || entry === 'skipped';
-        const isPaused = isInPauseWindow(habit, dayDate);
+        const isPaused = isInPauseWindow(habit, dayDate) && isHabitDay && !isFuture && !isBeforeCreated;
         const isMissed = isHabitDay && !isDone && !isSkipped && !isPaused && !isFuture && !isBeforeCreated && !isToday;
 
         let circleClass = 'stat-week-day-circle';
@@ -240,7 +240,7 @@ function renderHeatmap12Weeks(habit) {
                 cellClass += ' stat-heatmap-cell-missed';
             }
 
-            const style = `grid-row: ${row + 1}; grid-column: ${12 - col};`;
+            const style = `grid-row: ${row + 1}; grid-column: ${col + 1};`;
             cells.push(`<div class="${cellClass}" style="${style}"></div>`);
         }
     }
