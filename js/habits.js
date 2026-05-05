@@ -100,6 +100,8 @@ function resumeHabit(habitId) {
 let _holdTimer = null;
 let _holdInterval = null;
 let _longPressActive = false;
+let _holdStartX = 0;
+let _holdStartY = 0;
 
 function initCounterRepeat() {
     document.addEventListener('touchstart', (e) => {
@@ -112,6 +114,9 @@ function initCounterRepeat() {
 
         _stopHold();
         _longPressActive = false;
+        _holdStartX = e.touches[0].clientX;
+        _holdStartY = e.touches[0].clientY;
+
         _holdTimer = setTimeout(() => {
             _holdTimer = null;
             _longPressActive = true;
@@ -121,11 +126,17 @@ function initCounterRepeat() {
 
     document.addEventListener('touchend', _stopHold, { passive: true });
     document.addEventListener('touchcancel', _stopHold, { passive: true });
-    document.addEventListener('touchmove', _stopHold, { passive: true });
 
-    // Suppress the synthetic click that fires after touchend following a long-press.
-    // Runs in capture phase (before router.js) to block both the extra increment
-    // and the open-detail that would fire if the click lands on the card.
+    // Only cancel on significant movement (>10px) — ignore natural finger tremor
+    document.addEventListener('touchmove', (e) => {
+        if (!_holdTimer && !_holdInterval) return;
+        const t = e.touches[0];
+        if (Math.hypot(t.clientX - _holdStartX, t.clientY - _holdStartY) > 10) {
+            _stopHold();
+        }
+    }, { passive: true });
+
+    // Suppress the synthetic click after a completed long-press
     document.addEventListener('click', (e) => {
         if (_longPressActive) {
             _longPressActive = false;
