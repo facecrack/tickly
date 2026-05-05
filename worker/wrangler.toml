@@ -7,4 +7,4 @@ binding = "PUSH_KV"
 id = "662d968a6c21452883c674053c5897ca"
 
 [triggers]
-crons = ["* * * * *"]
+crons = ["*/5 * * * *"]

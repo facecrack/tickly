@@ -88,12 +88,18 @@ async function fetchVapidPublicKey() {
 async function syncWithWorker(sub) {
     const reminders = buildReminders();
     const timezone  = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const payload   = JSON.stringify({ reminders, timezone, endpoint: sub.endpoint });
+
+    // Skip the KV write if nothing changed since last sync
+    if (localStorage.getItem('tickly-last-sync') === payload) return;
 
     await fetch(`${PUSH_WORKER}/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscription: sub.toJSON(), reminders, timezone })
     });
+
+    localStorage.setItem('tickly-last-sync', payload);
 }
 
 function buildReminders() {

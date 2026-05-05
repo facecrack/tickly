@@ -38,11 +38,17 @@ export default {
 
 async function handleSubscribe(request, env) {
     const { subscription, reminders, timezone } = await request.json();
-    await env.PUSH_KV.put(kvKey(subscription.endpoint), JSON.stringify({
+    const key = kvKey(subscription.endpoint);
+
+    // Preserve existing sent-history so notifications don't repeat after a sync
+    const existing = await env.PUSH_KV.get(key);
+    const sent = existing ? (JSON.parse(existing).sent || {}) : {};
+
+    await env.PUSH_KV.put(key, JSON.stringify({
         subscription,
         reminders: reminders ?? [],
         timezone:  timezone  ?? 'UTC',
-        sent: {}
+        sent
     }));
     return replyJson({ ok: true });
 }
@@ -91,15 +97,22 @@ async function sendDueReminders(env) {
         });
         const parts = Object.fromEntries(fmt.formatToParts(now).map(p => [p.type, p.value]));
 
-        const timeStr = `${parts.hour}:${parts.minute}`;
+        const currentMin = parseInt(parts.minute);
+        const currentHour = parseInt(parts.hour);
+        // Round current time down to the 5-minute window
+        const currentWindow = currentHour * 60 + Math.floor(currentMin / 5) * 5;
+
         const dayStr  = parts.weekday.toLowerCase();   // "mon", "tue", …
         const dateStr = `${parts.year}-${parts.month}-${parts.day}`;
 
         let dirty = false;
 
         for (const r of data.reminders) {
-            if (r.time !== timeStr)          continue;
-            if (!r.days.includes(dayStr))    continue;
+            // Check if reminder falls in the current 5-minute window
+            const [schedHour, schedMin] = r.time.split(':').map(Number);
+            const schedWindow = schedHour * 60 + Math.floor(schedMin / 5) * 5;
+            if (currentWindow !== schedWindow)   continue;
+            if (!r.days.includes(dayStr))        continue;
 
             const sentKey = `${r.habitId}_${dateStr}`;
             if (data.sent[sentKey])          continue;
