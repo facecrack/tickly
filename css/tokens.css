@@ -123,3 +123,13 @@
 [data-theme="light"] .action-btn-resume .action-pause-icon {
     filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
 }
+
+/* Done cells use var(--bg-primary) for text — in light mode that's near-white on lime, fix to dark */
+[data-theme="light"] .heatmap-cell-done {
+    color: #1D1D1D;
+}
+
+/* Weekly stat check-icon uses color: var(--bg-primary) — same issue */
+[data-theme="light"] .stat-week-day-icon {
+    color: #1D1D1D;
+}
