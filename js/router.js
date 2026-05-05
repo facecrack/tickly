@@ -205,6 +205,14 @@ document.addEventListener('click', (event) => {
             detail.changeMonth(1);
             break;
 
+        case 'chart-prev':
+            detail.changeChartWeek(1);
+            break;
+
+        case 'chart-next':
+            detail.changeChartWeek(-1);
+            break;
+
         case 'edit-habit':
             form.openEdit(detail.currentId());
             break;

@@ -460,8 +460,18 @@
 
         <section class="chart">
             <header class="chart-header">
-                <h3 class="chart-title">Last 7 days</h3>
-                <span class="chart-unit">glasses</span>
+                <div class="chart-header-text">
+                    <h3 class="chart-title">Last 7 days</h3>
+                    <span class="chart-unit">glasses</span>
+                </div>
+                <div class="chart-nav">
+                    <button class="chart-nav-btn" data-action="chart-prev">
+                        <img src="icons/chevron-left.svg" alt="Previous">
+                    </button>
+                    <button class="chart-nav-btn" data-action="chart-next" disabled>
+                        <img src="icons/chevron-right.svg" alt="Next">
+                    </button>
+                </div>
             </header>
 
             <div class="chart-bars">

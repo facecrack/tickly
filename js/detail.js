@@ -5,6 +5,7 @@
 
 let currentDetailHabitId = null;
 let heatmapMonthOffset = 0;  // 0 = текущий месяц, -1 = прошлый и т.д.
+let chartOffset = 0;          // 0 = последние 7 дней, 1 = предыдущие 7 и т.д.
 
 
 // ============================================
@@ -17,6 +18,7 @@ function openHabitDetail(habitId) {
 
     currentDetailHabitId = habitId;
     heatmapMonthOffset = 0;
+    chartOffset = 0;
 
     if (habit.type === 'binary') {
         showScreen('habit-detail-binary');
@@ -247,11 +249,18 @@ function renderChart(habit) {
     const chartBars = screen.querySelector('.chart-bars');
     if (!chartBars) return;
 
-    const days = [];
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const todayKey = formatDateKey(now);
+
+    // Конец периода: сегодня - offset*7
+    const endDate = new Date(now);
+    endDate.setDate(now.getDate() - chartOffset * 7);
+
+    const days = [];
     for (let i = 6; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(now.getDate() - i);
+        const d = new Date(endDate);
+        d.setDate(endDate.getDate() - i);
         d.setHours(0, 0, 0, 0);
         const key = formatDateKey(d);
         const rawValue = habit.entries[key];
@@ -263,9 +272,20 @@ function renderChart(habit) {
             key: key,
             value: value,
             isSkipped: isSkipped,
-            isToday: i === 0
+            isToday: key === todayKey
         });
     }
+
+    // Заголовок — диапазон дат
+    const chartTitle = screen.querySelector('.chart-title');
+    if (chartTitle) {
+        const fmt = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        chartTitle.textContent = `${fmt(days[0].date)} – ${fmt(days[6].date)}`;
+    }
+
+    // Кнопка "вперёд" задизейблена на текущей неделе
+    const nextBtn = screen.querySelector('[data-action="chart-next"]');
+    if (nextBtn) nextBtn.disabled = chartOffset === 0;
 
     const target = habit.target || 1;
     const maxValue = Math.max(target, ...days.map((d) => d.value));
@@ -278,7 +298,7 @@ function renderChart(habit) {
         const finalHeight = d.isSkipped ? 8 : heightPx;
         return `
             <div class="bar-col ${todayClass}">
-                <span class="bar-value">${d.value}</span>
+                <span class="bar-value">${d.isSkipped ? '' : d.value}</span>
                 <div class="bar ${colorClass}" style="height: ${finalHeight}px;"></div>
             </div>
         `;
@@ -292,6 +312,14 @@ function renderChart(habit) {
             return `<span class="${todayClass}">${letter}</span>`;
         }).join('');
     }
+}
+
+
+function changeChartWeek(delta) {
+    const habit = storage.getHabit(currentDetailHabitId);
+    if (!habit) return;
+    chartOffset = Math.max(0, chartOffset + delta);
+    renderChart(habit);
 }
 
 
@@ -451,5 +479,6 @@ function updatePauseBtn(screen, isPaused) {
 window.detail = {
     open: openHabitDetail,
     changeMonth: changeHeatmapMonth,
+    changeChartWeek,
     currentId: () => currentDetailHabitId
 };

@@ -341,6 +341,12 @@
     margin-bottom: 24px;
 }
 
+.chart-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .chart-title {
     font-size: 14px;
     font-weight: 500;
@@ -348,9 +354,36 @@
 }
 
 .chart-unit {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
+}
+
+.chart-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chart-nav-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.chart-nav-btn img {
+    width: 12px;
+    height: 12px;
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.chart-nav-btn:disabled {
+    opacity: 0.3;
 }
 
 .chart-bars {
