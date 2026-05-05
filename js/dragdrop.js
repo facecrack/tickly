@@ -46,7 +46,10 @@ function onTouchMove(e) {
         const touch = e.touches[0];
         dragState.lastTouchY = touch.clientY;
         dragState.ghost.style.top = (touch.clientY - dragState.offsetY) + 'px';
-        updateDropTarget(touch.clientY);
+        if (dragState.isGrid) {
+            dragState.ghost.style.left = (touch.clientX - dragState.offsetX) + 'px';
+        }
+        updateDropTarget(touch.clientX, touch.clientY);
         return;
     }
 
@@ -105,17 +108,20 @@ function beginDrag(touch, item) {
 
     if (navigator.vibrate) navigator.vibrate(15);
 
+    const list = item.closest('.today-list, .counters-list');
     dragState = {
         item,
-        list: item.closest('.today-list, .counters-list'),
+        list,
         ghost,
         offsetY: touch.clientY - rect.top,
+        offsetX: touch.clientX - rect.left,
+        isGrid: list.classList.contains('counters-list'),
         currentTarget: null,
         lastTouchY: touch.clientY
     };
 }
 
-function updateDropTarget(touchY) {
+function updateDropTarget(touchX, touchY) {
     const items = Array.from(dragState.list.querySelectorAll('[data-habit-id]'))
         .filter(el => el !== dragState.item);
 
@@ -124,7 +130,11 @@ function updateDropTarget(touchY) {
 
     items.forEach(el => {
         const r = el.getBoundingClientRect();
-        const dist = Math.abs(touchY - (r.top + r.height / 2));
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dist = dragState.isGrid
+            ? Math.hypot(touchX - cx, touchY - cy)
+            : Math.abs(touchY - cy);
         if (dist < closestDist) {
             closestDist = dist;
             closest = el;

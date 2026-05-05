@@ -17,7 +17,7 @@ function toggleHabit(habitId) {
         if (navigator.vibrate) navigator.vibrate(10);
     }
 
-    render.main();
+    render.updateBinary(habitId);
 }
 
 

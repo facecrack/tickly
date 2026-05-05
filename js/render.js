@@ -339,6 +339,56 @@ function escapeHtml(str) {
 }
 
 
+function updateBinary(habitId) {
+    const habit = storage.getHabit(habitId);
+    if (!habit) return;
+
+    const li = document.querySelector(`[data-screen="main"] [data-habit-id="${habitId}"]`);
+    if (!li) return;
+
+    const today = storage.getTodayString();
+    const todayEntry = habit.entries[today];
+    const isDone = todayEntry === 'done';
+    const isSkipped = todayEntry === 'Skipped' || todayEntry === 'skipped';
+    const streak = calculateStreak(habit);
+
+    li.className = `habit${isDone ? ' habit-done' : isSkipped ? ' habit-skipped' : ''}`;
+
+    const checkBtn = li.querySelector('.habit-check');
+    if (checkBtn) {
+        checkBtn.className = `habit-check${isDone ? ' habit-check-done' : ''}`;
+        const circle = checkBtn.querySelector('.habit-check-circle');
+        if (circle) circle.innerHTML = isDone ? '<img src="icons/check.svg" alt="Done">' : '';
+    }
+
+    const infoEl = li.querySelector('.habit-info');
+    if (infoEl) {
+        let streakEl = infoEl.querySelector('.habit-streak');
+        if (streak > 0) {
+            if (!streakEl) {
+                streakEl = document.createElement('p');
+                streakEl.className = 'habit-streak';
+                infoEl.appendChild(streakEl);
+            }
+            streakEl.textContent = `${streak} day streak`;
+        } else if (streakEl) {
+            streakEl.remove();
+        }
+    }
+
+    const meta = document.querySelector('[data-screen="main"] .today .section-meta');
+    if (meta) {
+        const allHabits = storage.getHabits();
+        const todayDayKey = getTodayDayKey();
+        const scheduled = allHabits.filter(h => h.type === 'binary' && h.schedule.includes(todayDayKey) && !h.paused);
+        const doneCount = scheduled.filter(h => h.entries[today] === 'done').length;
+        meta.textContent = `${doneCount} of ${scheduled.length} done`;
+    }
+
+    renderLast5Days(storage.getHabits());
+}
+
+
 function updateCounter(habitId) {
     const habit = storage.getHabit(habitId);
     if (!habit) return;
@@ -371,5 +421,6 @@ window.render = {
     main: renderMainScreen,
     counters: renderCounters,
     binaries: renderBinaries,
+    updateBinary: updateBinary,
     updateCounter: updateCounter
 };
