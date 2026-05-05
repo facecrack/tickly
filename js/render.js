@@ -339,8 +339,37 @@ function escapeHtml(str) {
 }
 
 
+function updateCounter(habitId) {
+    const habit = storage.getHabit(habitId);
+    if (!habit) return;
+
+    const li = document.querySelector(`[data-screen="main"] [data-habit-id="${habitId}"]`);
+    if (!li) return;
+
+    const today = storage.getTodayString();
+    const rawValue = habit.entries[today];
+    const isSkipped = rawValue === 'Skipped';
+    const value = typeof rawValue === 'number' ? rawValue : 0;
+    const target = habit.target || 1;
+    const percent = isSkipped ? 0 : Math.min(100, (value / target) * 100);
+    const isComplete = !isSkipped && value >= target;
+
+    const valueEl = li.querySelector('.counter-value');
+    if (valueEl) {
+        valueEl.textContent = isSkipped ? 'skipped' : value;
+        valueEl.className = isSkipped ? 'counter-value counter-value-skipped' : 'counter-value';
+    }
+
+    const fill = li.querySelector('.counter-bar-fill');
+    if (fill) fill.style.width = (isSkipped ? 0 : percent) + '%';
+
+    li.classList.toggle('counter-done', isComplete);
+}
+
+
 window.render = {
     main: renderMainScreen,
     counters: renderCounters,
-    binaries: renderBinaries
+    binaries: renderBinaries,
+    updateCounter: updateCounter
 };

@@ -40,8 +40,8 @@ function changeCounter(habitId, delta) {
         storage.setEntry(habitId, today, newValue);
     }
 
-    const allHabits = storage.getHabits();
-    render.counters(allHabits.filter(h => h.type === 'counter'));
+    // Update only the changed card — preserves DOM so touch events stay intact
+    render.updateCounter(habitId);
 
     // Bump анимация на изменённой карточке
     requestAnimationFrame(() => {
@@ -110,6 +110,7 @@ function initCounterRepeat() {
         const habitId = li.dataset.habitId;
         const delta = btn.classList.contains('counter-btn-plus') ? 1 : -1;
 
+        _stopHold();
         _longPressActive = false;
         _holdTimer = setTimeout(() => {
             _holdTimer = null;
