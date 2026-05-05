@@ -10,10 +10,8 @@ function renderSettings() {
 
     // Theme
     const themeOptions = screen.querySelectorAll('.theme-option');
-    themeOptions.forEach((opt, i) => {
-        const isActive = (i === 0 && settings.theme === 'default') ||
-                          (i === 1 && settings.theme === 'minimal');
-        opt.classList.toggle('theme-option-active', isActive);
+    themeOptions.forEach((opt) => {
+        opt.classList.toggle('theme-option-active', opt.dataset.themeValue === (settings.theme || 'default'));
     });
 
     // Reminders toggle
@@ -114,6 +112,21 @@ function capitalize(s) {
 }
 
 
+function setTheme(value) {
+    storage.updateSettings({ theme: value });
+    applyTheme(value);
+    renderSettings();
+}
+
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.dataset.theme = 'light';
+    } else {
+        delete document.documentElement.dataset.theme;
+    }
+}
+
+
 // ============================================
 // ДОСТУПНОСТЬ
 // ============================================
@@ -122,5 +135,7 @@ window.settings = {
     render: renderSettings,
     toggleReminders: toggleReminders,
     export: exportData,
-    import: importData
+    import: importData,
+    setTheme,
+    applyTheme
 };

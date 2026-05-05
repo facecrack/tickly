@@ -89,6 +89,8 @@ if (backdrop) {
 }
 
 
+settings.applyTheme(storage.getSettings().theme);
+
 render.main();
 dragdrop.init();
 habits.initRepeat();

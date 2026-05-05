@@ -82,3 +82,44 @@
        ============================================ */
     --shadow-sheet: 0 -20px 40px rgba(0, 0, 0, 0.5);
 }
+
+
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+
+[data-theme="light"] {
+    --bg-primary: #F2F2F7;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #E8E8ED;
+    --bg-backdrop: rgba(0, 0, 0, 0.35);
+    --text-primary: #1D1D1D;
+    --text-secondary: #8E8E93;
+    --habit-grey: #E0E0E0;
+    --shadow-sheet: 0 -20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* "New habit" lime button — keep text dark in light mode */
+[data-theme="light"] .nav-btn-primary .nav-label {
+    color: #1D1D1D;
+}
+
+/* Active nav icon: was white, becomes black */
+[data-theme="light"] .nav-btn-active .nav-icon-img {
+    filter: brightness(0);
+}
+
+/* White icons → black icons in light mode */
+[data-theme="light"] .icon-btn-img,
+[data-theme="light"] .reminder-icon,
+[data-theme="light"] .action-edit-icon,
+[data-theme="light"] .action-skip-icon,
+[data-theme="light"] .action-pause-icon,
+[data-theme="light"] .settings-export-icon {
+    filter: brightness(0);
+}
+
+/* Resume button always keeps lime filter */
+[data-theme="light"] .action-btn-resume .action-pause-icon {
+    filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
+}

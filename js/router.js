@@ -5,6 +5,13 @@
 
 document.addEventListener('click', (event) => {
 
+    // THEME SWITCH
+    const themeOption = event.target.closest('.theme-option');
+    if (themeOption && themeOption.dataset.themeValue) {
+        settings.setTheme(themeOption.dataset.themeValue);
+        return;
+    }
+
     // TYPE SWITCH
     const typeOption = event.target.closest('.type-option');
     if (typeOption) {
