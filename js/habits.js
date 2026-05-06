@@ -62,17 +62,15 @@ function changeCounter(habitId, delta) {
     // Update only the changed card — preserves DOM so touch events stay intact
     render.updateCounter(habitId);
 
+    if (goalJustReached && !habit.paused) {
+        if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+    }
+
     requestAnimationFrame(() => {
         const card = document.querySelector(`[data-habit-id="${habitId}"]`);
         if (!card) return;
-        if (goalJustReached && !habit.paused) {
-            card.classList.add('counter-goal-reached');
-            if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
-            setTimeout(() => card.classList.remove('counter-goal-reached'), 600);
-        } else {
-            card.classList.add('counter-bump');
-            setTimeout(() => card.classList.remove('counter-bump'), 250);
-        }
+        card.classList.add('counter-bump');
+        setTimeout(() => card.classList.remove('counter-bump'), 250);
     });
 }
 

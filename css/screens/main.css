@@ -247,7 +247,7 @@
 }
 
 .counter-btn-plus {
-    flex: 1;
+    width: 40px;
     background: var(--brand-lime);
 }
 
@@ -269,22 +269,12 @@
 }
 
 .counter-step {
+    flex: 1;
     font-size: 14px;
     font-weight: 600;
     color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
-}
-
-@keyframes counter-goal-pulse {
-    0%   { transform: scale(1); }
-    30%  { transform: scale(1.04); box-shadow: 0 0 0 4px rgba(178, 240, 65, 0.3); }
-    60%  { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(178, 240, 65, 0.1); }
-    100% { transform: scale(1); box-shadow: none; }
-}
-
-.counter-goal-reached {
-    animation: counter-goal-pulse 0.6s ease-out;
 }
 
 .mood-tooltip {
