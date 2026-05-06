@@ -62,8 +62,8 @@ function changeCounter(habitId, delta) {
     // Update only the changed card — preserves DOM so touch events stay intact
     render.updateCounter(habitId);
 
-    if (goalJustReached && !habit.paused) {
-        if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+    if (navigator.vibrate) {
+        navigator.vibrate(goalJustReached && !habit.paused ? [10, 40, 10] : 5);
     }
 
     requestAnimationFrame(() => {
