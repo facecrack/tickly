@@ -160,14 +160,17 @@
 
         <section class="form-group">
             <label class="form-label">REMINDER</label>
-            <div class="reminder">
-                <button class="reminder-info" data-action="open-time-picker">
-                    <img src="icons/bell.svg" alt="" class="reminder-icon">
-                    <span class="reminder-time">9:00 AM</span>
-                </button>
-                <button class="toggle toggle-on">
-                    <span class="toggle-thumb"></span>
-                </button>
+            <div class="reminder-multi">
+                <div class="reminder-toggle-row">
+                    <div class="reminder-toggle-info">
+                        <img src="icons/bell.svg" alt="" class="reminder-icon">
+                        <span class="reminder-toggle-label">Reminders</span>
+                    </div>
+                    <button class="toggle" data-action="toggle-reminder">
+                        <span class="toggle-thumb"></span>
+                    </button>
+                </div>
+                <div class="reminder-times-list"></div>
             </div>
         </section>
     </main>
@@ -266,14 +269,17 @@
 
         <section class="form-group">
             <label class="form-label">REMINDER</label>
-            <div class="reminder">
-                <button class="reminder-info" data-action="open-time-picker">
-                    <img src="icons/bell.svg" alt="" class="reminder-icon">
-                    <span class="reminder-time reminder-time-off">Off</span>
-                </button>
-                <button class="toggle">
-                    <span class="toggle-thumb"></span>
-                </button>
+            <div class="reminder-multi">
+                <div class="reminder-toggle-row">
+                    <div class="reminder-toggle-info">
+                        <img src="icons/bell.svg" alt="" class="reminder-icon">
+                        <span class="reminder-toggle-label">Reminders</span>
+                    </div>
+                    <button class="toggle" data-action="toggle-reminder">
+                        <span class="toggle-thumb"></span>
+                    </button>
+                </div>
+                <div class="reminder-times-list"></div>
             </div>
         </section>
     </main>
@@ -389,9 +395,9 @@
         <img src="icons/edit.svg" alt="" class="action-edit-icon">
         <span>Edit</span>
     </button>
-    <button class="action-btn detail-skip-btn" data-action="skip-today">
-        <img src="icons/skip.svg" alt="" class="action-skip-icon">
-        <span>Skip today</span>
+    <button class="action-btn detail-archive-btn" data-action="archive-habit">
+        <img src="icons/archive.svg" alt="" class="action-archive-icon">
+        <span>Archive</span>
     </button>
     <button class="action-btn action-btn-resume detail-resume-btn" data-action="resume-habit" hidden>
         <img src="icons/resume.svg" alt="" class="action-pause-icon">
@@ -500,9 +506,9 @@
         <img src="icons/edit.svg" alt="" class="action-edit-icon">
         <span>Edit</span>
     </button>
-    <button class="action-btn detail-skip-btn" data-action="skip-today">
-        <img src="icons/skip.svg" alt="" class="action-skip-icon">
-        <span>Skip today</span>
+    <button class="action-btn detail-archive-btn" data-action="archive-habit">
+        <img src="icons/archive.svg" alt="" class="action-archive-icon">
+        <span>Archive</span>
     </button>
     <button class="action-btn action-btn-resume detail-resume-btn" data-action="resume-habit" hidden>
         <img src="icons/resume.svg" alt="" class="action-pause-icon">
@@ -613,6 +619,22 @@
             </div>
         </section>
         <input type="file" id="import-file-input" accept=".json" style="display:none">
+
+        <section class="settings-group settings-archived-group" hidden>
+            <label class="form-label">ARCHIVED</label>
+            <div class="settings-card">
+                <button class="settings-row settings-row-button settings-row-export" data-action="open-archived">
+                    <span class="settings-export">
+                        <img src="icons/archive.svg" alt="" class="settings-export-icon">
+                        <span class="settings-export-text">
+                            <span class="settings-row-label">Archived habits</span>
+                            <span class="settings-export-hint settings-archived-count">0 habits</span>
+                        </span>
+                    </span>
+                    <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
+                </button>
+            </div>
+        </section>
 
         <section class="settings-group">
             <label class="form-label">ABOUT</label>
@@ -821,6 +843,19 @@
         </button>
     </nav>
 </main>
+
+
+    <!-- 18 — ARCHIVED -->
+    <main class="screen archived-screen" data-screen="archived" hidden>
+        <header class="form-header">
+            <button class="icon-btn" data-action="back-to-settings">
+                <img src="icons/arrow-left.svg" alt="Back" class="icon-btn-img">
+            </button>
+            <h1 class="form-title">Archived</h1>
+            <div class="form-header-spacer"></div>
+        </header>
+        <div class="archived-list"></div>
+    </main>
 
 
     <!-- ============================================
@@ -1047,6 +1082,40 @@
     <!-- ============================================
          ALERT
          ============================================ -->
+
+    <!-- ARCHIVE TIP -->
+    <div class="alert" data-alert="archive-tip" hidden>
+        <div class="alert-icon alert-icon-archive">
+            <span class="alert-icon-archive-inner" aria-hidden="true"></span>
+        </div>
+        <h2 class="alert-title">Habit archived</h2>
+        <p class="alert-message">Hidden from your lists but keeps all history. Restore any time in Settings → Archived.</p>
+        <div class="alert-actions">
+            <button class="alert-btn alert-btn-primary" data-action="cancel-alert">Got it</button>
+        </div>
+    </div>
+
+    <!-- HINTS -->
+    <div class="alert" data-alert="hints" hidden>
+        <h2 class="alert-title">Hidden features</h2>
+        <div class="hint-list">
+            <div class="hint-item">
+                <span class="hint-item-icon">✋</span>
+                <p class="hint-item-text">Long-press a habit to drag and reorder it</p>
+            </div>
+            <div class="hint-item">
+                <span class="hint-item-icon">☀️</span>
+                <p class="hint-item-text">Tap mood icons to see your daily score</p>
+            </div>
+            <div class="hint-item">
+                <span class="hint-item-icon">📦</span>
+                <p class="hint-item-text">Archive habits instead of deleting to keep their history</p>
+            </div>
+        </div>
+        <div class="alert-actions">
+            <button class="alert-btn alert-btn-primary" data-action="cancel-alert">Got it</button>
+        </div>
+    </div>
 
     <!-- 15 — DELETE HABIT -->
     <div class="alert" data-alert="delete-habit" hidden>

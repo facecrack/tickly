@@ -179,3 +179,69 @@
 .settings-row-export {
     height: 64px;
 }
+
+
+/* ============================================
+   ARCHIVED SCREEN
+   ============================================ */
+
+.archived-screen {
+    padding-bottom: 40px;
+}
+
+.archived-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.archived-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.archived-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.archived-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.archived-item-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.archived-item-meta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.archived-restore-btn {
+    padding: 0 14px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--brand-lime-25);
+    color: var(--brand-lime);
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}

@@ -17,7 +17,10 @@ const DEFAULT_DATA = {
         sound: 'gentle-chime',
         vibrate: true,
         startWeekOn: 'monday',
-        timeFormat: '24h'
+        timeFormat: '24h',
+        archiveTipShown: false,
+        hintShown: false,
+        lastStatTab: 'weekly'
     },
     version: 1
 };
@@ -73,6 +76,15 @@ function migrateData(data) {
         Object.keys(habit.entries).forEach((key) => {
             if (habit.entries[key] === 'skipped') habit.entries[key] = 'Skipped';
         });
+        if (habit.archived === undefined) habit.archived = false;
+        if (habit.reminders === undefined) {
+            if (habit.reminder && habit.reminder.enabled && habit.reminder.time) {
+                habit.reminders = [{ time: habit.reminder.time }];
+            } else {
+                habit.reminders = [];
+            }
+            delete habit.reminder;
+        }
     });
     return data;
 }

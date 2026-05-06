@@ -4,7 +4,7 @@
 
 
 function renderMainScreen() {
-    const habits = storage.getHabits();
+    const habits = storage.getHabits().filter((h) => !h.archived);
 
     if (habits.length === 0) {
         renderEmptyDate();
@@ -63,11 +63,11 @@ function renderLast5Days(habits) {
     moodsList.innerHTML = days.map((d) => {
         const mood = calculateDayMood(habits, d);
         if (mood === null) {
-            // Нет запланированных привычек на этот день — нейтральный rest day
             return `<li class="mood mood-rest" aria-label="Rest day"></li>`;
         }
         const file = moodFile(mood);
-        return `<li class="mood"><img src="moods/${file}" alt="${moodLabel(mood)}"></li>`;
+        const label = moodLabel(mood);
+        return `<li class="mood" data-action="mood-tap" data-mood-label="${label}" data-date="${d.name}"><img src="moods/${file}" alt="${label}"></li>`;
     }).join('');
 }
 
@@ -195,6 +195,7 @@ function renderCounters(counters) {
                         <button class="counter-btn counter-btn-minus" data-action="counter-decrement">
                             <img src="icons/minus.svg" alt="Decrease">
                         </button>
+                        <span class="counter-step">×${habit.step || 1}</span>
                         <button class="counter-btn counter-btn-plus" data-action="counter-increment">
                             <img src="icons/plus.svg" alt="Increase">
                         </button>
@@ -229,6 +230,7 @@ function renderCounters(counters) {
                     <button class="counter-btn counter-btn-minus" data-action="counter-decrement">
                         <img src="icons/minus.svg" alt="Decrease">
                     </button>
+                    <span class="counter-step">×${habit.step || 1}</span>
                     <button class="counter-btn counter-btn-plus" data-action="counter-increment">
                         <img src="icons/plus.svg" alt="Increase">
                     </button>
@@ -405,14 +407,14 @@ function updateBinary(habitId) {
 
     const meta = document.querySelector('[data-screen="main"] .today .section-meta');
     if (meta) {
-        const allHabits = storage.getHabits();
+        const allHabits = storage.getHabits().filter((h) => !h.archived);
         const todayDayKey = getTodayDayKey();
         const scheduled = allHabits.filter(h => h.type === 'binary' && h.schedule.includes(todayDayKey) && !h.paused);
         const doneCount = scheduled.filter(h => h.entries[today] === 'done').length;
         meta.textContent = `${doneCount} of ${scheduled.length} done`;
     }
 
-    renderLast5Days(storage.getHabits());
+    renderLast5Days(storage.getHabits().filter((h) => !h.archived));
 }
 
 
@@ -451,10 +453,31 @@ function updateCounter(habitId) {
 }
 
 
+let _tooltipTimer = null;
+
+function showMoodTooltip(anchor, text) {
+    let tip = document.getElementById('mood-tooltip');
+    if (!tip) {
+        tip = document.createElement('div');
+        tip.id = 'mood-tooltip';
+        tip.className = 'mood-tooltip';
+        document.body.appendChild(tip);
+    }
+    tip.textContent = text;
+    const rect = anchor.getBoundingClientRect();
+    tip.style.left = (rect.left + rect.width / 2) + 'px';
+    tip.style.top = rect.top + 'px';
+    tip.classList.add('mood-tooltip-visible');
+    clearTimeout(_tooltipTimer);
+    _tooltipTimer = setTimeout(() => tip.classList.remove('mood-tooltip-visible'), 5000);
+}
+
+
 window.render = {
     main: renderMainScreen,
     counters: renderCounters,
     binaries: renderBinaries,
     updateBinary: updateBinary,
-    updateCounter: updateCounter
+    updateCounter: updateCounter,
+    showMoodTooltip: showMoodTooltip
 };

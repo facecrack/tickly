@@ -7,15 +7,17 @@ let activeStatTab = 'weekly';
 
 
 function openStatistic() {
-    activeStatTab = 'weekly';
+    const saved = storage.getSettings().lastStatTab || 'weekly';
+    activeStatTab = saved;
     showScreen('statistic');
-    setStatTab('weekly');
+    setStatTab(saved);
 }
 
 
 function setStatTab(tab) {
     if (tab !== 'weekly' && tab !== 'overall') return;
     activeStatTab = tab;
+    storage.updateSettings({ lastStatTab: tab });
 
     const screen = document.querySelector('[data-screen="statistic"]');
     screen.querySelectorAll('.stat-tab').forEach((btn) => {
@@ -43,7 +45,7 @@ function renderStatistic() {
 // ============================================
 
 function renderStatWeekly() {
-    const habits = storage.getHabits();
+    const habits = storage.getHabits().filter((h) => !h.archived);
     const list = document.querySelector('.stat-weekly-list');
     if (!list) return;
 
@@ -123,7 +125,7 @@ function renderStatWeeklyCard(habit) {
 // ============================================
 
 function renderStatOverall() {
-    const habits = storage.getHabits();
+    const habits = storage.getHabits().filter((h) => !h.archived);
 
     // Summary
     const summary = calculateSummary(habits);

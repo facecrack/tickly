@@ -450,18 +450,18 @@ function isHabitDay(habit, date) {
 
 
 function updatePauseBtn(screen, isPaused) {
-    const pauseBtn  = screen.querySelector('.detail-pause-btn');
-    const skipBtn   = screen.querySelector('.detail-skip-btn');
-    const resumeBtn = screen.querySelector('.detail-resume-btn');
+    const pauseBtn   = screen.querySelector('.detail-pause-btn');
+    const archiveBtn = screen.querySelector('.detail-archive-btn');
+    const resumeBtn  = screen.querySelector('.detail-resume-btn');
 
     if (isPaused) {
-        if (pauseBtn)  pauseBtn.hidden  = true;
-        if (skipBtn)   skipBtn.hidden   = true;
-        if (resumeBtn) resumeBtn.hidden = false;
+        if (pauseBtn)   pauseBtn.hidden   = true;
+        if (archiveBtn) archiveBtn.hidden = true;
+        if (resumeBtn)  resumeBtn.hidden  = false;
     } else {
-        if (pauseBtn)  pauseBtn.hidden  = false;
-        if (skipBtn)   skipBtn.hidden   = false;
-        if (resumeBtn) resumeBtn.hidden = true;
+        if (pauseBtn)   pauseBtn.hidden   = false;
+        if (archiveBtn) archiveBtn.hidden = false;
+        if (resumeBtn)  resumeBtn.hidden  = true;
     }
 }
 

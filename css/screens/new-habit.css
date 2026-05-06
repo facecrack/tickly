@@ -391,12 +391,16 @@
 
 
 /* ============================================
-   REMINDER
+   REMINDER — multi
    ============================================ */
 
-.reminder {
+.reminder-multi {
     background: var(--bg-card);
     border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.reminder-toggle-row {
     height: 56px;
     padding: 0 16px;
     display: flex;
@@ -404,7 +408,7 @@
     justify-content: space-between;
 }
 
-.reminder-info {
+.reminder-toggle-info {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -416,14 +420,85 @@
     filter: brightness(0) invert(1);
 }
 
-.reminder-time {
+.reminder-toggle-label {
     font-size: 16px;
     font-weight: 500;
     color: var(--text-primary);
 }
 
-.reminder-time-off {
-    color: var(--text-secondary);
+.reminder-times-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.reminder-time-row {
+    height: 52px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid var(--bg-elevated);
+}
+
+.reminder-time-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    padding: 0;
+}
+
+.reminder-time-icon {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
+}
+
+.reminder-time-btn span {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.reminder-remove-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.reminder-remove-btn img {
+    width: 10px;
+    height: 10px;
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.reminder-add-btn {
+    height: 48px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid var(--bg-elevated);
+    background: transparent;
+    width: 100%;
+}
+
+.reminder-add-icon {
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
+}
+
+.reminder-add-btn span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brand-lime);
 }
 
 

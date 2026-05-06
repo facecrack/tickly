@@ -40,13 +40,6 @@ document.addEventListener('click', (event) => {
         return;
     }
 
-    // REMINDER TOGGLE (form)
-    const reminderToggle = event.target.closest('.reminder .toggle');
-    if (reminderToggle) {
-        form.toggleReminder();
-        return;
-    }
-
     // ICON OPTION
     const iconOption = event.target.closest('.icon-option');
     if (iconOption) {
@@ -150,8 +143,20 @@ document.addEventListener('click', (event) => {
             pickers.saveIcon();
             break;
 
+        case 'toggle-reminder':
+            form.toggleReminder();
+            break;
+
+        case 'add-reminder':
+            form.addReminder();
+            break;
+
+        case 'remove-reminder':
+            form.removeReminder(parseInt(actionEl.dataset.reminderIndex || '0'));
+            break;
+
         case 'open-time-picker':
-            pickers.openTime();
+            pickers.openTime(parseInt(actionEl.dataset.reminderIndex || '0'));
             break;
 
         case 'save-time-picker':
@@ -220,6 +225,30 @@ document.addEventListener('click', (event) => {
         case 'skip-today':
             habits.skipToday(detail.currentId());
             break;
+
+        case 'archive-habit':
+            habits.archive(detail.currentId());
+            break;
+
+        case 'restore-habit':
+            habits.restore(actionEl.dataset.habitId);
+            break;
+
+        case 'open-archived':
+            settings.openArchived();
+            break;
+
+        case 'back-to-settings':
+            settings.render();
+            showScreen('settings');
+            break;
+
+        case 'mood-tap': {
+            const label = actionEl.dataset.moodLabel;
+            const date = actionEl.dataset.date;
+            if (label) render.showMoodTooltip(actionEl, `${date} — ${label}`);
+            break;
+        }
 
         case 'open-delete-alert':
             showAlert('delete-habit');

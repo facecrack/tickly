@@ -104,14 +104,14 @@ async function syncWithWorker(sub) {
 
 function buildReminders() {
     return storage.getHabits()
-        .filter(h => h.reminder?.enabled)
-        .map(h => ({
+        .filter((h) => !h.archived && h.reminders && h.reminders.length > 0)
+        .flatMap((h) => h.reminders.map((r) => ({
             habitId: h.id,
             name:    h.name,
             icon:    h.icon,
-            time:    h.reminder.time,
+            time:    r.time,
             days:    h.schedule
-        }));
+        })));
 }
 
 

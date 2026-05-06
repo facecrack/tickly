@@ -13,7 +13,7 @@ function createDefaultFormState() {
         unit: '',
         step: 1,
         schedule: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        reminder: { enabled: false, time: '09:00' }
+        reminders: []
     };
 }
 
@@ -51,7 +51,7 @@ function openEditForm(habitId) {
         unit: habit.unit || '',
         step: habit.step || 1,
         schedule: [...habit.schedule],
-        reminder: { enabled: false, time: '09:00', ...(habit.reminder || {}) }
+        reminders: [...(habit.reminders || [])]
     };
 
     if (formState.type === 'binary') {
@@ -117,7 +117,24 @@ function applyPreset(preset) {
 
 
 function toggleReminder() {
-    formState.reminder.enabled = !formState.reminder.enabled;
+    if (formState.reminders.length > 0) {
+        formState.reminders = [];
+    } else {
+        formState.reminders = [{ time: '09:00' }];
+    }
+    renderForm();
+}
+
+
+function addReminder() {
+    if (formState.reminders.length >= 3) return;
+    formState.reminders.push({ time: '09:00' });
+    renderForm();
+}
+
+
+function removeReminder(index) {
+    formState.reminders.splice(index, 1);
     renderForm();
 }
 
@@ -164,7 +181,7 @@ function saveHabit() {
         color: formState.color,
         type: formState.type,
         schedule: [...formState.schedule],
-        reminder: { ...formState.reminder }
+        reminders: [...formState.reminders]
     };
 
     if (formState.type === 'counter') {
@@ -186,7 +203,13 @@ function saveHabit() {
     } else {
         storage.addHabit(habitData);
         notifications.scheduleReminders();
-        render.main();
+        if (!storage.getSettings().hintShown) {
+            storage.updateSettings({ hintShown: true });
+            render.main();
+            setTimeout(() => showAlert('hints'), 300);
+        } else {
+            render.main();
+        }
     }
 }
 
@@ -218,16 +241,32 @@ if (iconPreviewBtn) {
 
     updateActivePreset(screen);
 
-    const toggle = screen.querySelector('.reminder .toggle');
-    const reminderTime = screen.querySelector('.reminder-time');
-    if (toggle) toggle.classList.toggle('toggle-on', formState.reminder.enabled);
-    if (reminderTime) {
-        if (formState.reminder.enabled) {
-            reminderTime.textContent = formatReminderTime(formState.reminder.time);
-            reminderTime.classList.remove('reminder-time-off');
+    const multiToggle = screen.querySelector('.reminder-multi .toggle');
+    if (multiToggle) multiToggle.classList.toggle('toggle-on', formState.reminders.length > 0);
+
+    const timesList = screen.querySelector('.reminder-times-list');
+    if (timesList) {
+        if (formState.reminders.length === 0) {
+            timesList.innerHTML = '';
         } else {
-            reminderTime.textContent = 'Off';
-            reminderTime.classList.add('reminder-time-off');
+            const rows = formState.reminders.map((r, i) => `
+                <div class="reminder-time-row">
+                    <button class="reminder-time-btn" data-action="open-time-picker" data-reminder-index="${i}">
+                        <img src="icons/bell.svg" alt="" class="reminder-time-icon">
+                        <span>${formatReminderTime(r.time)}</span>
+                    </button>
+                    <button class="reminder-remove-btn" data-action="remove-reminder" data-reminder-index="${i}">
+                        <img src="icons/close.svg" alt="Remove">
+                    </button>
+                </div>
+            `).join('');
+            const addBtn = formState.reminders.length < 3 ? `
+                <button class="reminder-add-btn" data-action="add-reminder">
+                    <img src="icons/plus.svg" alt="" class="reminder-add-icon">
+                    <span>Add reminder</span>
+                </button>
+            ` : '';
+            timesList.innerHTML = rows + addBtn;
         }
     }
 
@@ -305,6 +344,8 @@ window.form = {
     toggleDay: toggleDay,
     applyPreset: applyPreset,
     toggleReminder: toggleReminder,
+    addReminder: addReminder,
+    removeReminder: removeReminder,
     setName: setName,
     setTarget: setTarget,
     changeStep: changeStep,

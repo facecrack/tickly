@@ -2,7 +2,7 @@
  * Service Worker — кэш + уведомления.
  */
 
-const CACHE_NAME = 'tickly-v36';
+const CACHE_NAME = 'tickly-v37';
 const SCOPE = self.registration.scope;
 
 function url(path) {
@@ -50,6 +50,7 @@ const STATIC_FILES = [
     url('fonts/FixelDisplay-Regular.woff2'),
     url('fonts/FixelDisplay-SemiBold.woff2'),
     // Icons
+    url('icons/archive.svg'),
     url('icons/arrow-left.svg'),
     url('icons/bell.svg'),
     url('icons/check.svg'),

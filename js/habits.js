@@ -46,9 +46,12 @@ function changeCounter(habitId, delta) {
 
     const current = typeof raw === 'number' ? raw : 0;
     const step = habit.step || 1;
+    const target = habit.target || 1;
 
     let newValue = current + (delta * step);
     if (newValue < 0) newValue = 0;
+
+    const goalJustReached = newValue >= target && current < target;
 
     if (newValue === 0) {
         storage.setEntry(habitId, today, null);
@@ -59,10 +62,14 @@ function changeCounter(habitId, delta) {
     // Update only the changed card — preserves DOM so touch events stay intact
     render.updateCounter(habitId);
 
-    // Bump анимация на изменённой карточке
     requestAnimationFrame(() => {
         const card = document.querySelector(`[data-habit-id="${habitId}"]`);
-        if (card) {
+        if (!card) return;
+        if (goalJustReached && !habit.paused) {
+            card.classList.add('counter-goal-reached');
+            if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+            setTimeout(() => card.classList.remove('counter-goal-reached'), 600);
+        } else {
             card.classList.add('counter-bump');
             setTimeout(() => card.classList.remove('counter-bump'), 250);
         }
@@ -88,6 +95,29 @@ function skipToday(habitId) {
 function deleteHabit(habitId) {
     storage.deleteHabit(habitId);
     render.main();
+}
+
+
+function archiveHabit(habitId) {
+    storage.updateHabit(habitId, { archived: true });
+    render.main();
+    const s = storage.getSettings();
+    if (!s.archiveTipShown) {
+        storage.updateSettings({ archiveTipShown: true });
+        showAlert('archive-tip');
+    }
+}
+
+
+function restoreHabit(habitId) {
+    storage.updateHabit(habitId, { archived: false });
+    const remaining = storage.getHabits().filter((h) => h.archived);
+    if (remaining.length === 0) {
+        settings.render();
+        showScreen('settings');
+    } else {
+        settings.renderArchived();
+    }
 }
 
 
@@ -179,5 +209,7 @@ window.habits = {
     deleteHabit: deleteHabit,
     pause: pauseHabit,
     resume: resumeHabit,
+    archive: archiveHabit,
+    restore: restoreHabit,
     initRepeat: initCounterRepeat
 };

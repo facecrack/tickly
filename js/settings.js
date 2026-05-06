@@ -8,6 +8,15 @@ function renderSettings() {
     const screen = document.querySelector('[data-screen="settings"]');
     if (!screen) return;
 
+    // Archived section
+    const archived = storage.getHabits().filter((h) => h.archived);
+    const archivedGroup = screen.querySelector('.settings-archived-group');
+    if (archivedGroup) {
+        archivedGroup.hidden = archived.length === 0;
+        const countEl = archivedGroup.querySelector('.settings-archived-count');
+        if (countEl) countEl.textContent = `${archived.length} ${archived.length === 1 ? 'habit' : 'habits'}`;
+    }
+
     // Theme
     const themeOptions = screen.querySelectorAll('.theme-option');
     themeOptions.forEach((opt) => {
@@ -125,6 +134,34 @@ function capitalize(s) {
 }
 
 
+function openArchived() {
+    showScreen('archived');
+    renderArchived();
+}
+
+
+function renderArchived() {
+    const list = document.querySelector('[data-screen="archived"] .archived-list');
+    if (!list) return;
+    const habits = storage.getHabits().filter((h) => h.archived);
+    if (habits.length === 0) {
+        renderSettings();
+        showScreen('settings');
+        return;
+    }
+    list.innerHTML = habits.map((habit) => `
+        <div class="archived-item">
+            <div class="archived-item-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
+            <div class="archived-item-info">
+                <p class="archived-item-name">${escapeHtml(habit.name)}</p>
+                <p class="archived-item-meta">${formatScheduleShort(habit.schedule)}</p>
+            </div>
+            <button class="archived-restore-btn" data-action="restore-habit" data-habit-id="${habit.id}">Restore</button>
+        </div>
+    `).join('');
+}
+
+
 function setTheme(value) {
     storage.updateSettings({ theme: value });
     applyTheme(value);
@@ -150,5 +187,7 @@ window.settings = {
     export: exportData,
     import: importData,
     setTheme,
-    applyTheme
+    applyTheme,
+    openArchived,
+    renderArchived
 };

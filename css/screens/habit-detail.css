@@ -499,6 +499,12 @@
     filter: brightness(0) invert(1);
 }
 
+.action-archive-icon {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+}
+
 .action-btn-delete {
     background: var(--status-red-25);
     color: var(--status-red);

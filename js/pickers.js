@@ -4,6 +4,7 @@
 
 
 let pickerDraft = {};
+let editingReminderIndex = 0;
 
 
 // ============================================
@@ -210,8 +211,11 @@ class TimeWheel {
 }
 
 
-function openTimePicker() {
-    const [h, m] = formState.reminder.time.split(':').map(Number);
+function openTimePicker(index = 0) {
+    editingReminderIndex = index;
+    const reminder = formState.reminders[index];
+    const time = reminder ? reminder.time : '09:00';
+    const [h, m] = time.split(':').map(Number);
     pickerDraft = { hour24: h, minute: m };
     buildTimeWheels();
     renderTimePickerRows();
@@ -303,8 +307,10 @@ function readTimeWheels() {
 
 function saveTimePicker() {
     readTimeWheels();
-    formState.reminder.time    = `${pad(pickerDraft.hour24)}:${pad(pickerDraft.minute)}`;
-    formState.reminder.enabled = true;
+    const timeStr = `${pad(pickerDraft.hour24)}:${pad(pickerDraft.minute)}`;
+    if (formState.reminders[editingReminderIndex]) {
+        formState.reminders[editingReminderIndex].time = timeStr;
+    }
     hideSheet();
     renderForm();
 }
