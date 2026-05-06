@@ -117,6 +117,11 @@ if ('serviceWorker' in navigator) {
             })
             .catch((err) => console.warn('SW регистрация не удалась:', err));
     });
+
+    // Автоперезагрузка при активации нового SW — гарантирует свежий код
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+    });
 }
 
 // Перепланируем уведомления при возврате в приложение

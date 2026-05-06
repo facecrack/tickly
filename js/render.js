@@ -482,12 +482,17 @@ function showMoodTooltip(anchor, text) {
 }
 
 
+function refreshMoods() {
+    renderLast5Days(storage.getHabits().filter((h) => !h.archived));
+}
+
 window.render = {
     main: renderMainScreen,
     counters: renderCounters,
     binaries: renderBinaries,
     updateBinary: updateBinary,
     updateCounter: updateCounter,
+    refreshMoods: refreshMoods,
     showMoodTooltip: showMoodTooltip,
     hideMoodTooltip: hideMoodTooltip
 };
