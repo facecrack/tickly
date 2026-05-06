@@ -65,14 +65,15 @@ function renderLast5Days(habits) {
         if (mood === null) {
             return `<li class="mood mood-rest" aria-label="Rest day"></li>`;
         }
-        const file = moodFile(mood);
-        const label = moodLabel(mood);
-        return `<li class="mood" data-action="mood-tap" data-mood-label="${label}" data-date="${d.name}"><img src="moods/${file}" alt="${label}"></li>`;
+        const file = moodFile(mood.percent);
+        const label = moodLabel(mood.percent);
+        const tipText = `${mood.done}/${mood.scheduled} habit${mood.scheduled !== 1 ? 's' : ''}`;
+        return `<li class="mood" data-action="mood-tap" data-mood-label="${tipText}" data-date="${d.name}"><img src="moods/${file}" alt="${label}"></li>`;
     }).join('');
 }
 
 
-// Возвращает % (0..100) или null если на день не было запланировано ни одной привычки
+// Возвращает {percent, done, scheduled} или null если день без привычек
 function calculateDayMood(habits, day) {
     let scheduled = 0;
     let done = 0;
@@ -94,7 +95,7 @@ function calculateDayMood(habits, day) {
     });
 
     if (scheduled === 0) return null;
-    return Math.round((done / scheduled) * 100);
+    return { percent: Math.round((done / scheduled) * 100), done, scheduled };
 }
 
 
@@ -455,6 +456,13 @@ function updateCounter(habitId) {
 
 let _tooltipTimer = null;
 
+function hideMoodTooltip() {
+    const tip = document.getElementById('mood-tooltip');
+    if (tip) tip.classList.remove('mood-tooltip-visible');
+    clearTimeout(_tooltipTimer);
+    window.removeEventListener('scroll', hideMoodTooltip);
+}
+
 function showMoodTooltip(anchor, text) {
     let tip = document.getElementById('mood-tooltip');
     if (!tip) {
@@ -469,7 +477,8 @@ function showMoodTooltip(anchor, text) {
     tip.style.top = rect.top + 'px';
     tip.classList.add('mood-tooltip-visible');
     clearTimeout(_tooltipTimer);
-    _tooltipTimer = setTimeout(() => tip.classList.remove('mood-tooltip-visible'), 5000);
+    _tooltipTimer = setTimeout(hideMoodTooltip, 2500);
+    window.addEventListener('scroll', hideMoodTooltip, { once: true, passive: true });
 }
 
 
@@ -479,5 +488,6 @@ window.render = {
     binaries: renderBinaries,
     updateBinary: updateBinary,
     updateCounter: updateCounter,
-    showMoodTooltip: showMoodTooltip
+    showMoodTooltip: showMoodTooltip,
+    hideMoodTooltip: hideMoodTooltip
 };

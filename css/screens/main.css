@@ -218,7 +218,8 @@
 
 .counter-buttons {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    align-items: center;
 }
 
 .counter-btn {
@@ -246,7 +247,7 @@
 }
 
 .counter-btn-plus {
-    width: 40px;
+    flex: 1;
     background: var(--brand-lime);
 }
 
@@ -268,11 +269,11 @@
 }
 
 .counter-step {
-    flex: 1;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-secondary);
     text-align: center;
+    white-space: nowrap;
 }
 
 @keyframes counter-goal-pulse {

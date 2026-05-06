@@ -11,6 +11,8 @@ let activeAlert = null;
 
 
 function showScreen(name) {
+    if (window.render && render.hideMoodTooltip) render.hideMoodTooltip();
+
     const screens = document.querySelectorAll('[data-screen]');
     screens.forEach((screen) => {
         screen.hidden = true;
