@@ -27,31 +27,30 @@ const DEFAULT_DATA = {
 // БАЗОВЫЕ ФУНКЦИИ
 // ============================================
 
-/**
- * Загрузить все данные из localStorage.
- * Если данных нет — вернуть дефолтные.
- */
-function loadData() {
-    const raw = localStorage.getItem(STORAGE_KEY);
+let _cache = null;
 
+function loadData() {
+    if (_cache) return _cache;
+
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-        // Первый запуск — возвращаем дефолтные данные
-        return structuredClone(DEFAULT_DATA);
+        _cache = structuredClone(DEFAULT_DATA);
+        return _cache;
     }
 
     try {
-        return JSON.parse(raw);
+        _cache = migrateData(JSON.parse(raw));
+        return _cache;
     } catch (error) {
         console.error('Не удалось распарсить данные из localStorage:', error);
-        return structuredClone(DEFAULT_DATA);
+        _cache = structuredClone(DEFAULT_DATA);
+        return _cache;
     }
 }
 
 
-/**
- * Сохранить все данные в localStorage целиком.
- */
 function saveData(data) {
+    _cache = data;
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
@@ -60,12 +59,22 @@ function saveData(data) {
 }
 
 
-/**
- * Полностью очистить все данные (для разработки или сброса).
- */
 function clearData() {
+    _cache = null;
     localStorage.removeItem(STORAGE_KEY);
-    console.log('Все данные удалены');
+}
+
+
+// Нормализует устаревшие значения в старых данных
+function migrateData(data) {
+    if (!Array.isArray(data.habits)) return data;
+    data.habits.forEach((habit) => {
+        if (!habit.entries) return;
+        Object.keys(habit.entries).forEach((key) => {
+            if (habit.entries[key] === 'skipped') habit.entries[key] = 'Skipped';
+        });
+    });
+    return data;
 }
 
 

@@ -89,7 +89,7 @@ function renderCounterDetail(habit) {
     if (name) name.textContent = habit.name;
 
     const meta = screen.querySelector('.detail-meta');
-    if (meta) meta.textContent = `${formatSchedule(habit.schedule)} / ${habit.target} ${habit.unit}`;
+    if (meta) meta.textContent = `${formatSchedule(habit.schedule)} / ${habit.target}${habit.unit ? ' ' + habit.unit : ''}`;
 
     // Pause state
     const banner = screen.querySelector('.detail-paused-banner');
@@ -100,7 +100,7 @@ function renderCounterDetail(habit) {
     // Today block
     const today = storage.getTodayString();
     const rawValue = habit.entries[today];
-    const isSkipped = rawValue === 'Skipped' || rawValue === 'skipped';
+    const isSkipped = rawValue === 'Skipped';
     const isPaused = !!habit.paused;
     const isInactive = isSkipped || isPaused;
     const todayValue = typeof rawValue === 'number' ? rawValue : 0;
@@ -117,7 +117,7 @@ function renderCounterDetail(habit) {
     }
 
     const todayTarget = screen.querySelector('.today-block-target');
-    if (todayTarget) todayTarget.textContent = `/ ${target} ${habit.unit}`;
+    if (todayTarget) todayTarget.textContent = `/ ${target}${habit.unit ? ' ' + habit.unit : ''}`;
 
     const todayBar = screen.querySelector('.today-block-bar-fill');
     if (todayBar) todayBar.style.width = (isInactive ? 0 : percent) + '%';
@@ -202,7 +202,7 @@ function renderHeatmap(habit) {
         const isFuture = d > today;
         const isBeforeCreated = d < created;
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
 
         if (isFuture || isBeforeCreated) {
             // Пустая ячейка — но цифру оставляем приглушённой
@@ -272,7 +272,7 @@ function renderChart(habit) {
         const key = formatDateKey(d);
         const rawValue = habit.entries[key];
         const isPaused = isInPauseWindow(habit, d);
-        const isSkipped = rawValue === 'Skipped' || rawValue === 'skipped' || isPaused;
+        const isSkipped = rawValue === 'Skipped' || isPaused;
         const value = typeof rawValue === 'number' && !isPaused ? rawValue : 0;
         days.push({
             date: d,
@@ -336,13 +336,6 @@ function changeChartWeek(delta) {
 // УТИЛИТЫ
 // ============================================
 
-// Парсит "YYYY-MM-DD" как локальную дату без UTC-сюрпризов
-function parseLocalDate(str) {
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
-}
-
-
 function calculateStats(habit) {
     const entries = habit.entries;
     const dates = Object.keys(entries).sort();
@@ -365,7 +358,7 @@ function calculateStats(habit) {
         if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
         if (isDone || isSkipped) {
             if (isDone) currentStreak++;
@@ -385,7 +378,7 @@ function calculateStats(habit) {
         if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
         if (isDone || isSkipped) {
             if (isDone) {
@@ -453,14 +446,6 @@ function isHabitDay(habit, date) {
     const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const dayKey = dayKeys[date.getDay()];
     return habit.schedule.includes(dayKey);
-}
-
-
-function formatDateKey(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
 }
 
 

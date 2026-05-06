@@ -175,6 +175,10 @@ function saveHabit() {
 
     if (editingHabitId) {
         const savedId = editingHabitId;
+        const existing = storage.getHabit(savedId);
+        if (existing && existing.type !== habitData.type) {
+            habitData.entries = {};
+        }
         storage.updateHabit(savedId, habitData);
         editingHabitId = null;
         notifications.scheduleReminders();

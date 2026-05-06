@@ -72,7 +72,7 @@ function renderStatWeeklyCard(habit) {
         const isBeforeCreated = dayDate < created;
         const isFuture = dayDate > today;
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
         const isPaused = isInPauseWindow(habit, dayDate) && isHabitDay && !isFuture && !isBeforeCreated;
         const isMissed = isHabitDay && !isDone && !isSkipped && !isPaused && !isFuture && !isBeforeCreated && !isToday;
 
@@ -223,7 +223,7 @@ function renderHeatmap12Weeks(habit) {
             const dayKey = dayKeys[(cellDate.getDay() + 6) % 7];
             const isHabitDay = habit.schedule.includes(dayKey);
             const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
-            const isSkipped = entry === 'Skipped' || entry === 'skipped';
+            const isSkipped = entry === 'Skipped';
 
             let cellClass = 'stat-heatmap-cell';
             let inlineStyle = '';
@@ -246,13 +246,6 @@ function renderHeatmap12Weeks(habit) {
     }
 
     return cells.join('');
-}
-
-
-// Парсит "YYYY-MM-DD" как локальную дату без UTC-сюрпризов
-function parseLocalDate(str) {
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
 }
 
 
@@ -306,11 +299,14 @@ function calculateSuccessPercent(habit) {
     while (cursor <= today) {
         const dayKey = dayKeys[(cursor.getDay() + 6) % 7];
         if (habit.schedule.includes(dayKey) && !isInPauseWindow(habit, cursor)) {
-            scheduledDays++;
             const key = formatDateKey(cursor);
             const entry = habit.entries[key];
-            if (entry === 'done' || (typeof entry === 'number' && entry >= target)) {
-                doneDays++;
+            const isSkipped = entry === 'Skipped';
+            if (!isSkipped) {
+                scheduledDays++;
+                if (entry === 'done' || (typeof entry === 'number' && entry >= target)) {
+                    doneDays++;
+                }
             }
         }
         cursor.setDate(cursor.getDate() + 1);
@@ -336,7 +332,7 @@ function calculateBestStreak(habit) {
         if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = habit.entries[key];
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
 
         if (isDone || isSkipped) {

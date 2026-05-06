@@ -75,6 +75,7 @@ function skipToday(habitId) {
     if (!habit) return;
 
     const today = storage.getTodayString();
+    if (habit.entries[today] === 'done') return;
     storage.setEntry(habitId, today, 'Skipped');
 
     // Перерендериваем deteail если открыт

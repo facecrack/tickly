@@ -84,7 +84,7 @@ function calculateDayMood(habits, day) {
         if (!habit.schedule.includes(day.dayKey)) return;
 
         const entry = habit.entries[day.key];
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
         if (isSkipped) return;
 
         scheduled++;
@@ -186,7 +186,7 @@ function renderCounters(counters) {
                     </header>
                     <div class="counter-progress">
                         <span class="counter-value counter-value-skipped">Paused</span>
-                        <span class="counter-target">/ ${target} ${escapeHtml(habit.unit || '')}</span>
+                        <span class="counter-target">/ ${target}${habit.unit ? ' ' + escapeHtml(habit.unit) : ''}</span>
                     </div>
                     <div class="counter-bar">
                         <div class="counter-bar-fill" style="width: 0%;"></div>
@@ -218,7 +218,7 @@ function renderCounters(counters) {
 
                 <div class="counter-progress">
                     <span class="${valueClass}">${displayValue}</span>
-                    <span class="counter-target">/ ${target} ${escapeHtml(habit.unit || '')}</span>
+                    <span class="counter-target">/ ${target}${habit.unit ? ' ' + escapeHtml(habit.unit) : ''}</span>
                 </div>
 
                 <div class="counter-bar">
@@ -278,7 +278,7 @@ function renderBinaries(binaries) {
 
         const todayEntry = habit.entries[todayKey];
         const isDone = todayEntry === 'done';
-        const isSkipped = todayEntry === 'Skipped' || todayEntry === 'skipped';
+        const isSkipped = todayEntry === 'Skipped';
         const streak = calculateStreak(habit);
 
         const stateClass = isDone ? 'habit-done' : isSkipped ? 'habit-skipped' : '';
@@ -320,7 +320,7 @@ function calculateStreak(habit) {
 
         const key = formatDateKey(date);
         const entry = habit.entries[key];
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
+        const isSkipped = entry === 'Skipped';
         const isDone = entry === 'done' || (typeof entry === 'number' && entry >= target);
 
         if (isDone || isSkipped) {
@@ -369,7 +369,7 @@ function updateBinary(habitId) {
     const today = storage.getTodayString();
     const todayEntry = habit.entries[today];
     const isDone = todayEntry === 'done';
-    const isSkipped = todayEntry === 'Skipped' || todayEntry === 'skipped';
+    const isSkipped = todayEntry === 'Skipped';
     const streak = calculateStreak(habit);
 
     li.className = `habit${isDone ? ' habit-done' : isSkipped ? ' habit-skipped' : ''}`;

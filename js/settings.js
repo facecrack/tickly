@@ -44,14 +44,27 @@ function renderSettings() {
 function toggleReminders() {
     const current = storage.getSettings();
     const enabling = !current.remindersEnabled;
-    storage.updateSettings({ remindersEnabled: enabling });
-    renderSettings();
 
     if (enabling) {
         notifications.requestPermission().then((granted) => {
-            if (granted) notifications.scheduleReminders();
+            if (granted) {
+                storage.updateSettings({ remindersEnabled: true });
+                renderSettings();
+                notifications.scheduleReminders();
+            } else {
+                storage.updateSettings({ remindersEnabled: false });
+                renderSettings();
+                const screen = document.querySelector('[data-screen="settings"]');
+                const toggle = screen?.querySelector('.settings-group:nth-of-type(2) .toggle');
+                if (toggle) {
+                    toggle.classList.add('schedule-error');
+                    setTimeout(() => toggle.classList.remove('schedule-error'), 700);
+                }
+            }
         });
     } else {
+        storage.updateSettings({ remindersEnabled: false });
+        renderSettings();
         notifications.cancelReminders();
     }
 }
