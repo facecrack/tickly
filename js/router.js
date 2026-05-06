@@ -245,8 +245,7 @@ document.addEventListener('click', (event) => {
 
         case 'mood-tap': {
             const label = actionEl.dataset.moodLabel;
-            const date = actionEl.dataset.date;
-            if (label) render.showMoodTooltip(actionEl, `${date} — ${label}`);
+            if (label) render.showMoodTooltip(actionEl, label);
             break;
         }
 

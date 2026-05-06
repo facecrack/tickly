@@ -237,7 +237,7 @@
 }
 
 .counter-btn-minus {
-    width: 40px;
+    width: 48px;
     background: var(--bg-elevated);
 }
 
@@ -247,7 +247,7 @@
 }
 
 .counter-btn-plus {
-    width: 40px;
+    width: 48px;
     background: var(--brand-lime);
 }
 
@@ -271,7 +271,7 @@
 .counter-step {
     flex: 1;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
