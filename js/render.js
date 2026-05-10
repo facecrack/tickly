@@ -2,6 +2,31 @@
  * Render — модуль рендеринга экранов из данных.
  */
 
+let _allDoneWasComplete = null;
+
+function checkAllDone() {
+    const habits = storage.getHabits().filter(h => !h.archived);
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const todayObj = {
+        date: todayDate,
+        key: storage.getTodayString(),
+        dayKey: dayNames[todayDate.getDay()],
+    };
+    const mood = calculateDayMood(habits, todayObj);
+    const allDone = mood !== null && mood.percent === 100;
+
+    const banner = document.querySelector('[data-screen="main"] .all-done-banner');
+    if (banner) banner.hidden = !allDone;
+
+    if (allDone && _allDoneWasComplete === false) {
+        sounds.playSuccess();
+        if (navigator.vibrate) navigator.vibrate([10, 40, 10, 40, 10]);
+    }
+    _allDoneWasComplete = allDone;
+}
+
 
 function renderMainScreen() {
     const habits = storage.getHabits().filter((h) => !h.archived);
@@ -25,6 +50,9 @@ function renderMainScreen() {
     renderBinaries(binaries);
 
     requestAnimationFrame(() => window.scrollTo(0, scrollY));
+
+    _allDoneWasComplete = null;
+    checkAllDone();
 }
 
 function renderLast5Days(habits) {
@@ -53,12 +81,26 @@ function renderLast5Days(habits) {
         });
     }
 
-    daysList.innerHTML = days.map((d) => `
-        <li class="day ${d.isToday ? 'day-today' : ''}">
-            <span class="day-name">${d.name}</span>
-            <span class="day-number">${d.number}</span>
-        </li>
-    `).join('');
+    const fullDayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    daysList.innerHTML = days.map((d) => {
+        if (d.isToday) {
+            return `
+                <li class="day day-today">
+                    <span class="day-name">${d.name}</span>
+                    <span class="day-number">${d.number}</span>
+                </li>
+            `;
+        }
+        const label = `${fullDayNames[d.date.getDay()]}, ${monthNames[d.date.getMonth()]} ${d.number}`;
+        return `
+            <li class="day day-past" data-action="open-day" data-date-key="${d.key}" data-date-label="${label}">
+                <span class="day-name">${d.name}</span>
+                <span class="day-number">${d.number}</span>
+            </li>
+        `;
+    }).join('');
 
     moodsList.innerHTML = days.map((d) => {
         const mood = calculateDayMood(habits, d);
@@ -413,6 +455,7 @@ function updateBinary(habitId) {
     }
 
     renderLast5Days(storage.getHabits().filter((h) => !h.archived));
+    checkAllDone();
 }
 
 
@@ -464,6 +507,8 @@ function updateCounter(habitId) {
             streakEl.remove();
         }
     }
+
+    checkAllDone();
 }
 
 
@@ -507,5 +552,9 @@ window.render = {
     updateCounter: updateCounter,
     refreshMoods: refreshMoods,
     showMoodTooltip: showMoodTooltip,
-    hideMoodTooltip: hideMoodTooltip
+    hideMoodTooltip: hideMoodTooltip,
+    checkAllDone: checkAllDone,
+    parseLocalDate: parseLocalDate,
+    isInPauseWindow: isInPauseWindow,
+    escapeHtml: escapeHtml,
 };

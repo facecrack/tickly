@@ -169,6 +169,19 @@ function applyTheme(theme) {
 // ДОСТУПНОСТЬ
 // ============================================
 
+function clearHistory() {
+    storage.clearAllEntries();
+    hideAlert();
+    render.main();
+}
+
+function eraseAll() {
+    storage.clearData();
+    hideAlert();
+    render.main();
+}
+
+
 window.settings = {
     render: renderSettings,
     toggleReminders: toggleReminders,
@@ -177,5 +190,7 @@ window.settings = {
     setTheme,
     applyTheme,
     openArchived,
-    renderArchived
+    renderArchived,
+    clearHistory,
+    eraseAll,
 };

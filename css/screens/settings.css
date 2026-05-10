@@ -180,6 +180,10 @@
     height: 64px;
 }
 
+.settings-row-destructive {
+    color: var(--status-red);
+}
+
 
 /* ============================================
    ARCHIVED SCREEN

@@ -87,4 +87,27 @@ function playSound(key) {
 }
 
 
-window.sounds = { play: playSound };
+function playSuccess() {
+    try {
+        const ctx = getCtx();
+        const t = ctx.currentTime;
+        // Ascending arpeggio: C5 → E5 → G5 → C6
+        [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.36]].forEach(([freq, delay]) => {
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, t + delay);
+            gain.gain.setValueAtTime(0.22, t + delay);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.55);
+            osc.start(t + delay);
+            osc.stop(t + delay + 0.6);
+        });
+    } catch (e) {
+        console.warn('Sound playback failed:', e);
+    }
+}
+
+
+window.sounds = { play: playSound, playSuccess };

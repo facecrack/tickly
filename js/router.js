@@ -313,6 +313,36 @@ case 'send-feedback':
 case 'stat-tab':
     statistic.setTab(actionEl.dataset.tab);
     break;
+
+        case 'open-day': {
+            const dateKey = actionEl.dataset.dateKey;
+            const dateLabel = actionEl.dataset.dateLabel;
+            if (dateKey) dayDetail.open(dateKey, dateLabel);
+            break;
+        }
+
+        case 'day-habit-toggle': {
+            event.stopPropagation();
+            const li = actionEl.closest('[data-habit-id]');
+            if (li) dayDetail.toggle(li.dataset.habitId);
+            break;
+        }
+
+        case 'clear-history':
+            showAlert('clear-history');
+            break;
+
+        case 'erase-all-data':
+            showAlert('erase-all');
+            break;
+
+        case 'confirm-clear-history':
+            settings.clearHistory();
+            break;
+
+        case 'confirm-erase-all':
+            settings.eraseAll();
+            break;
     }
 });
 

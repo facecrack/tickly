@@ -443,3 +443,36 @@
     color: var(--text-secondary);
     padding: 0 2px 8px;
 }
+
+
+/* ============================================
+   ALL-DONE BANNER — celebration strip
+   ============================================ */
+
+.all-done-banner {
+    background: var(--brand-lime);
+    border-radius: var(--radius-lg);
+    padding: 18px 24px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.all-done-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1D1D1D;
+}
+
+
+/* ============================================
+   PAST DAYS — tappable day cells
+   ============================================ */
+
+.day-past {
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.day-past:active {
+    opacity: 0.6;
+}

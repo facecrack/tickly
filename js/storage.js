@@ -259,10 +259,18 @@ function getTodayString() {
 // ДЕЛАЕМ ДОСТУПНЫМ ИЗ КОНСОЛИ И ИЗ app.js
 // ============================================
 
+function clearAllEntries() {
+    const data = loadData();
+    data.habits.forEach(h => { h.entries = {}; });
+    saveData(data);
+}
+
+
 window.storage = {
     loadData,
     saveData,
     clearData,
+    clearAllEntries,
     getHabits,
     getHabit,
     addHabit,

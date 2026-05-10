@@ -52,6 +52,10 @@
             <ul class="today-list"></ul>
         </section>
 
+        <div class="all-done-banner" hidden>
+            <span class="all-done-text">All done today ✦</span>
+        </div>
+
         <nav class="bottom-nav">
             <button class="nav-btn" data-action="open-statistic">
     <img src="icons/stats.svg" alt="" class="nav-icon-img">
@@ -637,6 +641,29 @@
         </section>
 
         <section class="settings-group">
+            <label class="form-label">STORAGE</label>
+            <div class="settings-card">
+                <button class="settings-row settings-row-button settings-row-export" data-action="clear-history">
+                    <span class="settings-export">
+                        <span class="settings-export-text">
+                            <span class="settings-row-label settings-row-destructive">Clear history</span>
+                            <span class="settings-export-hint">Remove all entries, keep habits</span>
+                        </span>
+                    </span>
+                </button>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button settings-row-export" data-action="erase-all-data">
+                    <span class="settings-export">
+                        <span class="settings-export-text">
+                            <span class="settings-row-label settings-row-destructive">Erase all data</span>
+                            <span class="settings-export-hint">Permanently delete everything</span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </section>
+
+        <section class="settings-group">
             <label class="form-label">ABOUT</label>
             <div class="settings-card">
                 <div class="settings-row">
@@ -1079,6 +1106,19 @@
     </div>
 
 
+    <!-- DAY DETAIL -->
+    <div class="sheet sheet-day-detail" data-sheet="day-detail" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-header sheet-header-compact">
+            <div></div>
+            <h2 class="sheet-title day-detail-title"></h2>
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Done</button>
+        </header>
+        <p class="day-detail-meta"></p>
+        <ul class="day-detail-list"></ul>
+    </div>
+
+
     <!-- ============================================
          ALERT
          ============================================ -->
@@ -1138,6 +1178,32 @@
         </div>
     </div>
 
+    <!-- CLEAR HISTORY -->
+    <div class="alert" data-alert="clear-history" hidden>
+        <div class="alert-icon">
+            <span class="alert-icon-trash" aria-hidden="true"></span>
+        </div>
+        <h2 class="alert-title">Clear history?</h2>
+        <p class="alert-message">All entries will be removed. Your habits will stay. This can't be undone.</p>
+        <div class="alert-actions">
+            <button class="alert-btn alert-btn-destructive" data-action="confirm-clear-history">Clear history</button>
+            <button class="alert-btn alert-btn-cancel" data-action="cancel-alert">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ERASE ALL -->
+    <div class="alert" data-alert="erase-all" hidden>
+        <div class="alert-icon">
+            <span class="alert-icon-trash" aria-hidden="true"></span>
+        </div>
+        <h2 class="alert-title">Erase all data?</h2>
+        <p class="alert-message">Habits and history will be permanently deleted. This can't be undone.</p>
+        <div class="alert-actions">
+            <button class="alert-btn alert-btn-destructive" data-action="confirm-erase-all">Erase everything</button>
+            <button class="alert-btn alert-btn-cancel" data-action="cancel-alert">Cancel</button>
+        </div>
+    </div>
+
     <!-- 15 — DELETE HABIT -->
     <div class="alert" data-alert="delete-habit" hidden>
         <div class="alert-icon">
@@ -1169,6 +1235,7 @@
 <script src="js/feedback.js" defer></script>
 <script src="js/notifications.js" defer></script>
 <script src="js/dragdrop.js" defer></script>
+<script src="js/daydetail.js" defer></script>
 <script src="js/router.js" defer></script>
 <script src="js/app.js" defer></script>
 </body>
