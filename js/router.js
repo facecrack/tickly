@@ -333,10 +333,12 @@ case 'stat-tab':
             break;
 
         case 'clear-history':
+            hideSheet();
             showAlert('clear-history');
             break;
 
         case 'erase-all-data':
+            hideSheet();
             showAlert('erase-all');
             break;
 
