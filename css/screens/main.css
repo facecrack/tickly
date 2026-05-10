@@ -40,12 +40,8 @@
 .week {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 32px;
-}
-
-.week-content {
     padding: 16px;
+    margin-bottom: 0;
 }
 
 .week-header {
@@ -458,6 +454,8 @@
     max-height: 0;
     opacity: 0;
     background: var(--bg-elevated);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    margin-bottom: 32px;
     transition:
         max-height 0.45s cubic-bezier(0.34, 1.1, 0.64, 1),
         opacity 0.3s ease,
