@@ -271,3 +271,7 @@
     text-align: center;
     padding: 24px 0;
 }
+
+.picker-item-destructive-label {
+    color: var(--status-red);
+}

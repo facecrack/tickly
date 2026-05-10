@@ -38,6 +38,7 @@ function showScreen(name) {
 
 const backdrop = document.querySelector('.sheet-backdrop');
 
+let _sheetScrollY = 0;
 
 function showSheet(name) {
     if (activeSheet) hideSheet();
@@ -47,6 +48,11 @@ function showSheet(name) {
         console.warn(`Модалка "${name}" не найдена`);
         return;
     }
+
+    _sheetScrollY = window.scrollY;
+    document.body.style.top = `-${_sheetScrollY}px`;
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
 
     sheet.hidden = false;
     backdrop.hidden = false;
@@ -59,6 +65,11 @@ function hideSheet() {
     if (sheet) sheet.hidden = true;
     backdrop.hidden = true;
     activeSheet = null;
+
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('top');
+    document.body.style.removeProperty('width');
+    window.scrollTo(0, _sheetScrollY);
 }
 
 

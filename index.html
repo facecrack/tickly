@@ -620,6 +620,17 @@
                     </span>
                     <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
                 </button>
+                <div class="settings-divider"></div>
+                <button class="settings-row settings-row-button settings-row-export" data-action="open-clear-data">
+                    <span class="settings-export">
+                        <img src="icons/erase.svg" alt="" class="settings-export-icon">
+                        <span class="settings-export-text">
+                            <span class="settings-row-label">Clear data</span>
+                            <span class="settings-export-hint">Remove history or reset everything</span>
+                        </span>
+                    </span>
+                    <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
+                </button>
             </div>
         </section>
         <input type="file" id="import-file-input" accept=".json" style="display:none">
@@ -636,29 +647,6 @@
                         </span>
                     </span>
                     <img src="icons/chevron-right.svg" alt="" class="settings-row-chevron-right">
-                </button>
-            </div>
-        </section>
-
-        <section class="settings-group">
-            <label class="form-label">STORAGE</label>
-            <div class="settings-card">
-                <button class="settings-row settings-row-button settings-row-export" data-action="clear-history">
-                    <span class="settings-export">
-                        <span class="settings-export-text">
-                            <span class="settings-row-label settings-row-destructive">Clear history</span>
-                            <span class="settings-export-hint">Remove all entries, keep habits</span>
-                        </span>
-                    </span>
-                </button>
-                <div class="settings-divider"></div>
-                <button class="settings-row settings-row-button settings-row-export" data-action="erase-all-data">
-                    <span class="settings-export">
-                        <span class="settings-export-text">
-                            <span class="settings-row-label settings-row-destructive">Erase all data</span>
-                            <span class="settings-export-hint">Permanently delete everything</span>
-                        </span>
-                    </span>
                 </button>
             </div>
         </section>
@@ -1109,13 +1097,41 @@
     <!-- DAY DETAIL -->
     <div class="sheet sheet-day-detail" data-sheet="day-detail" hidden>
         <div class="sheet-handle"></div>
-        <header class="sheet-header sheet-header-compact">
-            <div></div>
+        <header class="sheet-header">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Close</button>
             <h2 class="sheet-title day-detail-title"></h2>
-            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Done</button>
+            <button class="sheet-action sheet-action-save" data-action="cancel-picker">Done</button>
         </header>
         <p class="day-detail-meta"></p>
         <ul class="day-detail-list"></ul>
+    </div>
+
+    <!-- CLEAR DATA -->
+    <div class="sheet" data-sheet="clear-data" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-header sheet-header-compact">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-picker">Cancel</button>
+            <h2 class="sheet-title">Clear data</h2>
+            <div></div>
+        </header>
+        <ul class="picker-list">
+            <li>
+                <button class="picker-item picker-item-multiline" data-action="clear-history">
+                    <span class="picker-item-text">
+                        <span class="picker-item-label picker-item-destructive-label">Clear history</span>
+                        <span class="picker-item-hint">Remove all entries, keep habits</span>
+                    </span>
+                </button>
+            </li>
+            <li>
+                <button class="picker-item picker-item-multiline" data-action="erase-all-data">
+                    <span class="picker-item-text">
+                        <span class="picker-item-label picker-item-destructive-label">Erase all data</span>
+                        <span class="picker-item-hint">Permanently delete everything</span>
+                    </span>
+                </button>
+            </li>
+        </ul>
     </div>
 
 
