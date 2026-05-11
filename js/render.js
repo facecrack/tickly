@@ -575,5 +575,4 @@ window.render = {
     parseLocalDate: parseLocalDate,
     isInPauseWindow: isInPauseWindow,
     escapeHtml: escapeHtml,
-    calculateStreak: calculateStreak,
 };

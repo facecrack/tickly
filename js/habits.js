@@ -3,31 +3,6 @@
  */
 
 
-const MILESTONES = [7, 21, 30, 100];
-
-function checkMilestone(habitId) {
-    const habit = storage.getHabit(habitId);
-    if (!habit) return;
-    const streak = render.calculateStreak(habit);
-    if (!MILESTONES.includes(streak)) return;
-
-    const seen = habit.seenMilestones || [];
-    if (seen.includes(streak)) return;
-
-    storage.updateHabit(habitId, { seenMilestones: [...seen, streak] });
-
-    const emoji = streak >= 100 ? '🏆' : streak >= 30 ? '⭐' : '🔥';
-    const emojiEl = document.getElementById('milestone-emoji');
-    const titleEl = document.getElementById('milestone-title');
-    const msgEl = document.getElementById('milestone-message');
-    if (emojiEl) emojiEl.textContent = emoji;
-    if (titleEl) titleEl.textContent = `${streak}-day streak!`;
-    if (msgEl) msgEl.textContent = `${habit.icon} ${habit.name} — ${streak} days in a row. Keep it up!`;
-
-    setTimeout(() => showAlert('milestone'), 400);
-}
-
-
 function toggleHabit(habitId) {
     const habit = storage.getHabit(habitId);
     if (!habit || habit.type !== 'binary') return;
@@ -39,7 +14,6 @@ function toggleHabit(habitId) {
         storage.setEntry(habitId, today, 'done');
         if (navigator.vibrate) navigator.vibrate(10);
         render.updateBinary(habitId);
-        checkMilestone(habitId);
         return;
     }
 
@@ -50,7 +24,6 @@ function toggleHabit(habitId) {
     } else {
         storage.setEntry(habitId, today, 'done');
         if (navigator.vibrate) navigator.vibrate(10);
-        checkMilestone(habitId);
     }
 
     render.updateBinary(habitId);
@@ -89,8 +62,6 @@ function changeCounter(habitId, delta) {
     // Update only the changed card — preserves DOM so touch events stay intact
     render.updateCounter(habitId);
     render.refreshMoods();
-
-    if (goalJustReached) checkMilestone(habitId);
 
     if (navigator.vibrate) {
         navigator.vibrate(goalJustReached ? [10, 40, 10] : 5);
