@@ -197,3 +197,18 @@
 .hint-actions {
     margin: 0;
 }
+
+
+/* ============================================
+   MILESTONE — streak celebration
+   ============================================ */
+
+.milestone-celebrate {
+    margin-bottom: 16px;
+}
+
+.milestone-emoji {
+    font-size: 56px;
+    display: block;
+    line-height: 1;
+}
