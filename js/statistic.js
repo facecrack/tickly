@@ -188,7 +188,7 @@ function renderStatOverallCard(habit) {
 
             <div class="stat-overall-divider"></div>
             <div class="stat-overall-legend">
-                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-done"></span>${habit.limitMode ? 'Within limit' : 'Done'}</div>
+                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-done"></span>${habit.limitMode ? 'Under limit' : 'Done'}</div>
                 <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-skipped"></span>Paused</div>
                 <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-missed"></span>${habit.limitMode ? 'Over limit' : 'Missed'}</div>
             </div>

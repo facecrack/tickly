@@ -450,6 +450,18 @@
     opacity: 0.4;
 }
 
+.counter-limit-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+}
+
 .counter-paused {
     opacity: 0.4;
 }

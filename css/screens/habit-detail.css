@@ -112,6 +112,17 @@
     color: var(--text-secondary);
 }
 
+.today-limit-badge {
+    align-self: center;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+}
+
 .today-block-bar {
     height: 4px;
     background: var(--bg-card);

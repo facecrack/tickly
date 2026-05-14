@@ -259,6 +259,8 @@ function renderCounters(counters) {
         const streak = calculateStreak(habit);
         const streakHtml = streak > 0 ? `<p class="counter-streak">${streak} day streak</p>` : '';
 
+        const limitBadge = habit.limitMode ? `<span class="counter-limit-badge">max</span>` : '';
+
         return `
             <li class="counter ${limitClass} ${stateClass}" data-habit-id="${habit.id}" data-action="open-detail">
                 <header class="counter-header">
@@ -267,6 +269,7 @@ function renderCounters(counters) {
                         <h3 class="counter-name">${escapeHtml(habit.name)}</h3>
                         ${streakHtml}
                     </div>
+                    ${limitBadge}
                 </header>
 
                 <div class="counter-progress">

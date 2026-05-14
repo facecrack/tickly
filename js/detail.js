@@ -89,7 +89,9 @@ function renderCounterDetail(habit) {
     if (name) name.textContent = habit.name;
 
     const meta = screen.querySelector('.detail-meta');
-    if (meta) meta.textContent = `${formatSchedule(habit.schedule)} / ${habit.target}${habit.unit ? habit.unit : ''}`;
+    if (meta) meta.textContent = habit.limitMode
+        ? `${formatSchedule(habit.schedule)} · max ${habit.target}${habit.unit ? habit.unit : ''}`
+        : `${formatSchedule(habit.schedule)} / ${habit.target}${habit.unit ? habit.unit : ''}`;
 
     // Pause state
     const banner = screen.querySelector('.detail-paused-banner');
@@ -121,7 +123,20 @@ function renderCounterDetail(habit) {
     }
 
     const todayTarget = screen.querySelector('.today-block-target');
-    if (todayTarget) todayTarget.textContent = `/ ${target}${habit.unit ? habit.unit : ''} ${habit.limitMode ? 'limit' : ''}`;
+    if (todayTarget) todayTarget.textContent = `/ ${target}${habit.unit ? habit.unit : ''}`;
+
+    const progressEl = todayTarget?.parentElement;
+    if (progressEl) {
+        let limitBadge = progressEl.querySelector('.today-limit-badge');
+        if (habit.limitMode && !limitBadge) {
+            limitBadge = document.createElement('span');
+            limitBadge.className = 'today-limit-badge';
+            limitBadge.textContent = 'max';
+            progressEl.appendChild(limitBadge);
+        } else if (!habit.limitMode && limitBadge) {
+            limitBadge.remove();
+        }
+    }
     const todayBar = screen.querySelector('.today-block-bar-fill');
     if (todayBar) {
         todayBar.style.width = (isInactive ? 0 : percent) + '%';
