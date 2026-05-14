@@ -259,6 +259,10 @@
     height: 40px;
     flex-shrink: 0;
     background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.counter-btn-minus:disabled {
     color: var(--text-secondary);
 }
 

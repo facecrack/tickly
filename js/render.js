@@ -243,7 +243,7 @@ function renderCounters(counters) {
                         <div class="counter-bar-fill" style="width: 0%;"></div>
                     </div>
                     <div class="counter-buttons">
-                        <button class="counter-btn counter-btn-minus" data-action="counter-decrement">−${habit.step || 1}</button>
+                        <button class="counter-btn counter-btn-minus" data-action="counter-decrement"${value <= 0 ? ' disabled' : ''}>−${habit.step || 1}</button>
                         <button class="counter-btn counter-btn-plus" data-action="counter-increment">+${habit.step || 1}</button>
                     </div>
                 </li>
@@ -279,7 +279,7 @@ function renderCounters(counters) {
                 </div>
 
                 <div class="counter-buttons">
-                    <button class="counter-btn counter-btn-minus" data-action="counter-decrement">−${habit.step || 1}</button>
+                    <button class="counter-btn counter-btn-minus" data-action="counter-decrement"${value <= 0 ? ' disabled' : ''}>−${habit.step || 1}</button>
                     <button class="counter-btn counter-btn-plus" data-action="counter-increment">+${habit.step || 1}</button>
                 </div>
             </li>
@@ -504,6 +504,9 @@ function updateCounter(habitId) {
 
     const fill = li.querySelector('.counter-bar-fill');
     if (fill) fill.style.width = (habit.paused ? 0 : percent) + '%';
+
+    const minusBtn = li.querySelector('.counter-btn-minus');
+    if (minusBtn) minusBtn.disabled = value <= 0;
 
     li.classList.toggle('counter-limit', !!habit.limitMode);
     li.classList.toggle('counter-done', isComplete && !habit.paused);
