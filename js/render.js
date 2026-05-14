@@ -489,7 +489,7 @@ function updateCounter(habitId) {
     const target = habit.target || 1;
     const percent = Math.min(100, (value / target) * 100);
     const isComplete = !habit.limitMode && value >= target;
-    const isOverLimit = habit.limitMode && value > target;
+    const isOverLimit = !!habit.limitMode && value > target;
 
     const valueEl = li.querySelector('.counter-value');
     if (valueEl) {

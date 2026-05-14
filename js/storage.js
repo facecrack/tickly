@@ -77,6 +77,7 @@ function migrateData(data) {
             if (habit.entries[key] === 'skipped') habit.entries[key] = 'Skipped';
         });
         if (habit.archived === undefined) habit.archived = false;
+        if (habit.type === 'counter' && habit.limitMode === undefined) habit.limitMode = false;
         if (habit.reminders === undefined) {
             if (habit.reminder && habit.reminder.enabled && habit.reminder.time) {
                 habit.reminders = [{ time: habit.reminder.time }];
