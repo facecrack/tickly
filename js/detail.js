@@ -105,13 +105,15 @@ function renderCounterDetail(habit) {
     const isInactive = isSkipped || isPaused;
     const todayValue = typeof rawValue === 'number' ? rawValue : 0;
     const target = habit.target || 1;
-    const percent = isInactive ? 0 : Math.min(100, Math.round((todayValue / target) * 100));
+    const rawPercent = isInactive ? 0 : Math.round((todayValue / target) * 100);
+    const displayPercent = habit.limitMode ? rawPercent : Math.min(100, rawPercent);
+    const barPercent = Math.min(100, rawPercent);
 
     const isComplete = !habit.limitMode && todayValue >= target;
-    const isOverLimit = habit.limitMode && todayValue > target;
+    const isOverLimit = !!habit.limitMode && todayValue > target;
 
     const todayPercent = screen.querySelector('.today-block-percent');
-    if (todayPercent) todayPercent.textContent = percent + '%';
+    if (todayPercent) todayPercent.textContent = displayPercent + '%';
 
     const todayValueEl = screen.querySelector('.today-block-value');
     if (todayValueEl) {
@@ -125,7 +127,7 @@ function renderCounterDetail(habit) {
 
     const todayBar = screen.querySelector('.today-block-bar-fill');
     if (todayBar) {
-        todayBar.style.width = (isInactive ? 0 : percent) + '%';
+        todayBar.style.width = (isInactive ? 0 : barPercent) + '%';
         if (isInactive) {
             todayBar.style.background = '';
         } else if (isOverLimit) {
