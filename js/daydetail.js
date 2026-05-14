@@ -104,7 +104,6 @@ function renderDayList() {
                         <h3 class="habit-name">${render.escapeHtml(habit.name)}</h3>
                         <button class="day-counter-subtitle" data-action="day-counter-edit">
                             <span class="habit-streak">${value} / ${target}${habit.unit ? render.escapeHtml(habit.unit) : ''}</span>
-                            <img src="icons/edit.svg" alt="" class="day-counter-edit-icon">
                         </button>
                     </div>
                     ${controls}

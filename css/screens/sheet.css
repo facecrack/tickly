@@ -282,18 +282,11 @@
    ============================================ */
 
 .day-counter-subtitle {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
-    background: transparent;
-    padding: 0;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    padding: 2px 8px;
+    margin-top: 2px;
     -webkit-tap-highlight-color: transparent;
-}
-
-.day-counter-edit-icon {
-    width: 10px;
-    height: 10px;
-    filter: brightness(0) saturate(100%) invert(48%);
-    flex-shrink: 0;
-    opacity: 0.7;
 }
