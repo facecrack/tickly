@@ -287,16 +287,16 @@
 
 .counter-edit-btn-minus {
     background: var(--bg-elevated);
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .counter-edit-btn-minus:disabled {
-    opacity: 0.35;
+    color: var(--text-secondary);
 }
 
 .counter-edit-btn-plus {
-    background: var(--brand-lime);
-    color: #1D1D1D;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
 }
 
 .counter-edit-done-btn {
