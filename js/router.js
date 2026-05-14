@@ -328,6 +328,20 @@ case 'stat-tab':
             break;
         }
 
+        case 'day-counter-increment': {
+            event.stopPropagation();
+            const li = actionEl.closest('[data-habit-id]');
+            if (li) dayDetail.changeCounter(li.dataset.habitId, 1);
+            break;
+        }
+
+        case 'day-counter-decrement': {
+            event.stopPropagation();
+            const li = actionEl.closest('[data-habit-id]');
+            if (li) dayDetail.changeCounter(li.dataset.habitId, -1);
+            break;
+        }
+
         case 'open-clear-data':
             showSheet('clear-data');
             break;

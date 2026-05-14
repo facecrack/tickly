@@ -148,6 +148,8 @@ function renderCounterDetail(habit) {
     }
     if (statValues[1]) statValues[1].textContent = stats.average;
     if (statValues[2]) statValues[2].textContent = stats.bestValue;
+    const bestLabel = screen.querySelectorAll('.stats-grid .stat-label')[2];
+    if (bestLabel) bestLabel.textContent = habit.limitMode ? 'Lowest' : 'Best';
 
     // Bar chart за 7 дней
     renderChart(habit);

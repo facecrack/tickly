@@ -88,16 +88,28 @@ function renderDayList() {
             ? 'rgba(255, 255, 255, 0.1)'
             : pickers.colorToBg(habit.color);
         const value = typeof entry === 'number' ? entry : 0;
-        const subtitle = habit.type === 'counter'
-            ? `<p class="habit-streak">${value} / ${target}${habit.unit ? render.escapeHtml(habit.unit) : ''}</p>`
-            : '';
+
+        if (habit.type === 'counter') {
+            return `
+                <li class="day-habit${isDone ? ' day-habit-done' : ''}" data-habit-id="${habit.id}">
+                    <div class="habit-icon" style="background-color: ${bgColor};">${habit.icon}</div>
+                    <div class="habit-info">
+                        <h3 class="habit-name">${render.escapeHtml(habit.name)}</h3>
+                        <p class="habit-streak">${value} / ${target}${habit.unit ? render.escapeHtml(habit.unit) : ''}</p>
+                    </div>
+                    <div class="day-counter-controls">
+                        <button class="day-counter-btn day-counter-btn-minus" data-action="day-counter-decrement"${value <= 0 ? ' disabled' : ''}>−</button>
+                        <button class="day-counter-btn day-counter-btn-plus" data-action="day-counter-increment">+</button>
+                    </div>
+                </li>
+            `;
+        }
 
         return `
             <li class="day-habit${isDone ? ' day-habit-done' : ''}" data-habit-id="${habit.id}">
                 <div class="habit-icon" style="background-color: ${bgColor};">${habit.icon}</div>
                 <div class="habit-info">
                     <h3 class="habit-name">${render.escapeHtml(habit.name)}</h3>
-                    ${subtitle}
                 </div>
                 <button class="habit-check ${isDone ? 'habit-check-done' : ''}" data-action="day-habit-toggle">
                     <span class="habit-check-circle">${isDone ? '<img src="icons/check.svg" alt="Done">' : ''}</span>
@@ -131,11 +143,11 @@ function _updateDayHabitEl(habitId) {
     }
 
     if (habit.type === 'counter') {
+        const value = typeof entry === 'number' ? entry : 0;
         const streakEl = li.querySelector('.habit-streak');
-        if (streakEl) {
-            const value = typeof entry === 'number' ? entry : 0;
-            streakEl.textContent = `${value} / ${target}${habit.unit ? habit.unit : ''}`;
-        }
+        if (streakEl) streakEl.textContent = `${value} / ${target}${habit.unit ? habit.unit : ''}`;
+        const minusBtn = li.querySelector('.day-counter-btn-minus');
+        if (minusBtn) minusBtn.disabled = value <= 0;
     }
 }
 
@@ -165,7 +177,25 @@ function toggleHabitForDay(habitId) {
 }
 
 
+function changeCounterForDay(habitId, delta) {
+    const habit = storage.getHabit(habitId);
+    if (!habit) return;
+
+    const entry = habit.entries[_dayKey];
+    const current = typeof entry === 'number' ? entry : 0;
+    const next = Math.max(0, current + delta);
+
+    storage.setEntry(habitId, _dayKey, next === 0 ? null : next);
+
+    if (navigator.vibrate) navigator.vibrate(10);
+    _updateDayHabitEl(habitId);
+    _refreshMeta();
+    render.refreshMoods();
+}
+
+
 window.dayDetail = {
     open: openDayDetail,
     toggle: toggleHabitForDay,
+    changeCounter: changeCounterForDay,
 };
