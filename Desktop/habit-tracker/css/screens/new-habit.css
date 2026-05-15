@@ -201,6 +201,28 @@
     gap: 16px;
 }
 
+.target-mode {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+}
+
+.target-mode-btn {
+    border-radius: var(--radius-sm);
+    height: 32px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.target-mode-btn-active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
 .target-row {
     display: grid;
     grid-template-columns: 40fr 60fr;
@@ -287,6 +309,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .step-btn {
@@ -391,12 +416,16 @@
 
 
 /* ============================================
-   REMINDER
+   REMINDER — multi
    ============================================ */
 
-.reminder {
+.reminder-multi {
     background: var(--bg-card);
     border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.reminder-toggle-row {
     height: 56px;
     padding: 0 16px;
     display: flex;
@@ -404,7 +433,7 @@
     justify-content: space-between;
 }
 
-.reminder-info {
+.reminder-toggle-info {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -416,14 +445,78 @@
     filter: brightness(0) invert(1);
 }
 
-.reminder-time {
+.reminder-toggle-label {
     font-size: 16px;
     font-weight: 500;
     color: var(--text-primary);
 }
 
-.reminder-time-off {
-    color: var(--text-secondary);
+.reminder-times-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.reminder-time-row {
+    height: 52px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid var(--bg-elevated);
+}
+
+.reminder-time-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    padding: 0;
+}
+
+.reminder-time-btn span {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.reminder-remove-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.reminder-remove-btn img {
+    width: 10px;
+    height: 10px;
+    filter: brightness(0) saturate(100%) invert(48%);
+}
+
+.reminder-add-btn {
+    height: 48px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid var(--bg-elevated);
+    background: transparent;
+    width: 100%;
+}
+
+.reminder-add-icon {
+    width: 10px;
+    height: 10px;
+    filter: brightness(0) saturate(100%) invert(89%) sepia(31%) saturate(1234%) hue-rotate(28deg) brightness(105%) contrast(95%);
+}
+
+.reminder-add-btn span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--brand-lime);
 }
 
 
@@ -482,4 +575,18 @@
 
 .form-input-field::placeholder {
     color: var(--text-secondary);
+}
+
+
+/* ============================================
+   SCHEDULE ERROR
+   ============================================ */
+
+@keyframes schedule-error-flash {
+    0%, 100% { box-shadow: 0 0 0 0px var(--status-red); }
+    30%, 70% { box-shadow: 0 0 0 2px var(--status-red); }
+}
+
+.schedule-error {
+    animation: schedule-error-flash 0.7s ease;
 }

@@ -18,7 +18,7 @@
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     padding: 24px;
-    z-index: 2;
+    z-index: 30;
     text-align: center;
 }
 
@@ -94,4 +94,217 @@
 .alert-btn-cancel {
     background: var(--bg-elevated);
     color: var(--text-primary);
+}
+
+.alert-btn-primary {
+    background: var(--brand-lime);
+    color: var(--bg-primary);
+}
+
+.alert-icon-archive {
+    background: rgba(107, 113, 255, 0.15);
+}
+
+.alert-icon-archive-inner {
+    width: 24px;
+    height: 24px;
+    background-color: var(--brand-purple);
+    -webkit-mask: url('../../icons/archive.svg') no-repeat center / contain;
+    mask: url('../../icons/archive.svg') no-repeat center / contain;
+}
+
+/* ============================================
+   HINTS MODAL
+   ============================================ */
+
+.hint-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.hint-header-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--brand-lime-25);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.hint-sparkles-icon {
+    width: 28px;
+    height: 28px;
+    background-color: var(--brand-lime);
+    -webkit-mask: url('../../icons/sparkles.svg') no-repeat center / contain;
+    mask: url('../../icons/sparkles.svg') no-repeat center / contain;
+}
+
+.hint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.hint-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.hint-item-icon-wrap {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: var(--brand-purple-25);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-purple);
+}
+
+.hint-item-svg {
+    width: 22px;
+    height: 22px;
+}
+
+.hint-item-icon-mask {
+    width: 20px;
+    height: 20px;
+    background-color: var(--brand-purple);
+    flex-shrink: 0;
+}
+
+.hint-icon-arrows {
+    -webkit-mask: url('../../icons/arrows.svg') no-repeat center / contain;
+    mask: url('../../icons/arrows.svg') no-repeat center / contain;
+}
+
+.hint-item-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.hint-actions {
+    margin: 0;
+}
+
+
+/* ============================================
+   COUNTER EDIT POPUP — центрированный попап над sheet
+   ============================================ */
+
+.counter-edit-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.counter-edit-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.counter-edit-modal {
+    position: relative;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.counter-edit-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.counter-edit-value-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+}
+
+.counter-edit-value {
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.counter-edit-hint {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.counter-edit-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.counter-edit-controls {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.counter-edit-btn {
+    flex: 1;
+    height: 52px;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.counter-edit-btn-minus {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.counter-edit-btn-minus:disabled {
+    color: var(--text-secondary);
+}
+
+.counter-edit-btn-plus {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.counter-edit-done-btn {
+    height: 52px;
+    width: 100%;
+    background: var(--brand-lime);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 600;
+    color: #1D1D1D;
 }

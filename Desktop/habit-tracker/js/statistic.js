@@ -7,15 +7,17 @@ let activeStatTab = 'weekly';
 
 
 function openStatistic() {
-    activeStatTab = 'weekly';
+    const saved = storage.getSettings().lastStatTab || 'weekly';
+    activeStatTab = saved;
     showScreen('statistic');
-    setStatTab('weekly');
+    setStatTab(saved);
 }
 
 
 function setStatTab(tab) {
     if (tab !== 'weekly' && tab !== 'overall') return;
     activeStatTab = tab;
+    storage.updateSettings({ lastStatTab: tab });
 
     const screen = document.querySelector('[data-screen="statistic"]');
     screen.querySelectorAll('.stat-tab').forEach((btn) => {
@@ -43,7 +45,7 @@ function renderStatistic() {
 // ============================================
 
 function renderStatWeekly() {
-    const habits = storage.getHabits();
+    const habits = storage.getHabits().filter((h) => !h.archived);
     const list = document.querySelector('.stat-weekly-list');
     if (!list) return;
 
@@ -71,9 +73,14 @@ function renderStatWeeklyCard(habit) {
         const dayDate = day.date;
         const isBeforeCreated = dayDate < created;
         const isFuture = dayDate > today;
-        const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
-        const isSkipped = entry === 'Skipped' || entry === 'skipped';
-        const isMissed = isHabitDay && !isDone && !isSkipped && !isFuture && !isBeforeCreated && !isToday;
+        const t = habit.target || 1;
+        const isDone = habit.limitMode
+            ? (typeof entry === 'number' && entry > 0 && entry <= t)
+            : (entry === 'done' || (typeof entry === 'number' && entry >= t));
+        const isOverLimit = habit.limitMode && typeof entry === 'number' && entry > t;
+        const isSkipped = entry === 'Skipped';
+        const isPaused = isInPauseWindow(habit, dayDate) && isHabitDay && !isFuture && !isBeforeCreated;
+        const isMissed = isHabitDay && !isDone && !isSkipped && !isPaused && !isFuture && !isBeforeCreated && !isToday;
 
         let circleClass = 'stat-week-day-circle';
         let icon = '';
@@ -81,13 +88,13 @@ function renderStatWeeklyCard(habit) {
         if (isDone) {
             circleClass += ' stat-week-day-circle-done';
             icon = '<svg class="stat-week-day-icon" viewBox="0 0 14 14" fill="none"><path d="M2 7l3 3 7-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        } else if (isSkipped) {
+        } else if (isSkipped || isPaused) {
             circleClass += ' stat-week-day-circle-skipped';
-        } else if (isToday) {
-            circleClass += ' stat-week-day-circle-today';
-        } else if (isMissed) {
+        } else if (isOverLimit || isMissed) {
             circleClass += ' stat-week-day-circle-missed';
             icon = '<svg class="stat-week-day-icon" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>';
+        } else if (isToday) {
+            circleClass += ' stat-week-day-circle-today';
         }
 
         return `
@@ -105,7 +112,7 @@ function renderStatWeeklyCard(habit) {
                     <div class="stat-week-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
                     <div class="stat-week-text">
                         <p class="stat-week-name">${escapeHtml(habit.name)}</p>
-                        <p class="stat-week-streak">${streak} day streak</p>
+                        <p class="stat-week-streak">${streak > 0 ? `${streak} day streak` : ''}</p>
                     </div>
                 </div>
                 <span class="stat-week-schedule">${formatScheduleShort(habit.schedule)}</span>
@@ -122,7 +129,7 @@ function renderStatWeeklyCard(habit) {
 // ============================================
 
 function renderStatOverall() {
-    const habits = storage.getHabits();
+    const habits = storage.getHabits().filter((h) => !h.archived);
 
     // Summary
     const summary = calculateSummary(habits);
@@ -181,9 +188,9 @@ function renderStatOverallCard(habit) {
 
             <div class="stat-overall-divider"></div>
             <div class="stat-overall-legend">
-                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-done"></span>Done</div>
-                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-skipped"></span>Skipped</div>
-                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-missed"></span>Missed</div>
+                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-done"></span>${habit.limitMode ? 'Under limit' : 'Done'}</div>
+                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-skipped"></span>Paused</div>
+                <div class="stat-legend-item"><span class="stat-legend-dot stat-legend-dot-missed"></span>${habit.limitMode ? 'Over limit' : 'Missed'}</div>
             </div>
         </div>
     `;
@@ -221,22 +228,25 @@ function renderHeatmap12Weeks(habit) {
             const isBeforeCreated = cellDate < created;
             const dayKey = dayKeys[(cellDate.getDay() + 6) % 7];
             const isHabitDay = habit.schedule.includes(dayKey);
-            const isDone = entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1));
-            const isSkipped = entry === 'Skipped' || entry === 'skipped';
+            const t = habit.target || 1;
+            const isDone = habit.limitMode
+                ? (typeof entry === 'number' && entry > 0 && entry <= t)
+                : (entry === 'done' || (typeof entry === 'number' && entry >= t));
+            const isOverLimit = habit.limitMode && typeof entry === 'number' && entry > t;
+            const isSkipped = entry === 'Skipped';
 
             let cellClass = 'stat-heatmap-cell';
-            let inlineStyle = '';
 
             if (isFuture || isBeforeCreated) {
                 // пустая
             } else if (isDone) {
                 cellClass += ' stat-heatmap-cell-done';
-            } else if (isSkipped) {
+            } else if (isSkipped || isInPauseWindow(habit, cellDate)) {
                 cellClass += ' stat-heatmap-cell-skipped';
+            } else if (isOverLimit || (!isToday && isHabitDay)) {
+                cellClass += ' stat-heatmap-cell-missed';
             } else if (isToday) {
                 cellClass += ' stat-heatmap-cell-today';
-            } else if (isHabitDay) {
-                cellClass += ' stat-heatmap-cell-missed';
             }
 
             const style = `grid-row: ${row + 1}; grid-column: ${col + 1};`;
@@ -245,13 +255,6 @@ function renderHeatmap12Weeks(habit) {
     }
 
     return cells.join('');
-}
-
-
-// Парсит "YYYY-MM-DD" как локальную дату без UTC-сюрпризов
-function parseLocalDate(str) {
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
 }
 
 
@@ -270,9 +273,11 @@ function calculateSummary(habits) {
         if (streak > bestStreak) bestStreak = streak;
 
         Object.values(habit.entries).forEach((entry) => {
-            if (entry === 'done' || (typeof entry === 'number' && entry >= (habit.target || 1))) {
-                totalDone++;
-            }
+            const t = habit.target || 1;
+            const isDone = habit.limitMode
+                ? (typeof entry === 'number' && entry > 0 && entry <= t)
+                : (entry === 'done' || (typeof entry === 'number' && entry >= t));
+            if (isDone) totalDone++;
         });
 
         const habitSuccess = calculateSuccessPercent(habit);
@@ -304,12 +309,16 @@ function calculateSuccessPercent(habit) {
     const cursor = new Date(created);
     while (cursor <= today) {
         const dayKey = dayKeys[(cursor.getDay() + 6) % 7];
-        if (habit.schedule.includes(dayKey)) {
-            scheduledDays++;
+        if (habit.schedule.includes(dayKey) && !isInPauseWindow(habit, cursor)) {
             const key = formatDateKey(cursor);
             const entry = habit.entries[key];
-            if (entry === 'done' || (typeof entry === 'number' && entry >= target)) {
-                doneDays++;
+            const isSkipped = entry === 'Skipped';
+            if (!isSkipped) {
+                scheduledDays++;
+                const isDone = habit.limitMode
+                    ? (typeof entry === 'number' && entry > 0 && entry <= target)
+                    : (entry === 'done' || (typeof entry === 'number' && entry >= target));
+                if (isDone) doneDays++;
             }
         }
         cursor.setDate(cursor.getDate() + 1);
@@ -325,16 +334,26 @@ function calculateBestStreak(habit) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const target = habit.target || 1;
+    const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
     for (let i = 365; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
+        const dayKey = dayKeys[d.getDay()];
+        if (!habit.schedule.includes(dayKey)) continue;
+        if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = habit.entries[key];
+        const isSkipped = entry === 'Skipped';
+        const isDone = habit.limitMode
+            ? (typeof entry === 'number' && entry > 0 && entry <= target)
+            : (entry === 'done' || (typeof entry === 'number' && entry >= target));
 
-        if (entry === 'done' || (typeof entry === 'number' && entry >= target)) {
-            temp++;
-            if (temp > best) best = temp;
+        if (isDone || isSkipped) {
+            if (isDone) {
+                temp++;
+                if (temp > best) best = temp;
+            }
         } else {
             temp = 0;
         }
@@ -359,23 +378,29 @@ function moodColor(percent) {
 function getCurrentWeekDays() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const monday = new Date(today);
-    const dayOfWeek = (today.getDay() + 6) % 7;
-    monday.setDate(today.getDate() - dayOfWeek);
 
-    const dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    const dayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const s = storage.getSettings();
+    const startOn = s.startWeekOn || 'monday';
+    const startDayJs = { monday: 1, sunday: 0, saturday: 6 }[startOn] ?? 1;
+
+    const startOfWeek = new Date(today);
+    const diff = (today.getDay() - startDayJs + 7) % 7;
+    startOfWeek.setDate(today.getDate() - diff);
+
+    const allLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const allDayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const days = [];
 
     for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
+        const d = new Date(startOfWeek);
+        d.setDate(startOfWeek.getDate() + i);
         d.setHours(0, 0, 0, 0);
+        const dow = d.getDay();
         days.push({
             date: d,
             key: formatDateKey(d),
-            letter: dayLetters[i],
-            dayKey: dayKeys[i]
+            letter: allLetters[dow],
+            dayKey: allDayKeys[dow]
         });
     }
 

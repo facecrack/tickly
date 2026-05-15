@@ -12,8 +12,9 @@ function createDefaultFormState() {
         target: 1,
         unit: '',
         step: 1,
+        limitMode: false,
         schedule: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-        reminder: { enabled: false, time: '09:00' }
+        reminders: []
     };
 }
 
@@ -50,8 +51,9 @@ function openEditForm(habitId) {
         target: habit.target || 1,
         unit: habit.unit || '',
         step: habit.step || 1,
+        limitMode: habit.limitMode || false,
         schedule: [...habit.schedule],
-        reminder: { ...habit.reminder }
+        reminders: [...(habit.reminders || [])]
     };
 
     if (formState.type === 'binary') {
@@ -75,12 +77,13 @@ function updateFormTitle(text) {
 function setType(newType) {
     if (newType !== 'binary' && newType !== 'counter') return;
     formState.type = newType;
-
+    const savedPrev = window.getPreviousScreen();
     if (newType === 'binary') {
         showScreen('new-habit-binary');
     } else {
         showScreen('new-habit-counter');
     }
+    window.setPreviousScreen(savedPrev);
     updateFormTitle(editingHabitId ? 'Edit habit' : 'New habit');
     renderForm();
 }
@@ -116,7 +119,24 @@ function applyPreset(preset) {
 
 
 function toggleReminder() {
-    formState.reminder.enabled = !formState.reminder.enabled;
+    if (formState.reminders.length > 0) {
+        formState.reminders = [];
+    } else {
+        formState.reminders = [{ time: '09:00' }];
+    }
+    renderForm();
+}
+
+
+function addReminder() {
+    if (formState.reminders.length >= 3) return;
+    formState.reminders.push({ time: '09:00' });
+    renderForm();
+}
+
+
+function removeReminder(index) {
+    formState.reminders.splice(index, 1);
     renderForm();
 }
 
@@ -137,6 +157,12 @@ function setTarget(value) {
 }
 
 
+function setLimitMode(isLimit) {
+    formState.limitMode = isLimit;
+    renderForm();
+}
+
+
 function changeStep(delta) {
     const newStep = formState.step + delta;
     formState.step = newStep < 1 ? 1 : newStep;
@@ -144,10 +170,18 @@ function changeStep(delta) {
 }
 
 
-function saveHabit() {
+async function saveHabit() {
     const name = formState.name.trim();
     if (!name) return;
-    if (formState.schedule.length === 0) return;
+    if (formState.schedule.length === 0) {
+        const screenName = formState.type === 'binary' ? 'new-habit-binary' : 'new-habit-counter';
+        const scheduleEl = document.querySelector(`[data-screen="${screenName}"] .schedule`);
+        if (scheduleEl) {
+            scheduleEl.classList.add('schedule-error');
+            setTimeout(() => scheduleEl.classList.remove('schedule-error'), 700);
+        }
+        return;
+    }
 
     const habitData = {
         name: name,
@@ -155,24 +189,50 @@ function saveHabit() {
         color: formState.color,
         type: formState.type,
         schedule: [...formState.schedule],
-        reminder: { ...formState.reminder }
+        reminders: [...formState.reminders]
     };
 
     if (formState.type === 'counter') {
         habitData.target = formState.target;
         habitData.unit = formState.unit;
         habitData.step = formState.step;
+        habitData.limitMode = formState.limitMode;
+    } else {
+        habitData.unit = undefined;
+        habitData.target = undefined;
+        habitData.step = undefined;
+        habitData.limitMode = undefined;
     }
 
     if (editingHabitId) {
-        // Edit mode — update
-        storage.updateHabit(editingHabitId, habitData);
+        const savedId = editingHabitId;
+        const existing = storage.getHabit(savedId);
+        if (existing && existing.type !== habitData.type) {
+            habitData.entries = {};
+        }
+        storage.updateHabit(savedId, habitData);
         editingHabitId = null;
+        if (habitData.reminders.length > 0 && !storage.getSettings().remindersEnabled) {
+            const granted = await notifications.requestPermission();
+            if (granted) storage.updateSettings({ remindersEnabled: true });
+        }
+        notifications.scheduleReminders();
+        detail.open(savedId);
     } else {
         storage.addHabit(habitData);
+        if (habitData.reminders.length > 0 && !storage.getSettings().remindersEnabled) {
+            const granted = await notifications.requestPermission();
+            if (granted) storage.updateSettings({ remindersEnabled: true });
+        }
+        notifications.scheduleReminders();
+        if (!storage.getSettings().hintShown) {
+            storage.updateSettings({ hintShown: true });
+            render.main();
+            setTimeout(() => showAlert('hints'), 300);
+        } else {
+            render.main();
+        }
     }
-
-    render.main();
 }
 
 
@@ -182,12 +242,12 @@ function renderForm() {
     if (!screen) return;
 
     const iconPreview = screen.querySelector('.icon-preview-emoji');
-if (iconPreview) iconPreview.textContent = formState.icon;
+    if (iconPreview) iconPreview.textContent = formState.icon;
 
-const iconPreviewBtn = screen.querySelector('.icon-preview');
-if (iconPreviewBtn) {
-    iconPreviewBtn.style.backgroundColor = pickers.colorToBg(formState.color);
-}
+    const iconPreviewBtn = screen.querySelector('.icon-preview');
+    if (iconPreviewBtn) {
+        iconPreviewBtn.style.backgroundColor = pickers.colorToBg(formState.color);
+    }
 
     const nameInput = screen.querySelector('.form-input-field');
     if (nameInput && nameInput.value !== formState.name) {
@@ -203,16 +263,34 @@ if (iconPreviewBtn) {
 
     updateActivePreset(screen);
 
-    const toggle = screen.querySelector('.reminder .toggle');
-    const reminderTime = screen.querySelector('.reminder-time');
-    if (toggle) toggle.classList.toggle('toggle-on', formState.reminder.enabled);
-    if (reminderTime) {
-        if (formState.reminder.enabled) {
-            reminderTime.textContent = formatReminderTime(formState.reminder.time);
-            reminderTime.classList.remove('reminder-time-off');
+    const multiToggle = screen.querySelector('.reminder-multi .toggle');
+    if (multiToggle) multiToggle.classList.toggle('toggle-on', formState.reminders.length > 0);
+
+    const reminderLabel = screen.querySelector('.reminder-toggle-label');
+    if (reminderLabel) reminderLabel.textContent = formState.reminders.length > 0 ? 'On' : 'Off';
+
+    const timesList = screen.querySelector('.reminder-times-list');
+    if (timesList) {
+        if (formState.reminders.length === 0) {
+            timesList.innerHTML = '';
         } else {
-            reminderTime.textContent = 'Off';
-            reminderTime.classList.add('reminder-time-off');
+            const rows = formState.reminders.map((r, i) => `
+                <div class="reminder-time-row">
+                    <button class="reminder-time-btn" data-action="open-time-picker" data-reminder-index="${i}">
+                        <span>${formatReminderTime(r.time)}</span>
+                    </button>
+                    <button class="reminder-remove-btn" data-action="remove-reminder" data-reminder-index="${i}">
+                        <img src="icons/close.svg" alt="Remove">
+                    </button>
+                </div>
+            `).join('');
+            const addBtn = formState.reminders.length < 3 ? `
+                <button class="reminder-add-btn" data-action="add-reminder">
+                    <img src="icons/plus.svg" alt="" class="reminder-add-icon">
+                    <span>Add reminder</span>
+                </button>
+            ` : '';
+            timesList.innerHTML = rows + addBtn;
         }
     }
 
@@ -234,6 +312,15 @@ if (iconPreviewBtn) {
 
         const unitBtn = screen.querySelector('.target-unit-btn span:first-child');
         if (unitBtn) unitBtn.textContent = formState.unit || 'Choose unit';
+
+        const modeBtns = screen.querySelectorAll('.target-mode-btn');
+        if (modeBtns.length === 2) {
+            modeBtns[0].classList.toggle('target-mode-btn-active', !formState.limitMode);
+            modeBtns[1].classList.toggle('target-mode-btn-active', formState.limitMode);
+        }
+
+        const goalLabel = screen.querySelector('.target-goal-label');
+        if (goalLabel) goalLabel.textContent = formState.limitMode ? 'Limit' : 'Goal';
     }
 
     const saveBtn = screen.querySelector('.save-btn');
@@ -273,7 +360,53 @@ function arraysEqual(a, b) {
 
 
 function formatReminderTime(time) {
-    return time;
+    if (storage.getSettings().timeFormat !== '12h') return time;
+    const [h, m] = time.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+
+function initStepRepeat() {
+    let _holdTimer = null;
+    let _holdInterval = null;
+    let _longPressActive = false;
+    let _holdStartX = 0;
+    let _holdStartY = 0;
+
+    function stopHold() {
+        if (_holdTimer) { clearTimeout(_holdTimer); _holdTimer = null; }
+        if (_holdInterval) { clearInterval(_holdInterval); _holdInterval = null; }
+    }
+
+    document.addEventListener('touchstart', (e) => {
+        const btn = e.target.closest('.step-btn-plus, .step-btn-minus');
+        if (!btn) return;
+        const delta = btn.classList.contains('step-btn-plus') ? 1 : -1;
+        stopHold();
+        _longPressActive = false;
+        _holdStartX = e.touches[0].clientX;
+        _holdStartY = e.touches[0].clientY;
+        _holdTimer = setTimeout(() => {
+            _holdTimer = null;
+            _longPressActive = true;
+            _holdInterval = setInterval(() => changeStep(delta), 150);
+        }, 500);
+    }, { passive: true });
+
+    document.addEventListener('touchend', stopHold, { passive: true });
+    document.addEventListener('touchcancel', stopHold, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!_holdTimer && !_holdInterval) return;
+        const t = e.touches[0];
+        if (Math.hypot(t.clientX - _holdStartX, t.clientY - _holdStartY) > 10) stopHold();
+    }, { passive: true });
+
+    document.addEventListener('click', (e) => {
+        if (_longPressActive) { _longPressActive = false; e.stopPropagation(); }
+    }, true);
 }
 
 
@@ -286,8 +419,12 @@ window.form = {
     toggleDay: toggleDay,
     applyPreset: applyPreset,
     toggleReminder: toggleReminder,
+    addReminder: addReminder,
+    removeReminder: removeReminder,
     setName: setName,
     setTarget: setTarget,
     changeStep: changeStep,
+    setLimitMode: setLimitMode,
+    initStepRepeat: initStepRepeat,
     save: saveHabit
 };

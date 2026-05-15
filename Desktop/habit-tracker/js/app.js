@@ -11,6 +11,8 @@ let activeAlert = null;
 
 
 function showScreen(name) {
+    if (window.render && render.hideMoodTooltip) render.hideMoodTooltip();
+
     const screens = document.querySelectorAll('[data-screen]');
     screens.forEach((screen) => {
         screen.hidden = true;
@@ -36,6 +38,7 @@ function showScreen(name) {
 
 const backdrop = document.querySelector('.sheet-backdrop');
 
+let _sheetScrollY = 0;
 
 function showSheet(name) {
     if (activeSheet) hideSheet();
@@ -45,6 +48,11 @@ function showSheet(name) {
         console.warn(`Модалка "${name}" не найдена`);
         return;
     }
+
+    _sheetScrollY = window.scrollY;
+    document.body.style.top = `-${_sheetScrollY}px`;
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
 
     sheet.hidden = false;
     backdrop.hidden = false;
@@ -57,6 +65,11 @@ function hideSheet() {
     if (sheet) sheet.hidden = true;
     backdrop.hidden = true;
     activeSheet = null;
+
+    document.body.style.removeProperty('position');
+    document.body.style.removeProperty('top');
+    document.body.style.removeProperty('width');
+    window.scrollTo(0, _sheetScrollY);
 }
 
 
@@ -89,7 +102,12 @@ if (backdrop) {
 }
 
 
+settings.applyTheme(storage.getSettings().theme);
+
 render.main();
+dragdrop.init();
+habits.initRepeat();
+form.initStepRepeat();
 
 
 window.showScreen = showScreen;
@@ -98,13 +116,29 @@ window.hideSheet = hideSheet;
 window.showAlert = showAlertModal;
 window.hideAlert = hideAlertModal;
 window.getPreviousScreen = () => previousScreen;
+window.setPreviousScreen = (name) => { previousScreen = name; };
 
 
 // Регистрация Service Worker для PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/habit-tracker/service-worker.js')
-            .then((reg) => console.log('SW зарегистрирован:', reg.scope))
+        navigator.serviceWorker.register('./service-worker.js')
+            .then((reg) => {
+                console.log('SW зарегистрирован:', reg.scope);
+                notifications.scheduleReminders();
+            })
             .catch((err) => console.warn('SW регистрация не удалась:', err));
     });
+
+    // Автоперезагрузка при активации нового SW — гарантирует свежий код
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+    });
 }
+
+// Перепланируем уведомления при возврате в приложение
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        notifications.scheduleReminders();
+    }
+});

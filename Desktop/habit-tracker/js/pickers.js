@@ -4,6 +4,7 @@
 
 
 let pickerDraft = {};
+let editingReminderIndex = 0;
 
 
 // ============================================
@@ -92,69 +93,224 @@ function cancelPicker() {
 
 
 // ============================================
-// TIME PICKER
+// TIME PICKER — scroll wheel
 // ============================================
 
-function openTimePicker() {
-    const [h, m] = formState.reminder.time.split(':').map(Number);
-    pickerDraft = { hour24: h, minute: m };
-    renderTimePicker();
-    showSheet('time');
-}
+const ITEM_H = 44;
+let twHour = null, twMin = null, twPeriod = null;
 
 
-function renderTimePicker() {
-    const sheet = document.querySelector('[data-sheet="time"]');
-    if (!sheet) return;
-
-    const cols = sheet.querySelectorAll('.time-col');
-    const hourCol = cols[0];
-    const minCol = cols[1];
-    const periodCol = cols[2];
-
-    const hour12 = pickerDraft.hour24 % 12 === 0 ? 12 : pickerDraft.hour24 % 12;
-    const period = pickerDraft.hour24 < 12 ? 'AM' : 'PM';
-
-    const hourCells = hourCol.querySelectorAll('.time-cell');
-    hourCells[0].textContent = pad((hour12 - 2 + 11) % 12 + 1);
-    hourCells[1].textContent = pad((hour12 - 1 + 11) % 12 + 1);
-    hourCells[2].textContent = pad(hour12);
-    hourCells[3].textContent = pad((hour12) % 12 + 1);
-    hourCells[4].textContent = pad((hour12 + 1) % 12 + 1);
-
-    const minCells = minCol.querySelectorAll('.time-cell');
-    minCells[0].textContent = pad((pickerDraft.minute - 2 + 60) % 60);
-    minCells[1].textContent = pad((pickerDraft.minute - 1 + 60) % 60);
-    minCells[2].textContent = pad(pickerDraft.minute);
-    minCells[3].textContent = pad((pickerDraft.minute + 1) % 60);
-    minCells[4].textContent = pad((pickerDraft.minute + 2) % 60);
-
-    const periodCells = periodCol.querySelectorAll('.time-cell');
-    periodCells[2].textContent = period;
-}
-
-
-function timeStep(direction, column) {
-    if (column === 'hour') {
-        pickerDraft.hour24 = (pickerDraft.hour24 + direction + 24) % 24;
-    } else if (column === 'minute') {
-        pickerDraft.minute = (pickerDraft.minute + direction + 60) % 60;
+class TimeWheel {
+    constructor(el, count) {
+        this.el = el;
+        this.count = count;
+        this._raf = null;
+        this._wheelTimer = null;
+        this._ac = new AbortController();
+        this._attach();
     }
-    renderTimePicker();
+
+    destroy() {
+        this._ac.abort();
+        if (this._raf) cancelAnimationFrame(this._raf);
+        clearTimeout(this._wheelTimer);
+    }
+
+    _attach() {
+        const sig = this._ac.signal;
+        let startY, startTop, lastY, lastT, vel;
+
+        this.el.addEventListener('touchstart', e => {
+            if (this._raf) cancelAnimationFrame(this._raf);
+            startY = lastY = e.touches[0].clientY;
+            startTop = this.el.scrollTop;
+            vel = 0;
+            lastT = performance.now();
+        }, { passive: true, signal: sig });
+
+        this.el.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const y = e.touches[0].clientY;
+            const now = performance.now();
+            const dt = now - lastT || 1;
+            vel = (lastY - y) / dt;
+            lastY = y;
+            lastT = now;
+            this.el.scrollTop = startTop + (startY - y);
+            this._updateSelected();
+        }, { passive: false, signal: sig });
+
+        this.el.addEventListener('touchend', () => this._settle(vel), { passive: true, signal: sig });
+
+        this.el.addEventListener('wheel', e => {
+            e.preventDefault();
+            this.el.scrollTop += e.deltaY;
+            this._updateSelected();
+            clearTimeout(this._wheelTimer);
+            this._wheelTimer = setTimeout(() => this._settle(0), 150);
+        }, { passive: false, signal: sig });
+
+        this.el.addEventListener('click', e => {
+            const item = e.target.closest('.time-item');
+            if (!item) return;
+            const items = this.el.querySelectorAll('.time-item');
+            const idx = Array.from(items).indexOf(item);
+            if (idx >= 0) this._animateTo(idx * ITEM_H);
+        }, { signal: sig });
+    }
+
+    _updateSelected() {
+        const idx = this.getIndex();
+        this.el.querySelectorAll('.time-item').forEach((el, i) => {
+            el.classList.toggle('time-item-selected', i === idx);
+        });
+    }
+
+    _settle(vel) {
+        const momentum = vel * 80;
+        const raw = this.el.scrollTop + momentum;
+        const max = (this.count - 1) * ITEM_H;
+        const target = Math.round(Math.max(0, Math.min(raw, max)) / ITEM_H) * ITEM_H;
+        this._animateTo(target);
+    }
+
+    _animateTo(target) {
+        if (this._raf) cancelAnimationFrame(this._raf);
+        const start = this.el.scrollTop;
+        const diff = target - start;
+        if (Math.abs(diff) < 1) {
+            this.el.scrollTop = target;
+            this._updateSelected();
+            return;
+        }
+        const dur = Math.min(380, Math.abs(diff) * 1.8);
+        const t0 = performance.now();
+        const step = now => {
+            const p = Math.min(1, (now - t0) / dur);
+            const e = 1 - Math.pow(1 - p, 3);
+            this.el.scrollTop = start + diff * e;
+            this._updateSelected();
+            if (p < 1) this._raf = requestAnimationFrame(step);
+        };
+        this._raf = requestAnimationFrame(step);
+    }
+
+    scrollToIndex(i, animate = true) {
+        const target = Math.max(0, Math.min(i, this.count - 1)) * ITEM_H;
+        if (animate) {
+            this._animateTo(target);
+        } else {
+            this.el.scrollTop = target;
+            this._updateSelected();
+        }
+    }
+
+    getIndex() {
+        return Math.max(0, Math.min(this.count - 1, Math.round(this.el.scrollTop / ITEM_H)));
+    }
 }
 
 
-function timeTogglePeriod() {
-    pickerDraft.hour24 = (pickerDraft.hour24 + 12) % 24;
-    renderTimePicker();
+function openTimePicker(index = 0) {
+    editingReminderIndex = index;
+    const reminder = formState.reminders[index];
+    const time = reminder ? reminder.time : '09:00';
+    const [h, m] = time.split(':').map(Number);
+    pickerDraft = { hour24: h, minute: m };
+    buildTimeWheels();
+    renderTimePickerRows();
+    showSheet('time');
+    requestAnimationFrame(() => requestAnimationFrame(scrollToCurrentTime));
+}
+
+
+function buildTimeWheels() {
+    if (twHour)   { twHour.destroy();   twHour   = null; }
+    if (twMin)    { twMin.destroy();    twMin    = null; }
+    if (twPeriod) { twPeriod.destroy(); twPeriod = null; }
+
+    const use12h = storage.getSettings().timeFormat === '12h';
+
+    const hourEl   = document.querySelector('[data-col="hour"] .time-col-scroll');
+    const minEl    = document.querySelector('[data-col="minute"] .time-col-scroll');
+    const periodWrap = document.querySelector('[data-col="period"]');
+    const periodEl = document.querySelector('[data-col="period"] .time-col-scroll');
+
+    if (!hourEl || !minEl) return;
+    if (periodWrap) periodWrap.hidden = !use12h;
+
+    const hours = use12h
+        ? Array.from({ length: 12 }, (_, i) => pad(i + 1))
+        : Array.from({ length: 24 }, (_, i) => pad(i));
+
+    hourEl.innerHTML =
+        '<div class="time-pad"></div>' +
+        hours.map(v => `<div class="time-item">${v}</div>`).join('') +
+        '<div class="time-pad"></div>';
+
+    minEl.innerHTML =
+        '<div class="time-pad"></div>' +
+        Array.from({ length: 60 }, (_, i) => `<div class="time-item">${pad(i)}</div>`).join('') +
+        '<div class="time-pad"></div>';
+
+    twHour = new TimeWheel(hourEl, hours.length);
+    twMin  = new TimeWheel(minEl, 60);
+
+    if (use12h && periodEl) {
+        periodEl.innerHTML =
+            '<div class="time-pad"></div>' +
+            '<div class="time-item">AM</div>' +
+            '<div class="time-item">PM</div>' +
+            '<div class="time-pad"></div>';
+        twPeriod = new TimeWheel(periodEl, 2);
+    } else {
+        twPeriod = null;
+    }
+}
+
+
+function scrollToCurrentTime() {
+    const use12h = storage.getSettings().timeFormat === '12h';
+    const h = pickerDraft.hour24;
+    const m = pickerDraft.minute;
+
+    if (!twHour || !twMin) return;
+
+    if (use12h) {
+        const hour12 = h % 12 === 0 ? 12 : h % 12;
+        twHour.scrollToIndex(hour12 - 1, false);
+        if (twPeriod) twPeriod.scrollToIndex(h >= 12 ? 1 : 0, false);
+    } else {
+        twHour.scrollToIndex(h, false);
+    }
+    twMin.scrollToIndex(m, false);
+}
+
+
+function readTimeWheels() {
+    const use12h = storage.getSettings().timeFormat === '12h';
+    if (!twHour || !twMin) return;
+
+    const hourIdx = twHour.getIndex();
+    const minIdx  = twMin.getIndex();
+
+    if (use12h) {
+        const hour12 = hourIdx + 1;  // 1–12
+        const isPM   = twPeriod ? twPeriod.getIndex() === 1 : false;
+        pickerDraft.hour24 = (hour12 % 12) + (isPM ? 12 : 0);
+    } else {
+        pickerDraft.hour24 = hourIdx;
+    }
+    pickerDraft.minute = minIdx;
 }
 
 
 function saveTimePicker() {
-    const h = pad(pickerDraft.hour24);
-    const m = pad(pickerDraft.minute);
-    formState.reminder.time = `${h}:${m}`;
-    formState.reminder.enabled = true;
+    readTimeWheels();
+    const timeStr = `${pad(pickerDraft.hour24)}:${pad(pickerDraft.minute)}`;
+    if (formState.reminders[editingReminderIndex]) {
+        formState.reminders[editingReminderIndex].time = timeStr;
+    }
     hideSheet();
     renderForm();
 }
@@ -247,9 +403,35 @@ function selectSound(label) {
         'Chirp': 'chirp',
         'None (vibration only)': 'none'
     };
-    storage.updateSettings({ sound: map[label] });
+    const key = map[label];
+    storage.updateSettings({ sound: key });
+    sounds.play(key);
     hideSheet();
-    settings.render();
+    const settingsScreen = document.querySelector('[data-screen="settings"]');
+    if (settingsScreen && !settingsScreen.hidden) {
+        settings.render();
+    } else {
+        renderTimePickerRows();
+        showSheet('time');
+    }
+}
+
+
+function renderTimePickerRows() {
+    const s = storage.getSettings();
+    const soundLabel = document.querySelector('.time-picker-sound-label');
+    if (soundLabel) soundLabel.textContent = formatSoundLabel(s.sound);
+}
+
+
+function formatSoundLabel(value) {
+    const map = {
+        'gentle-chime': 'Gentle chime',
+        'bell': 'Bell',
+        'chirp': 'Chirp',
+        'none': 'None (vibration only)'
+    };
+    return map[value] || value;
 }
 
 
@@ -334,8 +516,6 @@ window.pickers = {
     saveIcon: saveIconPicker,
     cancel: cancelPicker,
     openTime: openTimePicker,
-    timeStep: timeStep,
-    timeTogglePeriod: timeTogglePeriod,
     saveTime: saveTimePicker,
     openUnit: openUnitPicker,
     selectUnit: selectUnit,

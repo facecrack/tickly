@@ -8,12 +8,19 @@ function renderSettings() {
     const screen = document.querySelector('[data-screen="settings"]');
     if (!screen) return;
 
+    // Archived section
+    const archived = storage.getHabits().filter((h) => h.archived);
+    const archivedGroup = screen.querySelector('.settings-archived-group');
+    if (archivedGroup) {
+        archivedGroup.hidden = archived.length === 0;
+        const countEl = archivedGroup.querySelector('.settings-archived-count');
+        if (countEl) countEl.textContent = `${archived.length} ${archived.length === 1 ? 'habit' : 'habits'}`;
+    }
+
     // Theme
     const themeOptions = screen.querySelectorAll('.theme-option');
-    themeOptions.forEach((opt, i) => {
-        const isActive = (i === 0 && settings.theme === 'default') ||
-                          (i === 1 && settings.theme === 'minimal');
-        opt.classList.toggle('theme-option-active', isActive);
+    themeOptions.forEach((opt) => {
+        opt.classList.toggle('theme-option-active', opt.dataset.themeValue === (settings.theme || 'default'));
     });
 
     // Reminders toggle
@@ -44,9 +51,19 @@ function renderSettings() {
 
 
 function toggleReminders() {
-    const settings = storage.getSettings();
-    storage.updateSettings({ remindersEnabled: !settings.remindersEnabled });
+    const current = storage.getSettings();
+    const enabling = !current.remindersEnabled;
+
+    storage.updateSettings({ remindersEnabled: enabling });
     renderSettings();
+
+    if (enabling) {
+        notifications.requestPermission().then((granted) => {
+            if (granted) notifications.scheduleReminders();
+        });
+    } else {
+        notifications.cancelReminders();
+    }
 }
 
 
@@ -66,6 +83,29 @@ function exportData() {
 }
 
 
+function importData() {
+    const input = document.getElementById('import-file-input');
+    input.onchange = function () {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!data.habits) throw new Error('Invalid format');
+                storage.saveData(data);
+                window.location.reload();
+            } catch {
+                alert('Could not read the file. Make sure it\'s a valid Tickly backup.');
+            }
+        };
+        reader.readAsText(file);
+        input.value = '';
+    };
+    input.click();
+}
+
+
 function formatSound(value) {
     const map = {
         'gentle-chime': 'Gentle chime',
@@ -82,12 +122,75 @@ function capitalize(s) {
 }
 
 
+function openArchived() {
+    showScreen('archived');
+    renderArchived();
+}
+
+
+function renderArchived() {
+    const list = document.querySelector('[data-screen="archived"] .archived-list');
+    if (!list) return;
+    const habits = storage.getHabits().filter((h) => h.archived);
+    if (habits.length === 0) {
+        renderSettings();
+        showScreen('settings');
+        return;
+    }
+    list.innerHTML = habits.map((habit) => `
+        <div class="archived-item">
+            <div class="archived-item-icon" style="background-color: ${pickers.colorToBg(habit.color)};">${habit.icon}</div>
+            <div class="archived-item-info">
+                <p class="archived-item-name">${escapeHtml(habit.name)}</p>
+                <p class="archived-item-meta">${formatScheduleShort(habit.schedule)}</p>
+            </div>
+            <button class="archived-restore-btn" data-action="restore-habit" data-habit-id="${habit.id}">Restore</button>
+        </div>
+    `).join('');
+}
+
+
+function setTheme(value) {
+    storage.updateSettings({ theme: value });
+    applyTheme(value);
+    renderSettings();
+}
+
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.dataset.theme = 'light';
+    } else {
+        delete document.documentElement.dataset.theme;
+    }
+}
+
+
 // ============================================
 // ДОСТУПНОСТЬ
 // ============================================
 
+function clearHistory() {
+    storage.clearAllEntries();
+    hideAlert();
+    render.main();
+}
+
+function eraseAll() {
+    storage.clearData();
+    hideAlert();
+    render.main();
+}
+
+
 window.settings = {
     render: renderSettings,
     toggleReminders: toggleReminders,
-    export: exportData
+    export: exportData,
+    import: importData,
+    setTheme,
+    applyTheme,
+    openArchived,
+    renderArchived,
+    clearHistory,
+    eraseAll,
 };
