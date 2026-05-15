@@ -74,6 +74,7 @@ input, textarea {
     outline: none;
     user-select: text;
     -webkit-user-select: text;
+    caret-color: var(--brand-lime);
 }
 
 
