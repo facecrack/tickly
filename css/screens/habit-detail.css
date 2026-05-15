@@ -136,8 +136,8 @@
 }
 
 .today-target-edit-icon {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     filter: brightness(0) saturate(100%) invert(45%);
     flex-shrink: 0;
 }
