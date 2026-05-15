@@ -448,7 +448,10 @@
                 </div>
                 <div class="today-block-progress">
                     <span class="today-block-value">5</span>
-                    <span class="today-block-target">/ 8 glasses</span>
+                    <button class="today-block-target today-target-edit-btn" data-action="edit-today-target">
+                        <span class="today-block-target-text">/ 8 glasses</span>
+                        <img src="icons/edit.svg" alt="" class="today-target-edit-icon">
+                    </button>
                 </div>
                 <div class="today-block-bar">
                     <div class="today-block-bar-fill" style="width: 62.5%;"></div>
@@ -1141,6 +1144,21 @@
                 </button>
             </li>
         </ul>
+    </div>
+
+
+    <!-- DAILY TARGET OVERRIDE -->
+    <div class="sheet" data-sheet="daily-target" hidden>
+        <div class="sheet-handle"></div>
+        <header class="sheet-header">
+            <button class="sheet-action sheet-action-cancel" data-action="cancel-daily-target">Cancel</button>
+            <h2 class="sheet-title">Today's Target</h2>
+            <button class="sheet-action sheet-action-save" data-action="save-daily-target">Save</button>
+        </header>
+        <div class="daily-target-body">
+            <input type="number" id="dailyTargetInput" class="daily-target-input" inputmode="numeric" min="1">
+            <button class="daily-target-reset" data-action="clear-daily-target">Reset to default</button>
+        </div>
     </div>
 
 

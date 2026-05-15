@@ -372,6 +372,22 @@ case 'stat-tab':
         case 'confirm-erase-all':
             settings.eraseAll();
             break;
+
+        case 'edit-today-target':
+            detail.openTargetOverride();
+            break;
+
+        case 'save-daily-target':
+            detail.saveTodayTarget();
+            break;
+
+        case 'cancel-daily-target':
+            hideSheet();
+            break;
+
+        case 'clear-daily-target':
+            detail.clearTodayTarget();
+            break;
     }
 });
 

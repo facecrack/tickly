@@ -107,9 +107,21 @@
 }
 
 .today-block-target {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--bg-elevated);
+    padding: 3px 8px 3px 6px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     color: var(--text-secondary);
+    -webkit-tap-highlight-color: transparent;
+    margin-bottom: -2px;
+}
+
+.today-block-target:active {
+    opacity: 0.6;
 }
 
 .today-block-bar {
@@ -123,6 +135,21 @@
     height: 100%;
     background: var(--brand-purple);
     border-radius: var(--radius-full);
+}
+
+.today-target-edit-icon {
+    width: 11px;
+    height: 11px;
+    filter: brightness(0) saturate(100%) invert(45%);
+    flex-shrink: 0;
+}
+
+.today-block-target--overridden {
+    color: var(--brand-lime);
+}
+
+.today-block-target--overridden .today-target-edit-icon {
+    filter: brightness(0) saturate(100%) invert(80%) sepia(40%) saturate(800%) hue-rotate(40deg);
 }
 
 

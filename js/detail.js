@@ -104,13 +104,14 @@ function renderCounterDetail(habit) {
     const isPaused = !!habit.paused;
     const isInactive = isSkipped || isPaused;
     const todayValue = typeof rawValue === 'number' ? rawValue : 0;
-    const target = habit.target || 1;
-    const rawPercent = isInactive ? 0 : Math.round((todayValue / target) * 100);
+    const effectiveTarget = getEffectiveTarget(habit, today);
+    const isOverridden = !!(habit.dailyOverrides?.[today]);
+    const rawPercent = isInactive ? 0 : Math.round((todayValue / effectiveTarget) * 100);
     const displayPercent = habit.limitMode ? rawPercent : Math.min(100, rawPercent);
     const barPercent = Math.min(100, rawPercent);
 
-    const isComplete = !habit.limitMode && todayValue >= target;
-    const isOverLimit = !!habit.limitMode && todayValue > target;
+    const isComplete = !habit.limitMode && todayValue >= effectiveTarget;
+    const isOverLimit = !!habit.limitMode && todayValue > effectiveTarget;
 
     const todayPercent = screen.querySelector('.today-block-percent');
     if (todayPercent) todayPercent.textContent = displayPercent + '%';
@@ -122,8 +123,13 @@ function renderCounterDetail(habit) {
         todayValueEl.style.color = (!isInactive && isOverLimit) ? 'var(--status-red)' : '';
     }
 
-    const todayTarget = screen.querySelector('.today-block-target');
-    if (todayTarget) todayTarget.textContent = `/ ${target}${habit.unit ? habit.unit : ''}`;
+    const todayTargetBtn = screen.querySelector('.today-block-target');
+    if (todayTargetBtn) {
+        const textEl = todayTargetBtn.querySelector('.today-block-target-text');
+        if (textEl) textEl.textContent = `/ ${effectiveTarget}${habit.unit ? habit.unit : ''}`;
+        todayTargetBtn.classList.toggle('today-block-target--overridden', isOverridden);
+        todayTargetBtn.hidden = isInactive;
+    }
 
     const todayBar = screen.querySelector('.today-block-bar-fill');
     if (todayBar) {
@@ -315,14 +321,15 @@ function renderChart(habit) {
     const prevBtn = screen.querySelector('[data-action="chart-prev"]');
     if (prevBtn) prevBtn.disabled = chartOffset >= 7;
 
-    const target = habit.target || 1;
-    const maxValue = Math.max(target, ...days.map((d) => d.value));
+    const defaultTarget = habit.target || 1;
+    const maxValue = Math.max(defaultTarget, ...days.map((d) => d.value));
 
     chartBars.innerHTML = days.map((d) => {
+        const dayTarget = getEffectiveTarget(habit, d.key);
         const reachedTarget = habit.limitMode
-            ? (d.value > 0 && d.value <= target)
-            : d.value >= target;
-        const overLimit = habit.limitMode && d.value > target;
+            ? (d.value > 0 && d.value <= dayTarget)
+            : d.value >= dayTarget;
+        const overLimit = habit.limitMode && d.value > dayTarget;
         const heightPx = maxValue > 0 ? Math.round((d.value / maxValue) * 80) : 0;
         const colorClass = d.isSkipped ? 'bar-skipped'
             : overLimit ? 'bar-red'
@@ -365,16 +372,17 @@ function calculateStats(habit) {
     const entries = habit.entries;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const target = habit.target || 1;
 
     const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
     // Current streak — от сегодня назад, пропускаем незапланированные дни и паузу
     let currentStreak = 0;
-    const todayEntry = entries[formatDateKey(today)];
+    const todayKey = formatDateKey(today);
+    const todayEntry = entries[todayKey];
+    const todayTarget = getEffectiveTarget(habit, todayKey);
     const todayDone = habit.limitMode
-        ? (typeof todayEntry === 'number' && todayEntry > 0 && todayEntry <= target)
-        : (todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target));
+        ? (typeof todayEntry === 'number' && todayEntry > 0 && todayEntry <= todayTarget)
+        : (todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= todayTarget));
     const startOffset = todayDone ? 0 : 1;
     for (let i = startOffset; i < 365; i++) {
         const d = new Date(today);
@@ -384,6 +392,7 @@ function calculateStats(habit) {
         if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
+        const target = getEffectiveTarget(habit, key);
         const isSkipped = entry === 'Skipped';
         const isDone = habit.limitMode
             ? (typeof entry === 'number' && entry > 0 && entry <= target)
@@ -406,6 +415,7 @@ function calculateStats(habit) {
         if (isInPauseWindow(habit, d)) continue;
         const key = formatDateKey(d);
         const entry = entries[key];
+        const target = getEffectiveTarget(habit, key);
         const isSkipped = entry === 'Skipped';
         const isDone = habit.limitMode
             ? (typeof entry === 'number' && entry > 0 && entry <= target)
@@ -500,9 +510,66 @@ function updatePauseBtn(screen, isPaused) {
 // ДОСТУПНОСТЬ
 // ============================================
 
+// ============================================
+// DAILY TARGET OVERRIDE
+// ============================================
+
+function openTodayTargetOverride() {
+    const habit = storage.getHabit(currentDetailHabitId);
+    if (!habit || habit.type !== 'counter') return;
+
+    const today = storage.getTodayString();
+    const effectiveTarget = getEffectiveTarget(habit, today);
+    const isOverridden = !!(habit.dailyOverrides?.[today]);
+
+    const input = document.getElementById('dailyTargetInput');
+    if (input) input.value = effectiveTarget;
+
+    const resetBtn = document.querySelector('[data-action="clear-daily-target"]');
+    if (resetBtn) resetBtn.hidden = !isOverridden;
+
+    showSheet('daily-target');
+    if (input) {
+        input.focus();
+        input.select();
+    }
+}
+
+function saveTodayTarget() {
+    const input = document.getElementById('dailyTargetInput');
+    const raw = parseInt(input?.value, 10);
+    if (!raw || raw <= 0) return;
+
+    const habit = storage.getHabit(currentDetailHabitId);
+    if (!habit) return;
+
+    const today = storage.getTodayString();
+    const isDefault = raw === (habit.target || 1);
+    storage.setDailyOverride(currentDetailHabitId, today, isDefault ? null : raw);
+    hideSheet();
+
+    const updated = storage.getHabit(currentDetailHabitId);
+    renderCounterDetail(updated);
+    render.updateCounter(currentDetailHabitId);
+}
+
+function clearTodayTarget() {
+    const today = storage.getTodayString();
+    storage.setDailyOverride(currentDetailHabitId, today, null);
+    hideSheet();
+
+    const habit = storage.getHabit(currentDetailHabitId);
+    renderCounterDetail(habit);
+    render.updateCounter(currentDetailHabitId);
+}
+
+
 window.detail = {
     open: openHabitDetail,
     changeMonth: changeHeatmapMonth,
     changeChartWeek,
-    currentId: () => currentDetailHabitId
+    currentId: () => currentDetailHabitId,
+    openTargetOverride: openTodayTargetOverride,
+    saveTodayTarget,
+    clearTodayTarget
 };

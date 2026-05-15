@@ -3,6 +3,11 @@
  */
 
 
+function getEffectiveTarget(habit, dateString) {
+    return habit.dailyOverrides?.[dateString] ?? (habit.target || 1);
+}
+
+
 function toggleHabit(habitId) {
     const habit = storage.getHabit(habitId);
     if (!habit || habit.type !== 'binary') return;
@@ -46,7 +51,7 @@ function changeCounter(habitId, delta) {
 
     const current = typeof raw === 'number' ? raw : 0;
     const step = habit.step || 1;
-    const target = habit.target || 1;
+    const target = getEffectiveTarget(habit, today);
 
     let newValue = current + (delta * step);
     if (newValue < 0) newValue = 0;
@@ -201,5 +206,6 @@ window.habits = {
     resume: resumeHabit,
     archive: archiveHabit,
     restore: restoreHabit,
-    initRepeat: initCounterRepeat
+    initRepeat: initCounterRepeat,
+    getEffectiveTarget
 };

@@ -133,7 +133,7 @@ function calculateDayMood(habits, day) {
         if (isSkipped) return;
 
         scheduled++;
-        const target = habit.target || 1;
+        const target = getEffectiveTarget(habit, day.key);
         const isDone = habit.limitMode
             ? (typeof entry === 'number' && entry > 0 && entry <= target)
             : (entry === 'done' || (typeof entry === 'number' && entry >= target));
@@ -224,7 +224,7 @@ function renderCounters(counters) {
     list.innerHTML = scheduled.map((habit) => {
         const rawValue = habit.entries[todayKey];
         const value = typeof rawValue === 'number' ? rawValue : 0;
-        const target = habit.target || 1;
+        const target = getEffectiveTarget(habit, todayKey);
 
         if (habit.paused) {
             return `
@@ -289,8 +289,8 @@ function renderCounters(counters) {
     const activeCounters = scheduled.filter(h => !h.paused);
     const allCountersDone = activeCounters.length > 0 && activeCounters.every(h => {
         const v = h.entries[todayKey];
-        if (h.limitMode) return typeof v === 'number' && v > 0 && v <= (h.target || 1);
-        return typeof v === 'number' && v >= (h.target || 1);
+        if (h.limitMode) return typeof v === 'number' && v > 0 && v <= getEffectiveTarget(h, todayKey);
+        return typeof v === 'number' && v >= getEffectiveTarget(h, todayKey);
     });
     const counterTitle = section.querySelector('.section-title');
     if (counterTitle) counterTitle.classList.toggle('section-title-done', allCountersDone);
@@ -363,13 +363,14 @@ function renderBinaries(binaries) {
 function calculateStreak(habit) {
     let streak = 0;
     const today = new Date();
-    const target = habit.target || 1;
     const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-    const todayEntry = habit.entries[formatDateKey(today)];
+    const todayKey = formatDateKey(today);
+    const todayEntry = habit.entries[todayKey];
+    const todayTarget = getEffectiveTarget(habit, todayKey);
     const todayDone = habit.limitMode
-        ? (typeof todayEntry === 'number' && todayEntry > 0 && todayEntry <= target)
-        : (todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= target));
+        ? (typeof todayEntry === 'number' && todayEntry > 0 && todayEntry <= todayTarget)
+        : (todayEntry === 'done' || (typeof todayEntry === 'number' && todayEntry >= todayTarget));
     const startOffset = todayDone ? 0 : 1;
 
     for (let i = startOffset; i < 365; i++) {
@@ -382,6 +383,7 @@ function calculateStreak(habit) {
 
         const key = formatDateKey(date);
         const entry = habit.entries[key];
+        const target = getEffectiveTarget(habit, key);
         const isSkipped = entry === 'Skipped';
         const isDone = habit.limitMode
             ? (typeof entry === 'number' && entry > 0 && entry <= target)
@@ -486,7 +488,7 @@ function updateCounter(habitId) {
     const today = storage.getTodayString();
     const rawValue = habit.entries[today];
     const value = typeof rawValue === 'number' ? rawValue : 0;
-    const target = habit.target || 1;
+    const target = getEffectiveTarget(habit, today);
     const percent = Math.min(100, (value / target) * 100);
     const isComplete = !habit.limitMode && value >= target;
     const isOverLimit = !!habit.limitMode && value > target;
@@ -537,8 +539,8 @@ function updateCounter(habitId) {
         const scheduledCounters = allHabits.filter(h => h.type === 'counter' && !h.paused && h.schedule.includes(todayDayKey));
         const allDone = scheduledCounters.length > 0 && scheduledCounters.every(h => {
             const v = h.entries[today];
-            if (h.limitMode) return typeof v === 'number' && v > 0 && v <= (h.target || 1);
-            return typeof v === 'number' && v >= (h.target || 1);
+            if (h.limitMode) return typeof v === 'number' && v > 0 && v <= getEffectiveTarget(h, today);
+            return typeof v === 'number' && v >= getEffectiveTarget(h, today);
         });
         const counterTitle = countersSection.querySelector('.section-title');
         if (counterTitle) counterTitle.classList.toggle('section-title-done', allDone);

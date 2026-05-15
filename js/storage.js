@@ -86,6 +86,7 @@ function migrateData(data) {
             }
             delete habit.reminder;
         }
+        if (habit.dailyOverrides === undefined) habit.dailyOverrides = {};
     });
     return data;
 }
@@ -216,6 +217,20 @@ function setEntry(habitId, dateString, value) {
 }
 
 
+function setDailyOverride(habitId, dateString, value) {
+    const data = loadData();
+    const habit = data.habits.find(h => h.id === habitId);
+    if (!habit) return;
+    if (!habit.dailyOverrides) habit.dailyOverrides = {};
+    if (value === null || value === undefined) {
+        delete habit.dailyOverrides[dateString];
+    } else {
+        habit.dailyOverrides[dateString] = value;
+    }
+    saveData(data);
+}
+
+
 // ============================================
 // РАБОТА С НАСТРОЙКАМИ
 // ============================================
@@ -281,5 +296,6 @@ window.storage = {
     getSettings,
     updateSettings,
     getTodayString,
-    reorderHabitsInSection
+    reorderHabitsInSection,
+    setDailyOverride
 };
